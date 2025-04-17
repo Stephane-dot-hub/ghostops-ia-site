@@ -1,114 +1,113 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GhostOps IA</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GhostOps IA – Agence Conseil IA</title>
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --primary: #0033ff;
+      --light-gray: #f3f4f6;
+    }
+
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background-color: #0a0d14;
-      color: #e2e8f0;
-      line-height: 1.6;
+      background-color: var(--bg);
+      color: var(--text);
     }
 
     header {
-      background: #0f111a;
-      padding: 30px;
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      border-bottom: 1px solid #e5e7eb;
       position: sticky;
       top: 0;
-      z-index: 999;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
+      background-color: white;
+      z-index: 100;
     }
 
     header h1 {
-      font-size: 2.8em;
       margin: 0;
-      color: #00f6ff;
-      letter-spacing: 1px;
-    }
-
-    nav {
-      margin-top: 10px;
+      font-size: 1.5em;
+      font-weight: 700;
+      color: var(--primary);
     }
 
     nav a {
-      color: #e2e8f0;
-      margin: 0 20px;
+      margin-left: 30px;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 1em;
-      transition: color 0.3s ease;
+      color: var(--text);
+      font-weight: 500;
     }
 
-    nav a:hover {
-      color: #00f6ff;
+    .hero {
+      padding: 100px 40px 60px;
+      text-align: center;
+      background-color: var(--light-gray);
+    }
+
+    .hero h2 {
+      font-size: 2.8em;
+      font-weight: 700;
+      margin-bottom: 15px;
+    }
+
+    .hero p {
+      font-size: 1.2em;
+      max-width: 700px;
+      margin: 0 auto 30px;
+      color: #555;
+    }
+
+    .btn {
+      background-color: var(--primary);
+      color: white;
+      padding: 14px 28px;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
     }
 
     section {
-      padding: 100px 20px;
+      padding: 80px 40px;
       max-width: 1100px;
       margin: auto;
     }
 
-    h2 {
-      font-size: 2.4em;
-      margin-bottom: 30px;
-      color: #ffffff;
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: start;
     }
 
-    .hero {
-      text-align: center;
-      background: linear-gradient(to right, #0a0d14, #111827);
-      padding: 150px 20px;
+    .offer-box {
+      border: 1px solid #e5e7eb;
+      padding: 30px;
+      border-radius: 10px;
+      background-color: #fff;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.03);
     }
 
-    .hero h1 {
-      font-size: 3.2em;
-      color: #00f6ff;
+    .testimonial {
+      font-style: italic;
       margin-bottom: 20px;
-    }
-
-    .hero p {
-      font-size: 1.3em;
-      max-width: 700px;
-      margin: 0 auto;
-      color: #cbd5e1;
-    }
-
-    .card {
-      background-color: #111827;
-      border-radius: 12px;
-      padding: 40px;
-      margin-bottom: 30px;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
-    }
-
-    .btn {
-      display: inline-block;
-      margin-top: 25px;
-      padding: 14px 30px;
-      background-color: #00f6ff;
-      color: #0a0d14;
-      font-weight: 700;
-      border-radius: 8px;
-      text-decoration: none;
-      transition: background 0.3s ease;
-    }
-
-    .btn:hover {
-      background-color: #00d6e0;
     }
 
     footer {
       text-align: center;
-      padding: 40px 0;
-      background: #0f111a;
-      color: #a0aec0;
+      padding: 40px;
+      background: #f9fafb;
+      font-size: 0.9em;
+      color: #888;
     }
   </style>
 </head>
@@ -118,74 +117,82 @@
     <nav>
       <a href="#about">À propos</a>
       <a href="#offers">Offres</a>
-      <a href="#testimonials">Témoignages</a>
+      <a href="#expertise">Expertise</a>
       <a href="#contact">Contact</a>
     </nav>
   </header>
 
   <section class="hero">
-    <h1>IA Stratégique & Opérationnelle</h1>
-    <p>Solutions concrètes, livrables instantanés. Pour décideurs exigeants, RH agiles, et structures ambitieuses.</p>
+    <h2>L’intelligence artificielle au service de vos opérations</h2>
+    <p>Conseil. Automatisation. Résultats mesurables. Pour dirigeants, consultants et RH exigeants.</p>
+    <a href="#contact" class="btn">Réserver un appel stratégique</a>
   </section>
 
   <section id="about">
-    <h2>👤 À propos</h2>
-    <div class="card">
-      <p>
-        GhostOps IA est une entité de conseil indépendante spécialisée dans la conception de solutions d’intelligence artificielle à fort impact.
-        Nous accompagnons dirigeants, consultants et équipes RH dans la transformation concrète de leurs flux métier, grâce à des outils IA sur-mesure.
-      </p>
-      <p>
-        Notre approche : ciblée, discrète, actionnable immédiatement. Zéro bullshit.
-      </p>
+    <div class="grid-2">
+      <div>
+        <h2>Qui sommes-nous ?</h2>
+        <p>GhostOps IA est une agence indépendante spécialisée dans les solutions IA à fort impact. Nous accompagnons les entreprises dans la mise en place de dispositifs IA concrets, sur mesure et orientés résultat.</p>
+        <p>Notre force : la capacité à intervenir vite, bien, et avec une exigence opérationnelle totale.</p>
+      </div>
+      <div>
+        <ul>
+          <li>✔️ Conseil stratégique IA</li>
+          <li>✔️ Automatisation des process métier</li>
+          <li>✔️ Génération de contenus RH & commerciaux</li>
+          <li>✔️ Coaching IA individuel ou collectif</li>
+        </ul>
+      </div>
     </div>
   </section>
 
   <section id="offers">
-    <h2>📦 Nos Offres</h2>
-    <div class="card">
-      <h3>📧 Pack Emails RH – 90 €</h3>
-      <p>10 e-mails RH générés par IA, adaptés à votre secteur, ton, objectifs. Format .doc + livrables modifiables.</p>
-      <a href="#" class="btn">Acheter ce pack</a>
+    <h2>Nos Offres</h2>
+    <div class="grid-2">
+      <div class="offer-box">
+        <h3>Pack Emails RH – 90 €</h3>
+        <p>10 e-mails stratégiques générés par IA selon vos enjeux RH. Format modifiable. Livraison rapide.</p>
+        <a href="#" class="btn">Commander</a>
+      </div>
+      <div class="offer-box">
+        <h3>CV IA + Coaching – 149 €</h3>
+        <p>Refonte complète de votre CV optimisé IA + coaching 1-to-1 de 30 minutes. Résultat immédiat.</p>
+        <a href="#" class="btn">Commander</a>
+      </div>
+      <div class="offer-box">
+        <h3>Audit IA PME – Sur devis</h3>
+        <p>Diagnostic rapide de votre activité et identification des leviers d’automatisation à forte valeur ajoutée.</p>
+        <a href="#contact" class="btn">Planifier un appel</a>
+      </div>
     </div>
-    <div class="card">
-      <h3>🎯 CV IA + Coaching – 149 €</h3>
-      <p>Refonte de CV par IA + session stratégique 30 min. Pitch, wording, structure et angles d’accroche optimisés.</p>
-      <a href="#" class="btn">Commander</a>
-    </div>
-    <div class="card">
-      <h3>📊 Audit IA pour PME – Sur devis</h3>
-      <p>Cartographie de vos process, analyse des goulots, recommandations d'automatisation. Ultra opérationnel.</p>
-      <a href="#contact" class="btn">Planifier un appel</a>
-    </div>
+  </section>
+
+  <section id="expertise">
+    <h2>Notre Approche</h2>
+    <p>GhostOps IA place l’exécution au cœur de sa stratégie. Nous construisons des dispositifs concrets, discrets et efficaces, sans superflu.</p>
+    <ul>
+      <li>🔍 Audit précis et sans jargon</li>
+      <li>⚙️ Automatisations opérationnelles</li>
+      <li>🧠 Contenus IA adaptés à votre métier</li>
+      <li>📊 Suivi & mesure d’impact</li>
+    </ul>
   </section>
 
   <section id="testimonials">
-    <h2>💬 Témoignages</h2>
-    <div class="card">
-      <p>“Nous avons automatisé les étapes critiques de recrutement en 8 jours. Zéro friction. GhostOps a compris notre besoin avant qu'on le formule.”</p>
-      <p><strong>Julie M. — DRH Industrie</strong></p>
-    </div>
-    <div class="card">
-      <p>“J’ai reçu 10 emails parfaitement ciblés en moins de 24h. Aucun mot à changer. Résultat : +52% de taux de réponse.”</p>
-      <p><strong>Karim L. — Consultant</strong></p>
-    </div>
-    <div class="card">
-      <p>“Simple, rapide, efficace. C’est tout ce que je cherchais. GhostOps coche toutes les cases.”</p>
-      <p><strong>Thomas B. — CEO Cabinet Conseil</strong></p>
-    </div>
+    <h2>Ils nous font confiance</h2>
+    <p class="testimonial">“Nous avons déployé une solution IA RH en moins de 10 jours. Gain de temps + impact. Merci GhostOps.”<br><strong>— Julie M., DRH</strong></p>
+    <p class="testimonial">“Mes emails commerciaux sont 10x plus efficaces depuis l’intervention de GhostOps IA.”<br><strong>— Karim L., Consultant</strong></p>
+    <p class="testimonial">“Exécution rapide, approche intelligente, zéro perte de temps.”<br><strong>— Thomas B., CEO</strong></p>
   </section>
 
   <section id="contact">
-    <h2>📆 Réserver un appel stratégique</h2>
-    <div class="card">
-      <p>15 minutes d’échange ciblé pour identifier les meilleures actions IA à engager dans votre business.</p>
-      <a href="https://calendly.com/stephane-kalanquin" class="btn" target="_blank">Réserver maintenant</a>
-    </div>
+    <h2>Prendre contact</h2>
+    <p>Réservez votre appel stratégique de 15 min pour voir comment l’IA peut transformer votre organisation.</p>
+    <a href="https://calendly.com/stephane-kalanquin" target="_blank" class="btn">Réserver maintenant</a>
   </section>
 
   <footer>
-    &copy; 2025 GhostOps IA — Tous droits réservés
+    &copy; 2025 GhostOps IA — Site propulsé avec stratégie & IA
   </footer>
 </body>
 </html>
