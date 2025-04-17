@@ -4,65 +4,111 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>GhostOps IA</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <link rel="icon" href="favicon.ico" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     body {
       margin: 0;
       font-family: 'Inter', sans-serif;
-      background-color: #0b0f19;
-      color: #f1f1f1;
+      background-color: #0a0d14;
+      color: #e2e8f0;
+      line-height: 1.6;
     }
+
     header {
-      background: #0f131f;
-      padding: 20px;
+      background: #0f111a;
+      padding: 30px;
       text-align: center;
       position: sticky;
       top: 0;
-      z-index: 1000;
+      z-index: 999;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.4);
     }
+
     header h1 {
+      font-size: 2.8em;
       margin: 0;
-      color: #00ffff;
-      font-size: 2em;
+      color: #00f6ff;
+      letter-spacing: 1px;
     }
+
     nav {
       margin-top: 10px;
     }
+
     nav a {
-      color: #f1f1f1;
+      color: #e2e8f0;
+      margin: 0 20px;
       text-decoration: none;
-      margin: 0 15px;
       font-weight: 600;
+      font-size: 1em;
+      transition: color 0.3s ease;
     }
+
+    nav a:hover {
+      color: #00f6ff;
+    }
+
     section {
-      padding: 80px 20px;
-      max-width: 1000px;
-      margin: 0 auto;
-      text-align: center;
+      padding: 100px 20px;
+      max-width: 1100px;
+      margin: auto;
     }
-    .offer {
-      background-color: #101622;
+
+    h2 {
+      font-size: 2.4em;
+      margin-bottom: 30px;
+      color: #ffffff;
+    }
+
+    .hero {
+      text-align: center;
+      background: linear-gradient(to right, #0a0d14, #111827);
+      padding: 150px 20px;
+    }
+
+    .hero h1 {
+      font-size: 3.2em;
+      color: #00f6ff;
+      margin-bottom: 20px;
+    }
+
+    .hero p {
+      font-size: 1.3em;
+      max-width: 700px;
+      margin: 0 auto;
+      color: #cbd5e1;
+    }
+
+    .card {
+      background-color: #111827;
       border-radius: 12px;
       padding: 40px;
-      margin: 30px auto;
-      max-width: 800px;
+      margin-bottom: 30px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.4);
     }
+
     .btn {
       display: inline-block;
-      margin-top: 20px;
-      padding: 12px 25px;
-      background-color: #00ffff;
-      color: #0b0f19;
-      font-weight: bold;
+      margin-top: 25px;
+      padding: 14px 30px;
+      background-color: #00f6ff;
+      color: #0a0d14;
+      font-weight: 700;
       border-radius: 8px;
       text-decoration: none;
+      transition: background 0.3s ease;
     }
+
+    .btn:hover {
+      background-color: #00d6e0;
+    }
+
     footer {
       text-align: center;
       padding: 40px 0;
-      color: #aaa;
-      font-size: 0.9em;
+      background: #0f111a;
+      color: #a0aec0;
     }
   </style>
 </head>
@@ -77,54 +123,65 @@
     </nav>
   </header>
 
+  <section class="hero">
+    <h1>IA Stratégique & Opérationnelle</h1>
+    <p>Solutions concrètes, livrables instantanés. Pour décideurs exigeants, RH agiles, et structures ambitieuses.</p>
+  </section>
+
   <section id="about">
-    <h2>👤 À propos de GhostOps IA</h2>
-    <p>
-      GhostOps IA est une cellule indépendante de conseil en intelligence artificielle, spécialisée dans la création de solutions concrètes et personnalisées pour les dirigeants, les équipes RH et les consultants exigeants.<br><br>
-      Nous combinons automatisation, IA générative et stratégie opérationnelle pour transformer vos processus métier et booster votre performance sans complexifier votre organisation.<br><br>
-      Notre force : une exécution rapide, des livrables exploitables immédiatement, et une discrétion totale.
-    </p>
+    <h2>👤 À propos</h2>
+    <div class="card">
+      <p>
+        GhostOps IA est une entité de conseil indépendante spécialisée dans la conception de solutions d’intelligence artificielle à fort impact.
+        Nous accompagnons dirigeants, consultants et équipes RH dans la transformation concrète de leurs flux métier, grâce à des outils IA sur-mesure.
+      </p>
+      <p>
+        Notre approche : ciblée, discrète, actionnable immédiatement. Zéro bullshit.
+      </p>
+    </div>
   </section>
 
   <section id="offers">
     <h2>📦 Nos Offres</h2>
-    <div class="offer">
-      <h3>Pack Email RH – 90 €</h3>
-      <p>10 e-mails RH rédigés par IA, adaptés à votre secteur et vos objectifs de communication. Livraison rapide.</p>
+    <div class="card">
+      <h3>📧 Pack Emails RH – 90 €</h3>
+      <p>10 e-mails RH générés par IA, adaptés à votre secteur, ton, objectifs. Format .doc + livrables modifiables.</p>
       <a href="#" class="btn">Acheter ce pack</a>
     </div>
-    <div class="offer">
-      <h3>CV IA + Coaching – 149 €</h3>
-      <p>CV restructuré, optimisé IA + session stratégique de 30 min. Impact immédiat sur votre image professionnelle.</p>
-      <a href="#" class="btn">Acheter ce pack</a>
+    <div class="card">
+      <h3>🎯 CV IA + Coaching – 149 €</h3>
+      <p>Refonte de CV par IA + session stratégique 30 min. Pitch, wording, structure et angles d’accroche optimisés.</p>
+      <a href="#" class="btn">Commander</a>
     </div>
-    <div class="offer">
-      <h3>Audit IA PME – Sur devis</h3>
-      <p>Diagnostic complet de vos processus métiers. Propositions concrètes d’automatisation et gains mesurables.</p>
-      <a href="#contact" class="btn">Demander un appel</a>
+    <div class="card">
+      <h3>📊 Audit IA pour PME – Sur devis</h3>
+      <p>Cartographie de vos process, analyse des goulots, recommandations d'automatisation. Ultra opérationnel.</p>
+      <a href="#contact" class="btn">Planifier un appel</a>
     </div>
   </section>
 
   <section id="testimonials">
-    <h2>💬 Ce qu’ils disent de GhostOps IA</h2>
-    <div class="offer">
-      <p>“Nous avons automatisé la gestion de nos recrutements en moins de 10 jours. L’approche GhostOps est rapide, pragmatique et redoutablement efficace.”</p>
-      <p><strong>Julie M. — DRH Groupe Industriel</strong></p>
+    <h2>💬 Témoignages</h2>
+    <div class="card">
+      <p>“Nous avons automatisé les étapes critiques de recrutement en 8 jours. Zéro friction. GhostOps a compris notre besoin avant qu'on le formule.”</p>
+      <p><strong>Julie M. — DRH Industrie</strong></p>
     </div>
-    <div class="offer">
-      <p>“GhostOps IA a identifié des opportunités d’automatisation que nos équipes n’avaient jamais envisagées. Résultat : +36% de productivité en 3 semaines.”</p>
-      <p><strong>Thomas B. — CEO cabinet de conseil</strong></p>
+    <div class="card">
+      <p>“J’ai reçu 10 emails parfaitement ciblés en moins de 24h. Aucun mot à changer. Résultat : +52% de taux de réponse.”</p>
+      <p><strong>Karim L. — Consultant</strong></p>
     </div>
-    <div class="offer">
-      <p>“En une seule session, j’ai obtenu une structure d’e-mails IA prête à envoyer à mes prospects. Instantané, utile, rentable.”</p>
-      <p><strong>Karim L. — Consultant indépendant</strong></p>
+    <div class="card">
+      <p>“Simple, rapide, efficace. C’est tout ce que je cherchais. GhostOps coche toutes les cases.”</p>
+      <p><strong>Thomas B. — CEO Cabinet Conseil</strong></p>
     </div>
   </section>
 
   <section id="contact">
     <h2>📆 Réserver un appel stratégique</h2>
-    <p>Bénéficiez d’un échange gratuit de 15 minutes pour identifier ensemble les meilleures options IA à mettre en place dans votre activité.</p>
-    <a href="https://calendly.com/stephane-kalanquin" target="_blank" class="btn">Réserver maintenant</a>
+    <div class="card">
+      <p>15 minutes d’échange ciblé pour identifier les meilleures actions IA à engager dans votre business.</p>
+      <a href="https://calendly.com/stephane-kalanquin" class="btn" target="_blank">Réserver maintenant</a>
+    </div>
   </section>
 
   <footer>
