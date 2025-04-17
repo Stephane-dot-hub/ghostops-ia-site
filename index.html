@@ -1,112 +1,100 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>GhostOps IA – Agence Conseil IA</title>
-  <link rel="icon" href="favicon.ico" type="image/x-icon" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GhostOps IA – Conseil & IA Opérationnelle</title>
+  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GHOSTOPS1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-GHOSTOPS1');
+  </script>
   <style>
-    :root {
-      --primary: #0033ff;
-      --light-gray: #f3f4f6;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
     }
 
     body {
-      margin: 0;
       font-family: 'Inter', sans-serif;
-      background: linear-gradient(135deg, #f5f7fa 0%, #e4ecf4 100%);
-      color: #1a1a1a;
+      color: #ffffff;
+      background: #0b0f19;
     }
 
     header {
+      position: sticky;
+      top: 0;
+      z-index: 999;
+      background: rgba(11, 15, 25, 0.9);
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 40px;
-      border-bottom: 1px solid #e5e7eb;
-      position: sticky;
-      top: 0;
-      background-color: white;
-      z-index: 100;
+      padding: 20px 60px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
     }
 
     header h1 {
-      margin: 0;
-      font-size: 1.5em;
-      font-weight: 700;
-      color: var(--primary);
+      color: #00f0ff;
+      font-size: 1.8em;
     }
 
     nav a {
+      color: #fff;
       margin-left: 30px;
       text-decoration: none;
-      color: #1a1a1a;
       font-weight: 500;
     }
 
     .hero {
-      padding: 100px 40px 60px;
+      height: 100vh;
+      background: url('/assets/bg-hero-tech.jpg') no-repeat center center/cover;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
       text-align: center;
-      background: radial-gradient(circle at top left, #ffffff 0%, #e4ecf4 100%);
-      background-size: cover;
+      padding: 0 20px;
     }
 
     .hero h2 {
-      font-size: 2.8em;
-      font-weight: 700;
-      margin-bottom: 15px;
+      font-size: 3em;
+      color: #ffffff;
+      max-width: 800px;
     }
 
     .hero p {
       font-size: 1.2em;
-      max-width: 700px;
-      margin: 0 auto 30px;
-      color: #555;
+      max-width: 600px;
+      color: #cbd5e1;
+      margin-top: 20px;
     }
 
-    .btn {
-      background-color: var(--primary);
-      color: white;
-      padding: 14px 28px;
-      border: none;
-      border-radius: 6px;
+    .btn-primary {
+      margin-top: 30px;
+      background: #00f0ff;
+      color: #0b0f19;
+      padding: 14px 30px;
+      border-radius: 8px;
       text-decoration: none;
-      font-weight: 600;
+      font-weight: bold;
+      transition: background 0.3s ease;
     }
 
-    section {
-      padding: 80px 40px;
-      max-width: 1100px;
-      margin: auto;
-    }
-
-    .grid-2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 40px;
-      align-items: start;
-    }
-
-    .offer-box {
-      border: 1px solid #e5e7eb;
-      padding: 30px;
-      border-radius: 10px;
-      background-color: #fff;
-      box-shadow: 0 8px 20px rgba(0,0,0,0.03);
-    }
-
-    .testimonial {
-      font-style: italic;
-      margin-bottom: 20px;
+    .btn-primary:hover {
+      background: #00cfe0;
     }
 
     footer {
       text-align: center;
-      padding: 40px;
-      background: #f9fafb;
+      padding: 40px 20px;
+      background: #0b0f19;
+      color: #8a8f9c;
       font-size: 0.9em;
-      color: #888;
     }
   </style>
 </head>
@@ -114,84 +102,21 @@
   <header>
     <h1>GhostOps IA</h1>
     <nav>
-      <a href="#about">À propos</a>
-      <a href="#offers">Offres</a>
-      <a href="#expertise">Expertise</a>
-      <a href="#contact">Contact</a>
+      <a href="/offres.html">Offres</a>
+      <a href="/a-propos.html">À propos</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/contact.html">Contact</a>
     </nav>
   </header>
 
   <section class="hero">
     <h2>L’intelligence artificielle au service de vos opérations</h2>
     <p>Conseil. Automatisation. Résultats mesurables. Pour dirigeants, consultants et RH exigeants.</p>
-    <a href="#contact" class="btn">Réserver un appel stratégique</a>
-  </section>
-
-  <section id="about">
-    <div class="grid-2">
-      <div>
-        <h2>Qui sommes-nous ?</h2>
-        <p>GhostOps IA est une agence indépendante spécialisée dans les solutions IA à fort impact. Nous accompagnons les entreprises dans la mise en place de dispositifs IA concrets, sur mesure et orientés résultat.</p>
-        <p>Notre force : la capacité à intervenir vite, bien, et avec une exigence opérationnelle totale.</p>
-      </div>
-      <div>
-        <ul>
-          <li>✔️ Conseil stratégique IA</li>
-          <li>✔️ Automatisation des process métier</li>
-          <li>✔️ Génération de contenus RH & commerciaux</li>
-          <li>✔️ Coaching IA individuel ou collectif</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section id="offers">
-    <h2>Nos Offres</h2>
-    <div class="grid-2">
-      <div class="offer-box">
-        <h3>Pack Emails RH – 90 €</h3>
-        <p>10 e-mails stratégiques générés par IA selon vos enjeux RH. Format modifiable. Livraison rapide.</p>
-        <a href="#" class="btn">Commander</a>
-      </div>
-      <div class="offer-box">
-        <h3>CV IA + Coaching – 149 €</h3>
-        <p>Refonte complète de votre CV optimisé IA + coaching 1-to-1 de 30 minutes. Résultat immédiat.</p>
-        <a href="#" class="btn">Commander</a>
-      </div>
-      <div class="offer-box">
-        <h3>Audit IA PME – Sur devis</h3>
-        <p>Diagnostic rapide de votre activité et identification des leviers d’automatisation à forte valeur ajoutée.</p>
-        <a href="#contact" class="btn">Planifier un appel</a>
-      </div>
-    </div>
-  </section>
-
-  <section id="expertise">
-    <h2>Notre Approche</h2>
-    <p>GhostOps IA place l’exécution au cœur de sa stratégie. Nous construisons des dispositifs concrets, discrets et efficaces, sans superflu.</p>
-    <ul>
-      <li>🔍 Audit précis et sans jargon</li>
-      <li>⚙️ Automatisations opérationnelles</li>
-      <li>🧠 Contenus IA adaptés à votre métier</li>
-      <li>📊 Suivi & mesure d’impact</li>
-    </ul>
-  </section>
-
-  <section id="testimonials">
-    <h2>Ils nous font confiance</h2>
-    <p class="testimonial">“Nous avons déployé une solution IA RH en moins de 10 jours. Gain de temps + impact. Merci GhostOps.”<br><strong>— Julie M., DRH</strong></p>
-    <p class="testimonial">“Mes emails commerciaux sont 10x plus efficaces depuis l’intervention de GhostOps IA.”<br><strong>— Karim L., Consultant</strong></p>
-    <p class="testimonial">“Exécution rapide, approche intelligente, zéro perte de temps.”<br><strong>— Thomas B., CEO</strong></p>
-  </section>
-
-  <section id="contact">
-    <h2>Prendre contact</h2>
-    <p>Réservez votre appel stratégique de 15 min pour voir comment l’IA peut transformer votre organisation.</p>
-    <a href="https://calendly.com/stephane-kalanquin" target="_blank" class="btn">Réserver maintenant</a>
+    <a href="/contact.html" class="btn-primary">Réserver un appel stratégique</a>
   </section>
 
   <footer>
-    &copy; 2025 GhostOps IA — Site propulsé avec stratégie & IA
+    &copy; 2025 GhostOps IA — Conseil IA Stratégique & Opérationnel
   </footer>
 </body>
 </html>
