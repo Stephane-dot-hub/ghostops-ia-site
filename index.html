@@ -62,24 +62,26 @@
       background: url('/assets/hero-neutral.jpg') no-repeat center center / cover;
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
+      align-items: center;
       position: relative;
       text-align: center;
+      padding: 0 20px; /* Espacement horizontal */
     }
 
     .hero h2 {
       font-size: 2.8em;
       color: white;
       font-weight: 700;
-      max-width: 800px;
+      max-width: 800px; /* Limiter la largeur du texte */
       margin-bottom: 20px;
     }
 
     .hero p {
       font-size: 1.2em;
       color: white;
-      max-width: 700px;
+      max-width: 700px; /* Limiter la largeur du texte */
       margin-bottom: 30px;
     }
 
@@ -93,6 +95,7 @@
       font-weight: 500;
       z-index: 10;
       transition: background 0.3s ease;
+      margin-top: 30px;
     }
 
     .btn-ghost:hover {
