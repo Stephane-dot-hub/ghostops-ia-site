@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GhostOps IA – Conseil IA Haut Niveau</title>
+  <title>GhostOps IA – Conseil RH et Stratégie</title>
   <link rel="icon" href="/assets/favicon.ico" type="image/x-icon" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-GHOSTOPS1"></script>
@@ -27,25 +27,27 @@
     }
 
     header {
-      position: sticky;
+      position: absolute;
       top: 0;
-      z-index: 999;
-      background: #ffffff;
+      left: 0;
+      width: 100%;
+      z-index: 10;
+      padding: 25px 60px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 60px;
-      border-bottom: 1px solid #e5e7eb;
+      background: transparent;
+      color: white;
     }
 
     header h1 {
-      color: #0033ff;
       font-size: 1.6em;
       font-weight: 700;
+      color: white;
     }
 
     nav a {
-      color: #1a1a1a;
+      color: white;
       margin-left: 30px;
       text-decoration: none;
       font-weight: 500;
@@ -53,44 +55,15 @@
     }
 
     nav a:hover {
-      color: #0033ff;
+      color: #c0d4ff;
     }
 
- .hero {
-  background: url('/assets/hero-home.jpg') no-repeat center center / cover;
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-    .hero h2 {
-      font-size: 3em;
-      color: #111827;
-      max-width: 800px;
-      font-weight: 700;
-    }
-
-    .hero p {
-      font-size: 1.2em;
-      max-width: 600px;
-      color: #4b5563;
-      margin-top: 20px;
-    }
-
-    .btn-primary {
-      margin-top: 30px;
-      background: #0033ff;
-      color: #ffffff;
-      padding: 14px 30px;
-      border-radius: 8px;
-      text-decoration: none;
-      font-weight: 600;
-      transition: background 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      background: #0022cc;
+    .hero {
+      background: url('/assets/hero-home.jpg') no-repeat center center / cover;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     footer {
@@ -102,6 +75,7 @@
     }
   </style>
 </head>
+
 <body>
   <header>
     <h1>GhostOps IA</h1>
@@ -112,9 +86,11 @@
       <a href="/contact.html">Contact</a>
     </nav>
   </header>
+
   <section class="hero"></section>
+
   <footer>
-    &copy; 2025 GhostOps IA — Conseil IA Stratégique et Opérationnel
+    &copy; 2025 GhostOps IA — Conseil RH & Stratégique
   </footer>
 </body>
 </html>
