@@ -59,13 +59,15 @@
     }
 
     .hero {
-      background: url('/assets/hero-home.jpg') no-repeat center center / cover;
+      background: url('/assets/hero-neutral.jpg') no-repeat center center / cover;
       min-height: 100vh;
       display: flex;
-      align-items: center;
+      flex-direction: column;
       justify-content: center;
+      align-items: flex-start;
       position: relative;
-      text-align: center;
+      text-align: left;
+      padding: 0 40px;
     }
 
     .hero h2 {
@@ -80,23 +82,7 @@
       font-size: 1.2em;
       color: white;
       max-width: 700px;
-      margin-bottom: 30px;
-    }
-
-    .btn-ghost {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid white;
-      padding: 12px 28px;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: 500;
-      z-index: 10;
-      transition: background 0.3s ease;
-    }
-
-    .btn-ghost:hover {
-      background: rgba(255, 255, 255, 0.15);
+      margin-bottom: 50px;
     }
 
     footer {
@@ -123,9 +109,8 @@
   </header>
 
   <section class="hero">
-    <h2>Méthodologie sur mesure pour des enjeux complexes</h2>
-    <p>Approche combinée RH, IA et stratégie – pensée pour les décideurs et les environnements critiques.</p>
-    <a href="https://calendly.com/stephane-kalanquin" class="btn-ghost" target="_blank">Réservez un appel stratégique</a>
+    <h2>Notre expertise au service de votre avenir stratégique</h2>
+    <p>Des conseils RH sur mesure et un accompagnement pour transformer vos enjeux métiers en solutions innovantes et durables.</p>
   </section>
 
   <footer>
