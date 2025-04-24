@@ -101,6 +101,24 @@
         transform: translateY(0);
       }
     }
+
+    .btn-ghost {
+      position: absolute;
+      bottom: 100px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid white;
+      padding: 12px 28px;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      z-index: 10;
+      transition: background 0.3s ease;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
   </style>
 </head>
 
@@ -116,6 +134,7 @@
   </header>
 
   <section class="hero">
+    <a href="/offres.html" class="btn-ghost">Découvrir nos services</a>
     <footer class="hero-footer fade-in">
       &copy; 2025 GhostOps IA — Conseil RH & Stratégique
     </footer>
