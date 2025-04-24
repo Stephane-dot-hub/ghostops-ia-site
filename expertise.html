@@ -59,7 +59,7 @@
     }
 
     .hero {
-      background: url('/assets/hero-neutral.jpg') no-repeat center center / cover; /* Assurez-vous que le chemin est correct */
+      background: url('/assets/hero-neutral.jpg') no-repeat center center / cover;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -85,6 +85,23 @@
       margin-bottom: 50px;
     }
 
+    .btn-ghost {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid white;
+      padding: 12px 28px;
+      color: white;
+      text-decoration: none;
+      border-radius: 6px;
+      font-weight: 500;
+      z-index: 10;
+      transition: background 0.3s ease;
+      margin-top: 40px;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
     footer {
       position: absolute;
       bottom: 30px;
@@ -94,6 +111,40 @@
       font-size: 0.85em;
       z-index: 10;
     }
+
+    .expertise {
+      padding: 60px 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .expertise h3 {
+      font-size: 2.5em;
+      color: #111827;
+      margin-bottom: 20px;
+    }
+
+    .expertise p {
+      font-size: 1.2em;
+      color: #4b5563;
+      line-height: 1.8;
+      margin-bottom: 40px;
+    }
+
+    .service-item {
+      margin-bottom: 40px;
+    }
+
+    .service-item h4 {
+      font-size: 1.8em;
+      color: #111827;
+    }
+
+    .service-item p {
+      font-size: 1.1em;
+      color: #6b7280;
+    }
+
   </style>
 </head>
 
@@ -109,8 +160,29 @@
   </header>
 
   <section class="hero">
-    <h2>Notre expertise au service de votre avenir stratégique</h2>
-    <p>Des conseils RH sur mesure et un accompagnement pour transformer vos enjeux métiers en solutions innovantes et durables.</p>
+    <h2>Aligner les compétences avec les nouveaux enjeux stratégiques</h2>
+    <p>Conseil RH et accompagnement sur mesure pour entreprises, dirigeants et experts métiers.</p>
+  </section>
+
+  <section class="expertise">
+    <h3>Notre approche stratégique sur mesure</h3>
+    <p>Chez GhostOps IA, nous ne proposons pas une approche standard. Chaque entreprise a ses propres défis, et chaque dirigeant a sa vision. C'est pourquoi nous adoptons une approche personnalisée pour aligner vos compétences avec les enjeux stratégiques de demain.</p>
+
+    <h3>Nos services d'expertise</h3>
+    <div class="service-item">
+      <h4>Conseil stratégique RH</h4>
+      <p>Nous vous aidons à définir les stratégies RH adaptées à vos objectifs et à identifier les talents clés pour votre croissance. Notre méthodologie combine expertise humaine et technologique pour un résultat optimal.</p>
+    </div>
+    <div class="service-item">
+      <h4>Accompagnement à la transformation digitale</h4>
+      <p>Nous accompagnons les entreprises dans leur transformation digitale en intégrant des solutions innovantes adaptées aux enjeux modernes, tout en restant centrés sur la dimension humaine.</p>
+    </div>
+    <div class="service-item">
+      <h4>Coaching et développement des talents</h4>
+      <p>Nous proposons des programmes de coaching pour dirigeants et cadres afin d’optimiser la gestion des talents, de renforcer la performance collective et de conduire des changements organisationnels efficaces.</p>
+    </div>
+
+    <a href="contact.html" class="btn-ghost">Contactez-nous pour en savoir plus</a>
   </section>
 
   <footer>
