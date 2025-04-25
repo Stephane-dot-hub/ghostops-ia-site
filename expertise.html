@@ -131,18 +131,25 @@
       margin-bottom: 40px;
     }
 
-    .service-item {
-      margin-bottom: 40px;
+    .button-container {
+      margin-top: 40px;
+      display: flex;
+      justify-content: center;
+      gap: 20px;
     }
 
-    .service-item h4 {
-      font-size: 1.8em;
-      color: #111827;
+    .btn-primary {
+      background: #0033ff;
+      color: white;
+      padding: 14px 30px;
+      border-radius: 8px;
+      font-weight: 600;
+      text-decoration: none;
+      transition: background 0.3s ease;
     }
 
-    .service-item p {
-      font-size: 1.1em;
-      color: #6b7280;
+    .btn-primary:hover {
+      background: #0022cc;
     }
 
   </style>
@@ -165,21 +172,10 @@
   </section>
 
   <section class="expertise">
-    <h3>Nos Services d'Expertise</h3>
-    <div class="service-item">
-      <h4>Valorisation des Talents</h4>
-      <p>Nous vous accompagnons dans la gestion des talents pour maximiser leur potentiel et aligner les compétences avec les objectifs stratégiques de votre entreprise.</p>
+    <div class="button-container">
+      <a href="/expertise-candidat.html" class="btn-primary">Candidat</a>
+      <a href="/expertise-entreprise.html" class="btn-primary">Entreprise</a>
     </div>
-    <div class="service-item">
-      <h4>Conseil RH Stratégique</h4>
-      <p>Nous vous aidons à définir les stratégies RH adaptées à vos objectifs et à identifier les talents clés pour votre croissance. Notre méthodologie combine expertise humaine et technologique pour un résultat optimal.</p>
-    </div>
-    <div class="service-item">
-      <h4>Coaching et Développement</h4>
-      <p>Nous proposons des programmes de coaching pour renforcer les compétences des équipes et favoriser l'alignement avec les défis stratégiques à venir.</p>
-    </div>
-
-    <a href="contact.html" class="btn-ghost">Contactez-nous pour un accompagnement personnalisé</a>
   </section>
 
   <footer>
