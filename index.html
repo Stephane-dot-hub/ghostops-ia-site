@@ -89,6 +89,13 @@
         0% { filter: brightness(1) contrast(1); }
         100% { filter: brightness(1.05) contrast(1.05); }
       }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 </style>
   </head>
   <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init();">
@@ -149,7 +156,7 @@
     <!-- TEMOIGNAGES -->
     <section id="temoignages" class="py-24 px-6 md:px-12 bg-transparent text-center" data-aos="fade-up">
       <h2 class="text-3xl md:text-4xl font-bold mb-12">Ce qu’ils disent de GhostOps IA</h2>
-      <div class="overflow-x-auto animate-scroll whitespace-nowrap scroll-snap" style="animation: scroll-left 60s linear infinite; display: flex;">
+      <div class="overflow-x-auto animate-scroll whitespace-nowrap scroll-snap no-scrollbar" style="animation: scroll-left 60s linear infinite; display: flex;">
         <div class="flex space-x-6 w-max px-2 max-w-full"></div>
           <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
             <p class="text-gray-300 italic">“Audit clair, livrable précis, recommandations activables : excellent.”</p>
