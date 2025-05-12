@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GhostOps IA – Conseil RH & IA</title>
@@ -46,11 +48,20 @@
         transform: scale(1.05);
         box-shadow: 0 8px 24px rgba(0,0,0,0.3);
       }
-    </style>
+      html {
+    scroll-behavior: smooth;
+  }
+  .scroll-snap {
+    scroll-snap-type: x mandatory;
+  }
+  .testimonial-card {
+    scroll-snap-align: center;
+  }
+</style>
   </head>
-  <body class="bg-gray-900 text-white font-sans leading-relaxed">
+  <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init();">
     <!-- HEADER -->
-    <header class="w-full py-6 px-6 md:px-12 flex justify-between items-center">
+    <header class="w-full py-6 px-6 md:px-12 flex justify-between items-center sticky top-0 bg-gray-900/80 backdrop-blur z-50">
       <h1 class="text-2xl font-bold">GhostOps IA</h1>
       <nav class="space-x-6 text-sm font-medium text-gray-300">
         <a href="#" class="hover:text-white transition">Accueil</a>
@@ -61,8 +72,8 @@
     </header>
 
     <!-- ACCROCHE -->
-    <section class="py-28 text-center px-6 md:px-12">
-      <h2 class="text-4xl md:text-6xl font-bold max-w-4xl mx-auto leading-tight">
+    <section class="py-28 text-center px-6 md:px-12" data-aos="fade-up">
+      <h2 class="text-4xl md:text-6xl font-bold max-w-4xl mx-auto leading-tight drop-shadow-xl">
         Aligner les compétences<br />avec les nouveaux enjeux stratégiques
       </h2>
       <p class="mt-6 text-lg md:text-xl max-w-2xl mx-auto text-gray-400">
@@ -79,11 +90,11 @@
     </section>
 
     <!-- SERVICES -->
-    <section id="services" class="py-24 px-6 md:px-12 bg-transparent text-center">
-      <h2 class="text-3xl md:text-4xl font-bold mb-12">Nos Services</h2>
+    <section id="services" class="py-24 px-6 md:px-12 bg-transparent text-center" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 drop-shadow">Nos Services</h2>
       <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
         <div class="bg-gray-900 p-6 rounded-xl shadow">
-          <h3 class="text-xl font-semibold mb-3">Pack Email RH / Managers</h3>
+          <h3 class="text-xl font-semibold mb-3 drop-shadow-sm">Pack Email RH / Managers</h3>
           <p class="text-gray-400 mb-4">10 mails personnalisés, puissants et percutants.</p>
           <p class="text-green-400 font-bold text-lg">90 €</p>
         </div>
@@ -101,9 +112,9 @@
     </section>
 
     <!-- TEMOIGNAGES -->
-    <section id="temoignages" class="py-24 px-6 md:px-12 bg-transparent text-center">
+    <section id="temoignages" class="py-24 px-6 md:px-12 bg-transparent text-center" data-aos="fade-up">
       <h2 class="text-3xl md:text-4xl font-bold mb-12">Ce qu’ils disent de GhostOps IA</h2>
-      <div class="overflow-x-auto animate-scroll whitespace-nowrap" style="animation: scroll-left 60s linear infinite;">
+      <div class="overflow-x-auto animate-scroll whitespace-nowrap scroll-snap" style="animation: scroll-left 60s linear infinite;">
         <div class="flex space-x-6 w-max px-2 max-w-full overflow-hidden">
           <!-- Début des 30 témoignages -->
           <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
@@ -232,7 +243,7 @@
     </section>
 
     <!-- CONTACT -->
-    <section id="contact" class="py-24 px-6 md:px-12 bg-transparent text-center">
+    <section id="contact" class="py-24 px-6 md:px-12 bg-transparent text-center" data-aos="fade-up">
       <h2 class="text-3xl md:text-4xl font-bold mb-6">Réservez votre audit IA personnalisé</h2>
       <p class="max-w-2xl mx-auto text-lg text-gray-400 mb-8">
         Bénéficiez d'un échange stratégique de 15 minutes avec un expert IA pour identifier les leviers d'automatisation dans votre activité.
