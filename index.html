@@ -4,29 +4,49 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GhostOps IA – Conseil RH & IA</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body::before {
+        content: "";
+        background: url('/assets/background.svg') no-repeat center center;
+        background-size: cover;
+        position: fixed;
+        inset: 0;
+        opacity: 0.1;
+        z-index: -1;
+      }
+    </style>
   </head>
-  <body class="bg-gray-900 text-white font-sans">
+  <body class="bg-gray-900 text-white font-sans leading-relaxed">
 
     <!-- HEADER -->
-    <header class="fixed top-0 left-0 w-full bg-gray-900 text-white shadow z-50">
-      <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-        <a href="index.html" class="text-2xl font-bold">GhostOps IA</a>
-        <nav class="space-x-4">
-          <a href="#services" class="hover:underline">Services</a>
-          <a href="#temoignages" class="hover:underline">Témoignages</a>
-          <a href="#contact" class="hover:underline">Contact</a>
-        </nav>
-      </div>
+    <header class="w-full py-6 px-6 md:px-12 flex justify-between items-center">
+      <h1 class="text-2xl font-bold">GhostOps IA</h1>
+      <nav class="space-x-6 text-sm font-medium text-gray-300">
+        <a href="#services" class="hover:text-white transition">Services</a>
+        <a href="#temoignages" class="hover:text-white transition">Témoignages</a>
+        <a href="#contact" class="hover:text-white transition">Contact</a>
+      </nav>
     </header>
 
-    <!-- HERO -->
-    <main class="pt-32 pb-20 text-center px-6">
-      <h1 class="text-4xl md:text-6xl font-bold max-w-4xl mx-auto leading-tight">
-        Aligner les compétences<br />
-        avec les nouveaux enjeux stratégiques
-      </h1>
-      <p class="mt-6 text-lg md:text-xl max-w-xl mx-auto text-gray-400">
+    <!-- ACCROCHE -->
+    <section class="py-28 text-center px-6 md:px-12">
+      <h2 class="text-4xl md:text-6xl font-bold max-w-4xl mx-auto leading-tight">
+        Aligner les compétences<br />avec les nouveaux enjeux stratégiques
+      </h2>
+      <p class="mt-6 text-lg md:text-xl max-w-2xl mx-auto text-gray-400">
         Conseil RH et accompagnement sur mesure pour entreprises, dirigeants et experts métiers.
       </p>
       <div class="mt-10 flex flex-col md:flex-row justify-center gap-4">
@@ -37,24 +57,24 @@
           Je suis un candidat
         </a>
       </div>
-    </main>
+    </section>
 
     <!-- SERVICES -->
-    <section id="services" class="py-20 px-6 bg-gray-800 text-white text-center">
+    <section id="services" class="py-24 px-6 md:px-12 bg-gray-800 text-center">
       <h2 class="text-3xl md:text-4xl font-bold mb-12">Nos Services</h2>
       <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        <div class="bg-gray-900 p-6 rounded-lg shadow">
-          <h3 class="text-xl font-semibold mb-4">Pack Email RH / Managers</h3>
+        <div class="bg-gray-900 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3">Pack Email RH / Managers</h3>
           <p class="text-gray-400 mb-4">10 mails personnalisés, puissants et percutants.</p>
           <p class="text-green-400 font-bold text-lg">90 €</p>
         </div>
-        <div class="bg-gray-900 p-6 rounded-lg shadow">
-          <h3 class="text-xl font-semibold mb-4">CV IA + Coaching Express</h3>
+        <div class="bg-gray-900 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3">CV IA + Coaching Express</h3>
           <p class="text-gray-400 mb-4">CV premium généré par IA + conseils pro.</p>
           <p class="text-green-400 font-bold text-lg">120 €</p>
         </div>
-        <div class="bg-gray-900 p-6 rounded-lg shadow">
-          <h3 class="text-xl font-semibold mb-4">Audit IA PME</h3>
+        <div class="bg-gray-900 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3">Audit IA PME</h3>
           <p class="text-gray-400 mb-4">Découvrez ce que l’IA peut automatiser dans votre entreprise.</p>
           <p class="text-green-400 font-bold text-lg">390 €</p>
         </div>
@@ -62,26 +82,26 @@
     </section>
 
     <!-- TEMOIGNAGES -->
-    <section id="temoignages" class="py-20 px-6 bg-gray-900 text-white text-center">
+    <section id="temoignages" class="py-24 px-6 md:px-12 bg-gray-900 text-center">
       <h2 class="text-3xl md:text-4xl font-bold mb-12">Ce qu’ils disent de GhostOps IA</h2>
       <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-        <div class="bg-gray-800 p-6 rounded-lg shadow">
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
           <p class="text-gray-300 italic">“Nous avons automatisé la gestion de nos recrutements en moins de 10 jours. L’approche GhostOps est rapide, pragmatique et redoutablement efficace.”</p>
           <p class="mt-4 font-semibold">Julie M. — DRH Groupe Industriel</p>
         </div>
-        <div class="bg-gray-800 p-6 rounded-lg shadow">
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
           <p class="text-gray-300 italic">“GhostOps IA a identifié des opportunités d’automatisation que nos équipes n’avaient jamais envisagées. Résultat : +36% de productivité en 3 semaines.”</p>
           <p class="mt-4 font-semibold">Thomas B. — CEO cabinet de conseil</p>
         </div>
-        <div class="bg-gray-800 p-6 rounded-lg shadow">
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
           <p class="text-gray-300 italic">“En une seule session, j’ai obtenu une structure d’e-mails IA prête à envoyer à mes prospects. Instantané, utile, rentable.”</p>
           <p class="mt-4 font-semibold">Karim L. — Consultant indépendant</p>
         </div>
       </div>
     </section>
 
-    <!-- CONTACT / CALENDLY -->
-    <section id="contact" class="py-20 px-6 bg-gray-800 text-white text-center">
+    <!-- CONTACT -->
+    <section id="contact" class="py-24 px-6 md:px-12 bg-gray-800 text-center">
       <h2 class="text-3xl md:text-4xl font-bold mb-6">Réservez votre audit IA personnalisé</h2>
       <p class="max-w-2xl mx-auto text-lg text-gray-400 mb-8">
         Bénéficiez d'un échange stratégique de 15 minutes avec un expert IA pour identifier les leviers d'automatisation dans votre activité.
@@ -92,7 +112,7 @@
     </section>
 
     <!-- FOOTER -->
-    <footer class="bg-gray-900 text-gray-400 text-center py-6">
+    <footer class="bg-gray-900 text-gray-500 text-center py-6">
       <p>© 2025 GhostOps IA. Tous droits réservés.</p>
       <div class="mt-2">
         <a href="https://www.linkedin.com/in/ton-profil" target="_blank" class="hover:underline mx-2">LinkedIn</a>
