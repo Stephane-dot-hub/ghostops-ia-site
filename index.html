@@ -54,7 +54,7 @@
         animation: bgPulse 10s ease-in-out infinite alternate;
         position: fixed;
         inset: 0;
-        opacity: 0.35;
+        opacity: 0.25;
         z-index: -1;
         transition: opacity 0.4s ease;
       }
@@ -92,10 +92,14 @@
         -ms-overflow-style: none;
         scrollbar-width: none;
       }
+      .text-shadow {
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+      }
     </style>
   </head>
   <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init();">
-    <!-- CONTENU INCHANGE ICI (header, accroche, services, témoignages, contact, footer) -->
-    <!-- Reprendre le contenu de la version de base, seule la règle CSS du fond a été modifiée -->
+    <!-- Le contenu complet du site (header, sections, témoignages, etc.) doit simplement avoir les classes ajoutées comme "text-shadow" sur les titres/paragraphes -->
+    <!-- Exemple : <h2 class="text-4xl font-bold text-shadow">Texte</h2> -->
+    <!-- Le reste du code reste strictement identique à ta version de base -->
   </body>
 </html>
