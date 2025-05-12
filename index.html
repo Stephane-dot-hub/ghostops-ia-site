@@ -1,136 +1,257 @@
 <!DOCTYPE html>
 <html lang="fr">
-  <head>
+  
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  "name": "GhostOps IA",
+  "url": "https://www.ghostops.tech",
+  "description": "GhostOps IA combine intelligence artificielle et stratégie RH pour transformer les organisations, améliorer la performance humaine et automatiser les processus clés.",
+  "publisher": {
+    "@type": "Organization",
+    "name": "GhostOps IA",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://www.ghostops.tech/assets/ghostops-preview.jpg"
+    }
+  }
+}
+</script>
+<script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GhostOps IA – Conseil RH & Stratégie</title>
-    <meta name="description" content="Cabinet de conseil haut de gamme en IA, RH et stratégie. Expertise pour dirigeants, experts métiers et entreprises en mutation.">
-    <link rel="stylesheet" href="styles.css" />
-    <script defer src="script.js"></script>
+    <title>GhostOps IA – Conseil RH & Intelligence Artificielle pour Entreprises et Dirigeants</title>
+    <meta name="description" content="GhostOps IA accompagne les entreprises et dirigeants dans l’optimisation stratégique de leurs ressources humaines grâce à l’intelligence artificielle. Coaching, audits, outils IA et conseil RH sur mesure." />
+    <meta name="keywords" content="Conseil RH, Intelligence Artificielle, Audit IA, Coaching IA, GhostOps, Recrutement IA, Performance RH, Stratégie RH IA, automatisation RH, transformation digitale RH" />
+    <meta name="author" content="GhostOps IA" />
+    <meta property="og:title" content="GhostOps IA – Conseil RH & IA pour Entreprises" />
+    <meta property="og:description" content="Audit IA, accompagnement RH et optimisation stratégique des talents grâce à l’Intelligence Artificielle. Découvrez nos services innovants." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.ghostops.tech" />
+    <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-preview.jpg" />
+    <meta name="robots" content="index, follow">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+            },
+          },
+        },
+      };
+    </script>
     <style>
-      body {
-        margin: 0;
-        font-family: 'Segoe UI', sans-serif;
-        background: url("background.jpg") no-repeat center center fixed;
-        background-size: cover;
-        color: white;
-        overflow-x: hidden;
-      }
-
-      header {
-        background-color: transparent;
-        padding: 3rem 2rem 6rem;
-        text-align: center;
-        position: relative;
-      }
-
-      header h1 {
-        font-size: 3rem;
-        margin: 0;
-        font-weight: 700;
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.7);
-      }
-
-      header p {
-        font-size: 1.4rem;
-        margin-top: 1rem;
-        max-width: 800px;
-        margin-left: auto;
-        margin-right: auto;
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6);
-      }
-
-      .cta-button {
-        margin-top: 2rem;
-        padding: 0.75rem 2rem;
-        font-size: 1rem;
-        font-weight: bold;
-        border: none;
-        border-radius: 8px;
-        background-color: #00aaff;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-
-      .cta-button:hover {
-        background-color: #0077aa;
-      }
-
-      .scrolling-comments {
-        margin-top: -3rem;
-        background-color: rgba(0, 0, 0, 0.8);
-        overflow: hidden;
-        white-space: nowrap;
-        padding: 1rem 0;
-      }
-
-      .comment-strip {
-        display: inline-block;
-        padding-left: 100%;
-        animation: scroll-left 30s linear infinite;
-      }
-
-      .comment {
-        display: inline-block;
-        margin: 0 2rem;
-        font-size: 1rem;
-        color: #e0e0e0;
+      body::before {
+        content: "";
+        background: url('/assets/background-ghostops.jpg') no-repeat center 3%;
+        background-color: #0f172a;
+        background-size: 46%;
+        animation: bgPulse 10s ease-in-out infinite alternate;
+        position: fixed;
+        inset: 0;
+        opacity: 0.35;
+        z-index: -1;
+        transition: opacity 0.4s ease;
       }
 
       @keyframes scroll-left {
-        0% {
-          transform: translateX(0);
-        }
-        100% {
-          transform: translateX(-100%);
-        }
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
       }
 
-      footer {
-        margin-top: 4rem;
-        text-align: center;
-        font-size: 0.9rem;
-        color: #ccc;
-        padding-bottom: 2rem;
+      .animate-scroll:hover {
+        animation-play-state: paused;
       }
-    </style>
+
+      .testimonial-card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .testimonial-card:hover {
+        transform: scale(1.05);
+        box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      }
+      html {
+    scroll-behavior: smooth;
+  }
+  .scroll-snap {
+    scroll-snap-type: x mandatory;
+  }
+  .testimonial-card {
+    scroll-snap-align: center;
+  }
+@keyframes bgPulse {
+        0% { filter: brightness(1) contrast(1); }
+        100% { filter: brightness(1.05) contrast(1.05); }
+      }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+</style>
   </head>
-
-  <body>
-    <header>
-      <h1>GhostOps IA</h1>
-      <p>Conseil RH & Stratégie pour dirigeants, experts métiers et entreprises en mutation</p>
-      <button class="cta-button" onclick="location.href='expertise.html'">Découvrir nos services</button>
+  <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init();">
+    <!-- HEADER -->
+    <header class="w-full py-6 px-6 md:px-12 flex justify-between items-center sticky top-0 bg-gray-900/80 backdrop-blur z-50">
+      <h1 class="text-2xl font-bold">GhostOps IA</h1>
+      <nav class="space-x-6 text-sm font-medium text-gray-300">
+        <a href="#" class="hover:text-white transition">Accueil</a>
+        <a href="#services" class="hover:text-white transition">Services</a>
+        <a href="#temoignages" class="hover:text-white transition">Témoignages</a>
+        <a href="#contact" class="hover:text-white transition">Contact</a>
+      </nav>
     </header>
 
-    <div class="scrolling-comments">
-      <div class="comment-strip" id="commentStrip">
-        <span class="comment">“Une approche stratégique impressionnante.”</span>
-        <span class="comment">“GhostOps a révolutionné notre vision RH.”</span>
-        <span class="comment">“Des conseils pointus adaptés à nos enjeux complexes.”</span>
-        <span class="comment">“Un cabinet unique en son genre.”</span>
+    <!-- ACCROCHE -->
+    <section class="py-32 text-left px-6 md:px-36 space-y-6" data-aos="fade-up">
+      <h2 class="text-4xl md:text-5xl font-bold max-w-4xl leading-tight drop-shadow-xl">
+        Aligner les compétences<br />avec les nouveaux enjeux stratégiques
+      </h2>
+      <p class="text-lg md:text-xl max-w-2xl text-gray-300">
+        Conseil RH et accompagnement sur mesure pour entreprises, dirigeants et experts métiers.
+      </p>
+      <div class="flex flex-col md:flex-row justify-start gap-6 mt-4">
+        <a href="entreprises.html" class="bg-white text-black px-6 py-3 rounded-md font-semibold hover:bg-gray-200 transition">
+          Je suis une entreprise
+        </a>
+        <a href="candidats.html" class="border border-white px-6 py-3 rounded-md font-semibold hover:bg-white hover:text-black transition">
+          Je suis un candidat
+        </a>
       </div>
-    </div>
+    
 
-    <footer>
-      &copy; 2025 GhostOps IA – Tous droits réservés
+    <!-- TEMOIGNAGES -->
+    
+
+    <!-- INDICATEURS CLÉS -->
+    <section class="py-20 px-6 md:px-12 bg-transparent text-left" data-aos="fade-up">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+        <div>
+          <p class="text-4xl md:text-5xl font-bold text-green-400">+320</p>
+          <p class="text-gray-300 mt-2">Profils accompagnés</p>
+        </div>
+        <div>
+          <p class="text-4xl md:text-5xl font-bold text-green-400">97%</p>
+          <p class="text-gray-300 mt-2">Taux de satisfaction</p>
+        </div>
+        <div>
+          <p class="text-4xl md:text-5xl font-bold text-green-400">+50K</p>
+          <p class="text-gray-300 mt-2">Emails IA générés</p>
+        </div>
+        <div>
+          <p class="text-4xl md:text-5xl font-bold text-green-400">12</p>
+          <p class="text-gray-300 mt-2">Secteurs couverts</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEMOIGNAGES -->
+    <section id="temoignages" class="py-24 px-6 md:px-12 bg-transparent text-center" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12">Ce qu’ils disent de GhostOps IA</h2>
+      <div class="overflow-x-auto animate-scroll whitespace-nowrap scroll-snap no-scrollbar" style="animation: scroll-left 90s linear infinite; display: flex;">
+                  <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“J’ai retrouvé confiance en mes compétences grâce à l’analyse IA ciblée.”</p>
+            <p class="mt-4 font-semibold">Mickaël T. — Directeur commercial</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“Audit clair, livrable précis, recommandations activables : excellent.”</p>
+            <p class="mt-4 font-semibold">Claire V. — DG PME industrielle</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“Une vraie aide à la décision dans la transformation RH de notre groupe.”</p>
+            <p class="mt-4 font-semibold">Jean-Pierre G. — DRH Groupe santé</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“Ma communication LinkedIn a fait un bond grâce à leurs contenus IA.”</p>
+            <p class="mt-4 font-semibold">Hélène R. — Responsable communication</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“Le pack e-mails RH est devenu un atout dans mes relances managériales.”</p>
+            <p class="mt-4 font-semibold">Guillaume D. — Manager recrutement</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“Une efficacité redoutable. Un ton direct et précis qui fait mouche.”</p>
+            <p class="mt-4 font-semibold">Julie N. — Fondatrice d’agence</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“GhostOps IA a structuré notre offre en 2 sessions. Résultat immédiat.”</p>
+            <p class="mt-4 font-semibold">Olivier P. — Consultant en stratégie</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“Les mails IA ont boosté ma prospection. 3 nouveaux clients en 1 semaine.”</p>
+            <p class="mt-4 font-semibold">Sonia B. — Coach professionnelle</p>
+          </div>
+          <!-- Témoignages ici -->
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“Chaque recommandation IA était directement actionnable.”</p>
+            <p class="mt-4 font-semibold">Emma D. — Directrice marketing</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“Une clarté d’analyse impressionnante pour un format aussi court.”</p>
+            <p class="mt-4 font-semibold">Loïc R. — Manager logistique</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“Le mix RH/IA est une vraie révolution. Bravo pour la maîtrise.”</p>
+            <p class="mt-4 font-semibold">Sophie K. — Directrice régionale</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“J’ai économisé 3 semaines de travail grâce aux outils IA recommandés.”</p>
+            <p class="mt-4 font-semibold">Karim B. — Fondateur TPE</p>
+          </div>
+          <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[260px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+            <p class="text-gray-300 italic">“GhostOps, c’est une vision stratégique + des outils concrets.”</p>
+            <p class="mt-4 font-semibold">Julie F. — HRBP industrie</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="py-24 px-6 md:px-12 bg-transparent text-left" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 drop-shadow">Nos Services</h2>
+      <div class="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <div class="bg-gray-900 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3 drop-shadow-sm">Pack Email RH / Managers</h3>
+          <p class="text-gray-400 mb-4">10 mails personnalisés, puissants et percutants.</p>
+          <p class="text-green-400 font-bold text-lg">90 €</p>
+        </div>
+        <div class="bg-gray-900 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3">CV IA + Coaching Express</h3>
+          <p class="text-gray-400 mb-4">CV premium généré par IA + conseils pro.</p>
+          <p class="text-green-400 font-bold text-lg">120 €</p>
+        </div>
+        <div class="bg-gray-900 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3">Audit IA PME</h3>
+          <p class="text-gray-400 mb-4">Découvrez ce que l’IA peut automatiser dans votre entreprise.</p>
+          <p class="text-green-400 font-bold text-lg">390 €</p>
+        </div>
+      </div>
+    </section>
+
+        <section id="contact" class="py-24 px-6 md:px-12 bg-transparent text-center" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-bold mb-6">Réservez votre audit IA personnalisé</h2>
+      <p class="max-w-2xl mx-auto text-lg text-gray-400 mb-8">
+        Bénéficiez d'un échange stratégique de 15 minutes avec un expert IA pour identifier les leviers d'automatisation dans votre activité.
+      </p>
+      <a href="https://calendly.com/ton-lien" target="_blank" class="bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-6 rounded-md transition">
+        Réserver un appel gratuit
+      </a>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-gray-900 text-gray-500 text-center py-6">
+      <p>© 2025 GhostOps IA. Tous droits réservés.</p>
+      <div class="mt-2">
+        <a href="https://www.linkedin.com/in/ton-profil" target="_blank" class="hover:underline mx-2">LinkedIn</a>
+        <a href="mailto:contact@ghostops.tech" class="hover:underline mx-2">Email</a>
+      </div>
     </footer>
-
-    <script>
-      const comments = [
-        "“Méthodologie redoutablement efficace.”",
-        "“Une vision qui anticipe les enjeux à venir.”"
-      ];
-
-      const commentStrip = document.getElementById("commentStrip");
-
-      comments.forEach(comment => {
-        const span = document.createElement("span");
-        span.className = "comment";
-        span.textContent = comment;
-        commentStrip.appendChild(span);
-      });
-    </script>
   </body>
 </html>
