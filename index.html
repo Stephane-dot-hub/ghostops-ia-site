@@ -31,6 +31,23 @@
     0% { transform: translateX(0); }
     100% { transform: translateX(-50%); }
   }
+  @keyframes scroll-left {
+    0% { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .animate-scroll:hover {
+    animation-play-state: paused;
+  }
+
+  .testimonial-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .testimonial-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+  }
 </style>
   </head>
   <body class="bg-gray-900 text-white font-sans leading-relaxed">
@@ -91,120 +108,120 @@
   <div class="overflow-x-auto animate-scroll whitespace-nowrap" style="animation: scroll-left 60s linear infinite;">
     <div class="flex space-x-6 w-max px-2 max-w-full overflow-hidden">
       <!-- 30 témoignages en carousel horizontal -->
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“L’approche GhostOps m’a permis d’optimiser mes processus RH dès la première semaine.”</p>
         <p class="mt-4 font-semibold">Nadia F. — Responsable RH</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Une clarté stratégique immédiate. L’IA devient un vrai levier avec GhostOps.”</p>
         <p class="mt-4 font-semibold">Benoît L. — CEO startup tech</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Le CV IA + coaching m’a permis de décrocher deux entretiens dès la première semaine.”</p>
         <p class="mt-4 font-semibold">Isabelle M. — Consultante freelance</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“J’ai retrouvé confiance en mes compétences grâce à l’analyse IA ciblée.”</p>
         <p class="mt-4 font-semibold">Mickaël T. — Directeur commercial</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Audit clair, livrable précis, recommandations activables : excellent.”</p>
         <p class="mt-4 font-semibold">Claire V. — DG PME industrielle</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Une vraie aide à la décision dans la transformation RH de notre groupe.”</p>
         <p class="mt-4 font-semibold">Jean-Pierre G. — DRH Groupe santé</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Ma communication LinkedIn a fait un bond grâce à leurs contenus IA.”</p>
         <p class="mt-4 font-semibold">Hélène R. — Responsable communication</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Le pack e-mails RH est devenu un atout dans mes relances managériales.”</p>
         <p class="mt-4 font-semibold">Guillaume D. — Manager recrutement</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Une efficacité redoutable. Un ton direct et précis qui fait mouche.”</p>
         <p class="mt-4 font-semibold">Julie N. — Fondatrice d’agence</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“GhostOps IA a structuré notre offre en 2 sessions. Résultat immédiat.”</p>
         <p class="mt-4 font-semibold">Olivier P. — Consultant en stratégie</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Les mails IA ont boosté ma prospection. 3 nouveaux clients en 1 semaine.”</p>
         <p class="mt-4 font-semibold">Sonia B. — Coach professionnelle</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Clair, rapide, efficace. C’est exactement ce dont j’avais besoin.”</p>
         <p class="mt-4 font-semibold">Yann C. — Entrepreneur</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Notre DRH a été bluffée par la précision des mails rédigés avec GhostOps.”</p>
         <p class="mt-4 font-semibold">Camille E. — Chargée de mission RH</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Très fluide. Les recommandations étaient activables immédiatement.”</p>
         <p class="mt-4 font-semibold">Bastien M. — Responsable innovation</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Le diagnostic IA nous a permis d’automatiser 4 tâches critiques RH.”</p>
         <p class="mt-4 font-semibold">Sarah J. — Directrice juridique</p>
       </div>
       <!-- 15 témoignages supplémentaires -->
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Approche centrée, impact immédiat. À recommander sans hésitation.”</p>
         <p class="mt-4 font-semibold">Alain R. — Directeur commercial senior</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Une nouvelle façon de penser la stratégie d’influence RH.”</p>
         <p class="mt-4 font-semibold">Virginie L. — Responsable marque employeur</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Le format express est parfaitement adapté à notre rythme PME.”</p>
         <p class="mt-4 font-semibold">Éric M. — Fondateur agence B2B</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“La meilleure synthèse IA que j’ai reçue, et j’en ai testé plusieurs.”</p>
         <p class="mt-4 font-semibold">Lucie G. — Consultante senior</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Prise de hauteur, structure claire, outils concrets.”</p>
         <p class="mt-4 font-semibold">Stéphane V. — Directeur transformation</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Une vraie boîte à outils IA adaptée à nos réalités terrain.”</p>
         <p class="mt-4 font-semibold">Anne C. — DRH multisites</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“En une heure, j’ai reçu plus de valeur que 2 semaines de consulting classique.”</p>
         <p class="mt-4 font-semibold">Marc J. — DG filiale énergie</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Vision business claire, livrables actionnables, IA au service des talents.”</p>
         <p class="mt-4 font-semibold">Sophie L. — HRBP</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Un benchmark IA RH taillé pour nos enjeux : rapide et efficace.”</p>
         <p class="mt-4 font-semibold">Bruno F. — Responsable performance RH</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Contenus IA calibrés, preneurs de décision conquis.”</p>
         <p class="mt-4 font-semibold">Laura H. — Responsable communication externe</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Une présentation RH/IA qui a convaincu notre COMEX.”</p>
         <p class="mt-4 font-semibold">Pascal D. — Directeur stratégie</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Je suis bluffé par la finesse de l’analyse IA RH sectorielle.”</p>
         <p class="mt-4 font-semibold">Valérie T. — Experte transformation sociale</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“En 48h, nous avions une stratégie IA RH prête à déployer.”</p>
         <p class="mt-4 font-semibold">Théo M. — Cofondateur startup tech RH</p>
       </div>
-      <div class="bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
+      <div class="testimonial-card bg-gray-800 p-6 rounded-xl shadow min-w-[300px] max-w-[320px] whitespace-normal overflow-hidden text-ellipsis">
         <p class="text-gray-300 italic">“Une équipe GhostOps percutante, agile, centrée sur le concret.”</p>
         <p class="mt-4 font-semibold">Delphine G. — Directrice opérations RH</p>
       </div>
