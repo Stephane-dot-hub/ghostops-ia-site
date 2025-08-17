@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <!-- AOS (cohérent avec l'accueil) -->
+  <!-- AOS -->
   <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
   <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
@@ -28,17 +28,13 @@
     "@context": "https://schema.org",
     "@type": "Service",
     "name": "GhostOps – Expertise tactique",
-    "provider": {
-      "@type": "Organization",
-      "name": "GhostOps",
-      "url": "https://www.ghostops.tech"
-    },
+    "provider": { "@type": "Organization", "name": "GhostOps", "url": "https://www.ghostops.tech" },
     "areaServed": "EU",
     "description": "Cellule d’opérations tactiques à haute valeur décisionnelle : crises RH, repositionnement de dirigeants, domination narrative, IA appliquée."
   }
   </script>
 
-  <!-- Fonts & Tailwind (alignés avec l’accueil) -->
+  <!-- Fonts & Tailwind -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
@@ -53,7 +49,7 @@
   </script>
 
   <style>
-    /* VISUEL : on garde le même fond et la même sensation */
+    /* VISUEL : on garde le même fond et la même sensation que l’accueil */
     body::before{
       content:"";
       background: url('/assets/background-ghostops.jpg') no-repeat center center fixed;
@@ -67,9 +63,23 @@
     html{scroll-behavior:smooth}
     .text-shadow{ text-shadow:1px 1px 4px rgba(0,0,0,.6) }
     header,main,section,footer{ position:relative; z-index:1 }
+    .topnav a{ opacity:.85 } .topnav a:hover{ opacity:1 }
   </style>
 </head>
 <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init();">
+
+  <!-- Top mini-nav (ancres internes) -->
+  <nav class="topnav sticky top-0 z-40 backdrop-blur bg-black/30 border-b border-white/10">
+    <div class="max-w-7xl mx-auto h-12 px-4 flex items-center gap-5 text-sm">
+      <a href="#domaines" class="hover:text-white">Domaines</a>
+      <a href="#entreprise" class="hover:text-white">Entreprise</a>
+      <a href="#dirigeants" class="hover:text-white">Dirigeants</a>
+      <a href="#engagement" class="hover:text-white">Engagement</a>
+      <a href="#faq" class="hover:text-white">FAQ</a>
+      <span class="ml-auto"></span>
+      <a href="/contact.html" class="px-3 py-1.5 rounded bg-white/10 hover:bg-white/15">Brief confidentiel</a>
+    </div>
+  </nav>
 
   <!-- HERO -->
   <section class="w-full min-h-[52vh] md:min-h-[60vh] flex items-center justify-center text-center px-6">
@@ -89,23 +99,23 @@
     </div>
   </section>
 
-  <!-- PREUVES / CE QUE VOUS OBTENEZ -->
-  <section class="py-16 px-6 md:px-24" data-aos="fade-up">
+  <!-- BOARD DECK — 30s -->
+  <section class="py-8 px-6 md:px-24" data-aos="fade-up">
     <div class="max-w-6xl mx-auto">
-      <div class="bg-gray-800/70 rounded-xl p-6 md:p-10">
-        <h2 class="text-2xl md:text-3xl font-bold text-white text-shadow">Ce que vous obtenez</h2>
-        <div class="mt-6 grid md:grid-cols-3 gap-6 text-sm">
+      <div class="bg-gray-800/70 rounded-xl p-6 md:p-8">
+        <h2 class="text-xl md:text-2xl font-bold text-white text-shadow">Board Deck — 30 secondes</h2>
+        <div class="mt-4 grid md:grid-cols-3 gap-6 text-sm">
           <div>
-            <div class="text-xl font-semibold">Décision & vitesse</div>
-            <p class="text-gray-300 mt-2">Diagnostic sous 48 h, angles d’attaque exploitables, exécution en boucles courtes. Le temps redevient un atout.</p>
+            <div class="text-lg font-semibold">Décision & vitesse</div>
+            <p class="text-gray-300 mt-1">Diagnostic 48 h. Angles exploitables. Exécution en boucles courtes. Le temps redevient un atout.</p>
           </div>
           <div>
-            <div class="text-xl font-semibold">Contrôle narratif</div>
-            <p class="text-gray-300 mt-2">Récits qui structurent le réel. Messages, séquences, preuves, canaux — opérés et mesurés.</p>
+            <div class="text-lg font-semibold">Contrôle narratif</div>
+            <p class="text-gray-300 mt-1">Narratifs qui structurent le réel. Messages, séquences, preuves — opérés et mesurés.</p>
           </div>
           <div>
-            <div class="text-xl font-semibold">Gouvernance assainie</div>
-            <p class="text-gray-300 mt-2">Chaînes de décision clarifiées, contre-pouvoirs neutralisés, risques humains maîtrisés.</p>
+            <div class="text-lg font-semibold">Gouvernance assainie</div>
+            <p class="text-gray-300 mt-1">Chaînes de décision clarifiées, contre-pouvoirs neutralisés, risques humains maîtrisés.</p>
           </div>
         </div>
       </div>
@@ -291,11 +301,55 @@
     </div>
   </section>
 
-  <!-- FOOTER LÉGER (optionnel) -->
+  <!-- FAQ JURIDIQUE / RGPD (fermée par défaut) -->
+  <section id="faq" class="py-16 px-6 md:px-24" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white text-shadow">FAQ — Juridique & RGPD</h2>
+
+      <details class="bg-gray-800/70 rounded-xl p-5 mb-3">
+        <summary class="cursor-pointer font-semibold">Confidentialité des échanges</summary>
+        <p class="mt-2 text-gray-300 text-sm">
+          Tous nos échanges sont traités selon un principe de confidentialité stricte. Nous pouvons signer un NDA en amont de tout partage sensible.
+        </p>
+      </details>
+
+      <details class="bg-gray-800/70 rounded-xl p-5 mb-3">
+        <summary class="cursor-pointer font-semibold">Conformité RGPD</summary>
+        <p class="mt-2 text-gray-300 text-sm">
+          Nous limitons nos traitements aux données nécessaires, avec durée de conservation minimale. Tri/purge documentée, accès restreint, chiffrement en transit et au repos selon les cas.
+        </p>
+      </details>
+
+      <details class="bg-gray-800/70 rounded-xl p-5 mb-3">
+        <summary class="cursor-pointer font-semibold">Éthique & légalité</summary>
+        <p class="mt-2 text-gray-300 text-sm">
+          Nos opérations respectent le cadre légal. Nous intervenons pour sécuriser la gouvernance et la réputation, jamais pour enfreindre la loi ni nuire aux droits fondamentaux.
+        </p>
+      </details>
+
+      <details class="bg-gray-800/70 rounded-xl p-5">
+        <summary class="cursor-pointer font-semibold">Traçabilité & documentation</summary>
+        <p class="mt-2 text-gray-300 text-sm">
+          La documentation est produite de manière opposable si nécessaire, et minimale par défaut pour limiter l’exposition. Nous définissons avec vous le niveau de traçabilité utile.
+        </p>
+      </details>
+    </div>
+  </section>
+
+  <!-- FOOTER LÉGER -->
   <footer class="px-6 md:px-24 pb-12">
     <div class="max-w-6xl mx-auto text-sm text-gray-400">
       © GhostOps — Interventions confidentielles. <a href="/mentions-legales.html" class="hover:text-white">Mentions légales</a> · <a href="/politique-confidentialite.html" class="hover:text-white">Confidentialité</a>
     </div>
   </footer>
+
+  <!-- Facilite l’arrivée depuis l’accueil via /expertise.html#domaines -->
+  <script>
+    // Si l’utilisateur arrive avec un hash (#domaines, etc.), on s’assure du scroll fluide
+    if (location.hash) {
+      const target = document.querySelector(location.hash);
+      if (target) setTimeout(()=> target.scrollIntoView({behavior:'smooth'}), 0);
+    }
+  </script>
 </body>
 </html>
