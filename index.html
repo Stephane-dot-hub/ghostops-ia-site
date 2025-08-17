@@ -20,7 +20,7 @@
     }
     </script>
 
-    <!-- JSON-LD Organization (ajout) -->
+    <!-- JSON-LD Organization -->
     <script type="application/ld+json">
     {
       "@context":"https://schema.org",
@@ -32,7 +32,7 @@
     }
     </script>
 
-    <!-- AOS (conservé) -->
+    <!-- AOS (si tu l’actives ailleurs) -->
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
@@ -41,32 +41,30 @@
 
     <!-- SEO -->
     <title>GhostOps – Cellule d’opérations tactiques (crises RH, repositionnement, influence)</title>
-    <meta name="description" content="Cellule d’opérations tactiques : crises RH, repositionnement de dirigeants, domination narrative, IA appliquée. Interventions discrètes, résultats mesurables." />
+    <meta name="description" content="Cellule d’élite en opérations tactiques. Crises RH, repositionnement exécutif, domination narrative et IA opérante. Interventions discrètes, résultats mesurables." />
     <link rel="canonical" href="https://www.ghostops.tech/" />
     <meta name="robots" content="index, follow">
     <meta name="author" content="GhostOps IA" />
 
     <!-- Open Graph / Twitter -->
     <meta property="og:title" content="GhostOps – Cellule d’opérations tactiques" />
-    <meta property="og:description" content="Crises RH, repositionnement de dirigeants, domination narrative, IA appliquée. Interventions discrètes, résultats mesurables." />
+    <meta property="og:description" content="Crises RH, repositionnement exécutif, domination narrative, IA opérante. Interventions discrètes, résultats mesurables." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.ghostops.tech" />
     <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
     <meta name="twitter:card" content="summary_large_image" />
 
     <!-- (Optionnel) mots-clés -->
-    <meta name="keywords" content="repositionnement dirigeant, influence narrative, neutralisation RH, cellule tactique, intervention de crise, gouvernance, IA RH, GhostOps" />
+    <meta name="keywords" content="GhostOps, cellule tactique, repositionnement dirigeant, crises RH, influence narrative, gouvernance, IA opérante" />
 
-    <!-- Fonts & Tailwind (conservés) -->
+    <!-- Fonts & Tailwind -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
-          extend: {
-            fontFamily: { sans: ['Inter', 'sans-serif'] },
-          },
-        },
+          extend: { fontFamily: { sans: ['Inter', 'sans-serif'] } }
+        }
       };
     </script>
 
@@ -93,39 +91,42 @@
       @keyframes bgPulse { 0% { filter: brightness(1) contrast(1); } 100% { filter: brightness(1.05) contrast(1.05); } }
       .no-scrollbar::-webkit-scrollbar { display: none; }
       .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      .text-shadow { text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6); }
+      .text-shadow { text-shadow: 1px 1px 4px rgba(0,0,0,0.6); }
       header, main, section, footer { position: relative; z-index: 1; }
     </style>
   </head>
 
-  <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init();">
+  <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init && AOS.init();">
     <!-- HERO -->
     <section class="w-full min-h-[60vh] flex items-center justify-center text-center px-6">
       <div class="z-10 max-w-4xl">
         <h1 class="text-4xl md:text-6xl font-bold leading-tight text-shadow">
           <span class="text-white">GHOST</span><span class="text-gray-400"> OPS</span>
         </h1>
+
         <p class="mt-6 text-lg md:text-xl text-gray-300 text-shadow max-w-3xl mx-auto">
-          Une cellule d’opérations tactiques à haute valeur décisionnelle.<br>
-          GhostOps intervient dans les <span class="font-semibold">interstices du pouvoir</span>,<br>
-          là où les lignes de commandement vacillent et où les trajectoires se reconfigurent.
+          Cellule d’élite en opérations tactiques à haute valeur décisionnelle.<br>
+          Nous opérons dans les <span class="font-semibold">interstices du pouvoir</span> — là où se décident les issues.
         </p>
+
         <p class="mt-6 text-md md:text-lg text-gray-400 text-shadow max-w-3xl mx-auto">
-          Crises RH, repositionnement de dirigeants, <span class="font-semibold">domination narrative</span> et <span class="font-semibold">IA appliquée</span>.<br>
-          Notre objectif n’est pas de rassurer, mais de <span class="font-semibold">repositionner</span>.
+          Crises RH, repositionnement exécutif, <span class="font-semibold">domination narrative</span> et <span class="font-semibold">IA opérante</span>.<br>
+          Notre rôle n’est pas de conseiller : c’est de <span class="font-semibold">produire l’issue</span>.
         </p>
+
         <p class="mt-4 text-md md:text-base text-gray-400 italic text-shadow">
           GhostOps ne conseille pas. GhostOps modifie la carte du pouvoir.
         </p>
-        <a href="/expertise.html"
+
+        <a href="/expertise.html#domaines"
            class="mt-10 inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
           Découvrir l’expertise
         </a>
       </div>
     </section>
 
-    <!-- INTERVENTIONS (9 domaines – textes niveau élite) -->
-    <section id="interventions" class="py-24 px-6 md:px-24 bg-gray-900 text-left" data-aos="fade-up">
+    <!-- INTERVENTIONS (9 domaines — texte “autorité absolue”) -->
+    <section id="interventions" class="py-24 px-6 md:px-24 bg-gray-900 text-left">
       <h2 class="text-3xl md:text-4xl font-bold mb-12 text-white text-shadow">
         Interventions confidentielles GhostOps
       </h2>
@@ -135,81 +136,95 @@
         <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
           <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Crises RH & verrouillages</h3>
           <p class="text-gray-300 text-sm mb-4">
-            Nous contenons les crises avant qu’elles n’explosent. Diagnostic sous 48 h, isolement des foyers de tension, trajectoires de résolution sous contrôle. Gouvernance de crise, documentation opposable, exécution en boucles courtes — sans bruit inutile.
+            Contenir avant l’explosion. Empreinte 48 h, isolement chirurgical des foyers de tension, scénarios de sortie verrouillés. Gouvernance de crise, documentation opposable, exécution sans bruit inutile.
           </p>
-          <a href="/expertise-entreprise.html" class="text-sm font-medium text-blue-400 hover:underline">Déployer la war-room</a>
+          <a href="/expertise.html#d1" class="text-sm font-medium text-blue-400 hover:underline">Déployer la war-room</a>
         </div>
 
         <!-- 2 -->
         <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
           <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Repositionnement exécutif</h3>
           <p class="text-gray-300 text-sm mb-4">
-            Nous reconfigurons le champ de perception autour d’une figure clé. Cartographie des rapports de force, preuves d’autorité visibles au bon endroit, calendrier d’apparitions stratégiques. Le dirigeant redevient un axe d’alignement, pas un point de friction.
+            Reconfigurer le champ de perception autour d’une figure clé. Cartographie des forces, preuves d’autorité au bon endroit, calendrier d’apparitions stratégiques. Un leader redevient un axe d’alignement.
           </p>
-          <a href="/expertise-candidat.html" class="text-sm font-medium text-blue-400 hover:underline">Engager le repositionnement</a>
+          <a href="/expertise.html#d2" class="text-sm font-medium text-blue-400 hover:underline">Engager le repositionnement</a>
         </div>
 
         <!-- 3 -->
         <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
           <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Domination narrative & IA opérante</h3>
           <p class="text-gray-300 text-sm mb-4">
-            Nous fabriquons des narratifs qui structurent le réel. Architecture de messages, cadence d’interventions, playbooks IA mesurables (écoute, génération, tests, itération). Influence pilotée par des indicateurs, pas par l’intuition.
+            Des récits qui structurent le réel. Architecture de messages, cadence d’interventions, playbooks IA (écoute, génération, tests, itération) pilotés par indicateurs. Influence démontrable, pas théorique.
           </p>
-          <a href="/expertise.html" class="text-sm font-medium text-blue-400 hover:underline">Activer la séquence narrative</a>
+          <a href="/expertise.html#d3" class="text-sm font-medium text-blue-400 hover:underline">Activer la séquence</a>
         </div>
 
         <!-- 4 -->
         <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
           <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Due diligence RH & gouvernance</h3>
           <p class="text-gray-300 text-sm mb-4">
-            Nous mettons à nu l’architecture humaine d’une organisation. Cartographie des personnes-clés, risques opérationnels et réputationnels, conformité (RGPD) et remédiations. Un éclairage décisif avant/après un deal, sans sur-révélation.
+            Mettre à nu l’architecture humaine : personnes-clés, risques opérationnels/réputationnels, conformité (RGPD), remédiations. Décisif pré/post-deal, sans sur-exposition.
           </p>
-          <a href="/expertise-entreprise.html" class="text-sm font-medium text-blue-400 hover:underline">Lancer une due diligence</a>
+          <a href="/expertise.html#d4" class="text-sm font-medium text-blue-400 hover:underline">Lancer un audit</a>
         </div>
 
         <!-- 5 -->
         <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
           <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Gestion d’alliances invisibles</h3>
           <p class="text-gray-300 text-sm mb-4">
-            Nous rendons lisibles les loyautés, pactes tacites et zones d’interdépendance. Activation des alliances utiles, desserrement des coalitions toxiques, réorientation des intérêts. La stabilité ne vient pas de la force, mais du maillage.
+            Rendre lisibles loyautés et pactes tacites. Activer les alliances utiles, desserrer les coalitions toxiques, réorienter les intérêts. La stabilité vient du maillage, pas de la force.
           </p>
-          <a href="/expertise.html" class="text-sm font-medium text-blue-400 hover:underline">Cartographier & mobiliser</a>
+          <a href="/expertise.html#d5" class="text-sm font-medium text-blue-400 hover:underline">Cartographier & mobiliser</a>
         </div>
 
         <!-- 6 -->
         <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
           <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Sorties & transitions sensibles</h3>
           <p class="text-gray-300 text-sm mb-4">
-            Nous orchestrons des atterrissages sans ondes de choc. Narratif de sortie, maîtrise des risques internes/externes, passations contrôlées. Préservation de l’actif réputationnel et continuité du système d’autorité.
+            Atterrissages sans ondes de choc : narratif de sortie, maîtrise des risques internes/externes, passations contrôlées. Continuité de l’autorité, image préservée.
           </p>
-          <a href="/expertise-entreprise.html" class="text-sm font-medium text-blue-400 hover:underline">Sécuriser la transition</a>
+          <a href="/expertise.html#d6" class="text-sm font-medium text-blue-400 hover:underline">Sécuriser la transition</a>
         </div>
 
         <!-- 7 -->
         <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
           <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Neutralisation des contre-pouvoirs</h3>
           <p class="text-gray-300 text-sm mb-4">
-            Nous dissocions la résistance au lieu de l’affronter. Anatomie des blocages, exposition des coûts, recomposition des circuits décisionnels. Un contre-pouvoir cesse d’exister quand il n’a plus d’espace fonctionnel.
+            Dissocier la résistance plutôt que l’affronter. Anatomie des blocages, exposition des coûts, recomposition des circuits décisionnels. Un contre-pouvoir s’éteint lorsqu’il n’a plus d’espace fonctionnel.
           </p>
-          <a href="/expertise.html" class="text-sm font-medium text-blue-400 hover:underline">Neutraliser un blocage</a>
+          <a href="/expertise.html#d7" class="text-sm font-medium text-blue-400 hover:underline">Neutraliser un blocage</a>
         </div>
 
         <!-- 8 -->
         <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
           <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Résilience post-crise</h3>
           <p class="text-gray-300 text-sm mb-4">
-            Nous évitons la rechute. Séquences de stabilisation, rituels de reprise, garde-fous de gouvernance et métriques d’adhésion. La normalité est un état à produire, pas à espérer.
+            Éviter la rechute. Séquences de stabilisation, rituels de reprise, garde-fous de gouvernance, métriques d’adhésion. La normalité se produit : elle ne s’attend pas.
           </p>
-          <a href="/expertise-entreprise.html" class="text-sm font-medium text-blue-400 hover:underline">Structurer la relance</a>
+          <a href="/expertise.html#d8" class="text-sm font-medium text-blue-400 hover:underline">Structurer la relance</a>
         </div>
 
         <!-- 9 -->
         <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
           <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Scénarisation d’influence externe</h3>
           <p class="text-gray-300 text-sm mb-4">
-            Nous concevons des séquences qui cadrent l’interprétation des parties prenantes (actionnaires, médias spécialisés, autorités). Messages, preuves, timing, canaux. L’externe reste aligné avec l’interne — et non l’inverse.
+            Cadrer l’interprétation des parties prenantes (actionnaires, médias spécialisés, autorités). Messages, preuves, timing, canaux. L’externe reste aligné sur l’interne — et non l’inverse.
           </p>
-          <a href="/expertise.html" class="text-sm font-medium text-blue-400 hover:underline">Concevoir l’offensive</a>
+          <a href="/expertise.html#d9" class="text-sm font-medium text-blue-400 hover:underline">Concevoir l’offensive</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- (Optionnel) CTA final court -->
+    <section class="pb-24 px-6 md:px-24">
+      <div class="max-w-6xl mx-auto text-center">
+        <div class="inline-block bg-gray-800/70 rounded-xl p-8">
+          <h3 class="text-2xl font-semibold text-white text-shadow">Exposez-nous votre problème en toute confidentialité</h3>
+          <p class="mt-2 text-gray-300 text-sm">Brief initial, NDA si nécessaire — réponse sous 24 h ouvrées.</p>
+          <a href="/contact.html"
+             class="mt-5 inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
+            Nous contacter
+          </a>
         </div>
       </div>
     </section>
