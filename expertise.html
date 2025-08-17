@@ -4,21 +4,23 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Expertise – GhostOps</title>
-    <meta name="description" content="Découvrez l’expertise GhostOps : interventions confidentielles à haute intensité, repositionnement de dirigeants, neutralisation RH et influence narrative au plus haut niveau." />
+    <meta name="description" content="Expertise GhostOps : interventions confidentielles à haute intensité. Crises RH, repositionnement exécutif, domination narrative, IA opérante, due diligence, alliances, transitions, neutralisation, influence externe." />
+
+    <!-- Fonts & Tailwind -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
-            fontFamily: {
-              sans: ['Inter', 'sans-serif'],
-            },
+            fontFamily: { sans: ['Inter', 'sans-serif'] },
           },
         },
       };
     </script>
+
     <style>
+      /* Visuel identique à l'accueil */
       body::before {
         content: "";
         background: url('/assets/background-ghostops.jpg') no-repeat center center fixed;
@@ -30,118 +32,303 @@
         opacity: 0.25;
         z-index: -1;
       }
-      @keyframes bgPulse {
-        0% { filter: brightness(1) contrast(1); }
-        100% { filter: brightness(1.05) contrast(1.05); }
-      }
-      .text-shadow {
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-      }
+      @keyframes bgPulse { 0% { filter: brightness(1) contrast(1); } 100% { filter: brightness(1.05) contrast(1.05); } }
+      html { scroll-behavior: smooth; }
+      .text-shadow { text-shadow: 1px 1px 4px rgba(0,0,0,.6); }
+      /* Micro-nav : défilement horizontal en mobile */
+      .topnav::-webkit-scrollbar { height: 0; }
     </style>
   </head>
+
   <body class="bg-gray-900 text-white font-sans leading-relaxed">
-    
-    <!-- Section Hero -->
+    <!-- Micro-navigation interne (sticky) -->
+    <nav class="sticky top-0 z-40 backdrop-blur bg-black/30 border-b border-white/10">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="h-12 flex items-center gap-3 text-sm">
+          <a href="index.html" class="px-3 py-1.5 rounded bg-white/10 hover:bg-white/15">← Accueil</a>
+          <a href="#domaines" class="px-2 py-1.5 hover:text-white">Domaines</a>
+          <a href="#entreprise" class="px-2 py-1.5 hover:text-white">Entreprise</a>
+          <a href="#dirigeants" class="px-2 py-1.5 hover:text-white">Dirigeants</a>
+          <a href="#engagement" class="px-2 py-1.5 hover:text-white">Engagement</a>
+          <a href="#faq" class="px-2 py-1.5 hover:text-white">FAQ</a>
+          <span class="ml-auto"></span>
+          <a href="/contact.html" class="px-3 py-1.5 rounded bg-white/10 hover:bg-white/15">Brief confidentiel</a>
+        </div>
+        <!-- Ligne 2 : raccourcis vers chaque domaine (scrollable) -->
+        <div class="topnav -mb-2 pb-2 overflow-x-auto whitespace-nowrap text-xs text-white/80">
+          <a href="#d1" class="px-2 py-1.5 hover:text-white inline-block">Crises RH</a>
+          <a href="#d2" class="px-2 py-1.5 hover:text-white inline-block">Repositionnement</a>
+          <a href="#d3" class="px-2 py-1.5 hover:text-white inline-block">Narratif & IA</a>
+          <a href="#d4" class="px-2 py-1.5 hover:text-white inline-block">Due diligence</a>
+          <a href="#d5" class="px-2 py-1.5 hover:text-white inline-block">Alliances</a>
+          <a href="#d6" class="px-2 py-1.5 hover:text-white inline-block">Transitions</a>
+          <a href="#d7" class="px-2 py-1.5 hover:text-white inline-block">Contre-pouvoirs</a>
+          <a href="#d8" class="px-2 py-1.5 hover:text-white inline-block">Post-crise</a>
+          <a href="#d9" class="px-2 py-1.5 hover:text-white inline-block">Influence externe</a>
+        </div>
+      </div>
+    </nav>
+
+    <!-- HERO -->
     <section class="w-full min-h-[50vh] flex items-center justify-center text-center px-6">
-      <div class="z-10 max-w-4xl">
-        <h1 class="text-4xl md:text-6xl font-bold leading-tight text-shadow">
-          Expertise Ghost<span class="text-gray-400">Ops</span>
+      <div class="z-10 max-w-5xl">
+        <h1 class="text-3xl md:text-5xl font-bold leading-tight text-shadow">
+          Expertise tactique — Opérations à haute valeur décisionnelle
         </h1>
-        <p class="mt-6 text-lg md:text-xl text-gray-300 text-shadow max-w-3xl mx-auto">
-          Une cellule d’élite opérant au croisement de la gouvernance, de l’influence et de la restructuration RH.  
-          Ici, chaque intervention est calibrée pour transformer un rapport de force en avantage irréversible.
+        <p class="mt-5 text-lg md:text-xl text-gray-300 text-shadow max-w-3xl mx-auto">
+          Nous intervenons là où la théorie se brise : dans les <span class="font-semibold">interstices du pouvoir</span>.
+          Crises RH, repositionnement exécutif, domination narrative, <span class="font-semibold">IA opérante</span>.<br class="hidden md:block">
+          Objectif : transformer une situation instable en avantage maîtrisé.
         </p>
+        <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+          <a href="#domaines" class="px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">Voir nos domaines</a>
+          <a href="#engagement" class="px-6 py-3 rounded-md bg-white/10 hover:bg:white/15 transition font-semibold text-shadow">Modalités d’engagement</a>
+        </div>
       </div>
     </section>
 
-    <!-- Bloc Expertise -->
-    <section class="py-24 px-6 md:px-24 bg-gray-900" data-aos="fade-up">
-      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-white text-shadow text-center">
-        Nos Axes d’Intervention
-      </h2>
-      <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-        
-        <!-- 1 -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Repositionnement de dirigeants</h3>
-          <p class="text-gray-300 text-sm">
-            Ingénierie de trajectoires exécutives : repositionner un leader, redonner de la légitimité, transformer une image fragilisée en autorité incontestable au sein des cercles décisionnels.
-          </p>
+    <!-- BOARD DECK — 30s -->
+    <section class="py-8 px-6 md:px-24">
+      <div class="max-w-6xl mx-auto">
+        <div class="bg-gray-800/70 rounded-xl p-6 md:p-8">
+          <h2 class="text-xl md:text-2xl font-bold text-white text-shadow">Board Deck — 30 secondes</h2>
+          <div class="mt-4 grid md:grid-cols-3 gap-6 text-sm">
+            <div>
+              <div class="text-lg font-semibold">Décision & vitesse</div>
+              <p class="text-gray-300 mt-1">Diagnostic 48 h. Angles exploitables. Exécution en boucles courtes. Le temps redevient un atout.</p>
+            </div>
+            <div>
+              <div class="text-lg font-semibold">Contrôle narratif</div>
+              <p class="text-gray-300 mt-1">Narratifs qui structurent le réel. Messages, séquences, preuves — opérés et mesurés.</p>
+            </div>
+            <div>
+              <div class="text-lg font-semibold">Gouvernance assainie</div>
+              <p class="text-gray-300 mt-1">Chaînes de décision clarifiées, contre-pouvoirs neutralisés, risques humains maîtrisés.</p>
+            </div>
+          </div>
         </div>
-        
-        <!-- 2 -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Neutralisation RH</h3>
-          <p class="text-gray-300 text-sm">
-            Démantèlement chirurgical des verrous humains : élimination des blocages, mise hors-jeu des résistances internes et restauration d’une dynamique organisationnelle fluide.
-          </p>
-        </div>
-        
-        <!-- 3 -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Influence narrative</h3>
-          <p class="text-gray-300 text-sm">
-            Maîtrise des récits et contrôle des perceptions : création de narratifs puissants qui redéfinissent le réel, façonnent la mémoire collective et conditionnent les décisions futures.
-          </p>
-        </div>
-        
-        <!-- 4 -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Restructurations critiques</h3>
-          <p class="text-gray-300 text-sm">
-            Redéploiement en profondeur des structures en crise : absorber le choc, neutraliser les fragilités et réorienter les organisations vers une stabilité durable et une puissance renforcée.
-          </p>
-        </div>
-        
-        <!-- 5 -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Cartographie du pouvoir</h3>
-          <p class="text-gray-300 text-sm">
-            Analyse systémique des jeux d’influence : identification des alliances visibles et invisibles, des points de rupture et des réseaux sous-jacents qui façonnent réellement les décisions.
-          </p>
-        </div>
-        
-        <!-- 6 -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Déstabilisation de contre-pouvoirs</h3>
-          <p class="text-gray-300 text-sm">
-            Anticiper, affaiblir et neutraliser les oppositions : transformer la résistance en levier, jusqu’à inverser le rapport de force pour en faire un avantage compétitif.
-          </p>
-        </div>
-        
-        <!-- 7 -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Gestion de crise à huis clos</h3>
-          <p class="text-gray-300 text-sm">
-            Interventions rapides et discrètes sur des crises sensibles : maîtrise de l’information, confinement des risques et restauration immédiate de l’autorité institutionnelle.
-          </p>
-        </div>
-        
-        <!-- 8 -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Sécurisation de transitions exécutives</h3>
-          <p class="text-gray-300 text-sm">
-            Préparer et orchestrer des passages de relais stratégiques : protection de la continuité, verrouillage des vulnérabilités et consolidation de la confiance des parties prenantes.
-          </p>
-        </div>
-        
-        <!-- 9 -->
-        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Domination réputationnelle</h3>
-          <p class="text-gray-300 text-sm">
-            Élaboration et déploiement d’architectures de réputation inattaquables : renforcer l’image publique, disqualifier les narratifs adverses et établir une présence incontestée.
-          </p>
-        </div>
-        
       </div>
     </section>
 
-    <!-- Bouton retour -->
+    <!-- 9 DOMAINES -->
+    <section id="domaines" class="py-20 px-6 md:px-24">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-white text-shadow">Domaines d’intervention</h2>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- d1 -->
+        <div id="d1" class="bg-gray-800 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Crises RH & verrouillages</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Contenir avant l’explosion. Diagnostic 48 h, isolement des foyers de tension, trajectoires de résolution sous contrôle. Gouvernance, documentation opposable, exécution sans bruit inutile.
+          </p>
+          <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Déployer la war-room</a>
+        </div>
+
+        <!-- d2 -->
+        <div id="d2" class="bg-gray-800 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Repositionnement exécutif</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Reconfigurer le champ de perception autour d’une figure clé. Cartographie des forces, preuves d’autorité au bon endroit, calendrier d’apparitions stratégiques.
+          </p>
+          <a href="#dirigeants" class="text-sm font-medium text-blue-400 hover:underline">Engager le repositionnement</a>
+        </div>
+
+        <!-- d3 -->
+        <div id="d3" class="bg-gray-800 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Domination narrative & IA opérante</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Narratifs qui structurent le réel. Architecture de messages, cadence d’interventions, playbooks IA (écoute, génération, tests, itération) pilotés par indicateurs.
+          </p>
+          <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Activer la séquence</a>
+        </div>
+
+        <!-- d4 -->
+        <div id="d4" class="bg-gray-800 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Due diligence RH & gouvernance</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Mettre à nu l’architecture humaine : personnes-clés, risques opérationnels et réputationnels, conformité (RGPD), remédiations. Décisif avant/après deal.
+          </p>
+          <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Lancer un audit</a>
+        </div>
+
+        <!-- d5 -->
+        <div id="d5" class="bg-gray-800 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Gestion d’alliances invisibles</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Rendre lisibles loyautés et pactes tacites. Activer les alliances utiles, desserrer les coalitions toxiques, réorienter les intérêts.
+          </p>
+          <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Cartographier & mobiliser</a>
+        </div>
+
+        <!-- d6 -->
+        <div id="d6" class="bg-gray-800 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Sorties & transitions sensibles</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Atterrissages sans ondes de choc : narratif de sortie, maîtrise des risques internes/externes, passations contrôlées. Continuité de l’autorité.
+          </p>
+          <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Sécuriser la transition</a>
+        </div>
+
+        <!-- d7 -->
+        <div id="d7" class="bg-gray-800 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Neutralisation des contre-pouvoirs</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Dissocier la résistance au lieu de l’affronter. Anatomie des blocages, exposition des coûts, recomposition des circuits décisionnels.
+          </p>
+          <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Neutraliser un blocage</a>
+        </div>
+
+        <!-- d8 -->
+        <div id="d8" class="bg-gray-800 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Résilience post-crise</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Prévenir la rechute : séquences de stabilisation, rituels de reprise, garde-fous de gouvernance, métriques d’adhésion.
+          </p>
+          <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Structurer la relance</a>
+        </div>
+
+        <!-- d9 -->
+        <div id="d9" class="bg-gray-800 p-6 rounded-xl shadow">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Scénarisation d’influence externe</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Séquences qui cadrent l’interprétation des parties prenantes (actionnaires, médias spécialisés, autorités). Messages, preuves, timing, canaux.
+          </p>
+          <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Concevoir l’offensive</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARCOURS ENTREPRISE -->
+    <section id="entreprise" class="py-20 px-6 md:px-24">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-white text-shadow">Pour l’Entreprise / le Board</h2>
+        <p class="mt-4 text-gray-300 max-w-3xl">
+          Nous traitons les situations où la trajectoire d’une unité, d’un deal ou d’un dirigeant est menacée par des dynamiques humaines instables.
+          L’objectif est simple : <span class="font-semibold">rendre l’issue prévisible</span> en votre faveur, avec le minimum d’exposition.
+        </p>
+
+        <div class="mt-10 grid md:grid-cols-3 gap-8 text-sm">
+          <div class="bg-gray-800 p-6 rounded-xl shadow">
+            <div class="text-lg font-semibold">War-room 30/60/90</div>
+            <p class="text-gray-300 mt-2">Cadence, priorités, boucles de correction. Une cellule opérationnelle, pas une task force de plus.</p>
+          </div>
+          <div class="bg-gray-800 p-6 rounded-xl shadow">
+            <div class="text-lg font-semibold">Playbooks opérants</div>
+            <p class="text-gray-300 mt-2">Décisions actionnables, messages prêts à l’emploi, circuits validés. Zéro artefact décoratif.</p>
+          </div>
+          <div class="bg-gray-800 p-6 rounded-xl shadow">
+            <div class="text-lg font-semibold">Pare-feux réputationnels</div>
+            <p class="text-gray-300 mt-2">Gestion des fuites, cohérence interne/externe, documentation opposable au besoin.</p>
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <a href="#engagement" class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
+            Demander un brief confidentiel
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- PARCOURS DIRIGEANTS / CANDIDATS -->
+    <section id="dirigeants" class="py-20 px-6 md:px-24">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-white text-shadow">Pour les Dirigeants / profils clés</h2>
+        <p class="mt-4 text-gray-300 max-w-3xl">
+          Repositionnement fin, restauration d’autorité, maîtrise des fenêtres d’apparition.
+          Nous travaillons sur votre <span class="font-semibold">pouvoir d’attraction</span> — pas sur votre “CV”.
+        </p>
+
+        <div class="mt-10 grid md:grid-cols-3 gap-8 text-sm">
+          <div class="bg-gray-800 p-6 rounded-xl shadow">
+            <div class="text-lg font-semibold">Narratif exécutif</div>
+            <p class="text-gray-300 mt-2">Bio, angles, preuves d’autorité. Ce qui se dit de vous, orchestré.</p>
+          </div>
+          <div class="bg-gray-800 p-6 rounded-xl shadow">
+            <div class="text-lg font-semibold">Apparitions stratégiques</div>
+            <p class="text-gray-300 mt-2">Cadrage des moments, canaux, séquences. On montre ce qui doit être vu.</p>
+          </div>
+          <div class="bg-gray-800 p-6 rounded-xl shadow">
+            <div class="text-lg font-semibold">Négociations sensibles</div>
+            <p class="text-gray-300 mt-2">Clauses, trajectoires de sortie, relais discret. Aucun angle mort critique.</p>
+          </div>
+        </div>
+
+        <div class="mt-8">
+          <a href="#engagement" class="inline-block px-6 py-3 rounded-md bg-white/10 hover:bg-white/15 transition font-semibold text-shadow">
+            Exposer votre situation
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODALITÉS D’ENGAGEMENT -->
+    <section id="engagement" class="py-20 px-6 md:px-24">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold text-white text-shadow">Modalités d’engagement</h2>
+        <div class="mt-8 grid lg:grid-cols-3 gap-8 text-sm">
+          <div class="bg-gray-800 p-6 rounded-xl shadow">
+            <div class="text-lg font-semibold">Prise d’empreinte (48 h)</div>
+            <p class="text-gray-300 mt-2">Cartographie acteurs/tensions, hypothèses exploitables, points d’appui immédiats.</p>
+          </div>
+          <div class="bg-gray-800 p-6 rounded-xl shadow">
+            <div class="text-lg font-semibold">Exécution sous contrôle</div>
+            <p class="text-gray-300 mt-2">Cellule opérationnelle, playbooks, boucles courtes. Mesure des effets en temps réel.</p>
+          </div>
+          <div class="bg-gray-800 p-6 rounded-xl shadow">
+            <div class="text-lg font-semibold">Stabilisation & relais</div>
+            <p class="text-gray-300 mt-2">Pare-chocs de fin de mission, prévention des rechutes, documentation utile — sans déballage.</p>
+          </div>
+        </div>
+
+        <div class="mt-10 text-center">
+          <a href="/contact.html" class="inline-block px-7 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
+            Brief confidentiel — réponse sous 24 h ouvrées
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ JURIDIQUE / RGPD -->
+    <section id="faq" class="py-16 px-6 md:px-24">
+      <div class="max-w-6xl mx-auto">
+        <h2 class="text-3xl md:text-4xl font-bold mb-6 text-white text-shadow">FAQ — Juridique & RGPD</h2>
+
+        <details class="bg-gray-800/70 rounded-xl p-5 mb-3">
+          <summary class="cursor-pointer font-semibold">Confidentialité des échanges</summary>
+          <p class="mt-2 text-gray-300 text-sm">
+            Tous nos échanges sont traités selon un principe de confidentialité stricte. Nous pouvons signer un NDA en amont de tout partage sensible.
+          </p>
+        </details>
+
+        <details class="bg-gray-800/70 rounded-xl p-5 mb-3">
+          <summary class="cursor-pointer font-semibold">Conformité RGPD</summary>
+          <p class="mt-2 text-gray-300 text-sm">
+            Traitements limités aux données nécessaires, durée de conservation minimale, accès restreint, chiffrement en transit et au repos selon les cas.
+          </p>
+        </details>
+
+        <details class="bg-gray-800/70 rounded-xl p-5 mb-3">
+          <summary class="cursor-pointer font-semibold">Éthique & légalité</summary>
+          <p class="mt-2 text-gray-300 text-sm">
+            Nos opérations respectent le cadre légal. Nous intervenons pour sécuriser la gouvernance et la réputation, jamais pour enfreindre la loi ni nuire aux droits fondamentaux.
+          </p>
+        </details>
+
+        <details class="bg-gray-800/70 rounded-xl p-5">
+          <summary class="cursor-pointer font-semibold">Traçabilité & documentation</summary>
+          <p class="mt-2 text-gray-300 text-sm">
+            Documentation opposable si nécessaire, minimale par défaut pour limiter l’exposition. Le niveau de traçabilité est défini avec vous.
+          </p>
+        </details>
+      </div>
+    </section>
+
+    <!-- Bouton retour accueil -->
     <div class="text-center pb-20">
       <a href="index.html" class="px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
         ← Retour à l’accueil
       </a>
     </div>
-
   </body>
 </html>
