@@ -1,168 +1,301 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
+  <!-- AOS (cohérent avec l'accueil) -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Expertise – GhostOps IA</title>
-  <link rel="icon" href="/assets/favicon.ico" type="image/x-icon" />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-GHOSTOPS1"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
-    gtag('config', 'G-GHOSTOPS1');
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- SEO -->
+  <title>GhostOps – Expertise tactique (crises RH, repositionnement, influence)</title>
+  <meta name="description" content="Cellule d’opérations tactiques de très haut niveau. Crises RH, repositionnement exécutif, domination narrative, IA opérante. Interventions discrètes, résultats mesurables." />
+  <link rel="canonical" href="https://www.ghostops.tech/expertise.html" />
+  <meta name="robots" content="index, follow" />
+
+  <!-- Open Graph / Twitter -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="GhostOps – Expertise tactique" />
+  <meta property="og:description" content="Opérations à haute valeur décisionnelle : crise RH, repositionnement, influence narrative, IA." />
+  <meta property="og:url" content="https://www.ghostops.tech/expertise.html" />
+  <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- JSON-LD minimal -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    "name": "GhostOps – Expertise tactique",
+    "provider": {
+      "@type": "Organization",
+      "name": "GhostOps",
+      "url": "https://www.ghostops.tech"
+    },
+    "areaServed": "EU",
+    "description": "Cellule d’opérations tactiques à haute valeur décisionnelle : crises RH, repositionnement de dirigeants, domination narrative, IA appliquée."
+  }
   </script>
+
+  <!-- Fonts & Tailwind (alignés avec l’accueil) -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter','sans-serif'] },
+          colors: { brand:'#4EC8FF' }
+        }
+      }
+    }
+  </script>
+
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+    /* VISUEL : on garde le même fond et la même sensation */
+    body::before{
+      content:"";
+      background: url('/assets/background-ghostops.jpg') no-repeat center center fixed;
+      background-color:#0f172a;
+      background-size:cover;
+      animation: bgPulse 10s ease-in-out infinite alternate;
+      position:fixed; inset:0; opacity:.25; z-index:-1;
+      transition: opacity .4s ease;
     }
-
-    body {
-      font-family: 'Inter', sans-serif;
-      color: #1a1a1a;
-      background: #f8f9fb;
-    }
-
-    header {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 10;
-      padding: 25px 60px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: transparent;
-      color: white;
-    }
-
-    header h1 {
-      font-size: 1.6em;
-      font-weight: 700;
-      color: white;
-    }
-
-    nav a {
-      color: white;
-      margin-left: 30px;
-      text-decoration: none;
-      font-weight: 500;
-      transition: color 0.3s ease;
-    }
-
-    nav a:hover {
-      color: #c0d4ff;
-    }
-
-    .hero {
-      background: url('/assets/hero-neutral.jpg') no-repeat center center / cover;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: flex-start;
-      position: relative;
-      text-align: left;
-      padding: 0 40px;
-    }
-
-    .hero h2 {
-      font-size: 2.8em;
-      color: white;
-      font-weight: 700;
-      max-width: 800px;
-      margin-bottom: 20px;
-    }
-
-    .hero p {
-      font-size: 1.2em;
-      color: white;
-      max-width: 700px;
-      margin-bottom: 50px;
-    }
-
-    .button-container {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 20px; /* Adjusted to move the buttons closer */
-    }
-
-    .btn-primary {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid white;
-      padding: 12px 28px;
-      color: white;
-      text-decoration: none;
-      border-radius: 6px;
-      font-weight: 500;
-      z-index: 10;
-      transition: background 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-    footer {
-      position: absolute;
-      bottom: 30px;
-      width: 100%;
-      text-align: center;
-      color: white;
-      font-size: 0.85em;
-      z-index: 10;
-    }
-
-    .expertise {
-      padding: 60px 40px;
-      max-width: 1200px;
-      margin: 0 auto;
-    }
-
-    .expertise h3 {
-      font-size: 2.5em;
-      color: #111827;
-      margin-bottom: 20px;
-    }
-
-    .expertise p {
-      font-size: 1.2em;
-      color: #4b5563;
-      line-height: 1.8;
-      margin-bottom: 40px;
-    }
-
+    @keyframes bgPulse{0%{filter:brightness(1) contrast(1)}100%{filter:brightness(1.05) contrast(1.05)}}
+    html{scroll-behavior:smooth}
+    .text-shadow{ text-shadow:1px 1px 4px rgba(0,0,0,.6) }
+    header,main,section,footer{ position:relative; z-index:1 }
   </style>
 </head>
+<body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init();">
 
-<body>
-  <header>
-    <h1>GhostOps IA</h1>
-    <nav>
-      <a href="/index.html">Accueil</a> <!-- Ajout de l'onglet "Accueil" -->
-      <a href="/offres.html">Nos offres</a>
-      <a href="/a-propos.html">À propos</a>
-      <a href="/blog.html">Blog</a>
-      <a href="/contact.html">Contact</a>
-    </nav>
-  </header>
-
-  <section class="hero">
-    <h2>Aligner les compétences avec les nouveaux enjeux stratégiques</h2>
-    <p>Conseil RH et accompagnement sur mesure pour entreprises, dirigeants et experts métiers.</p>
-    <div class="button-container">
-      <a href="/expertise-candidat.html" class="btn-primary">Candidat</a>
-      <a href="/expertise-entreprise.html" class="btn-primary">Entreprise</a>
+  <!-- HERO -->
+  <section class="w-full min-h-[52vh] md:min-h-[60vh] flex items-center justify-center text-center px-6">
+    <div class="z-10 max-w-5xl">
+      <h1 class="text-3xl md:text-5xl font-bold leading-tight text-shadow">
+        Expertise tactique — Opérations à haute valeur décisionnelle
+      </h1>
+      <p class="mt-5 text-lg md:text-xl text-gray-300 text-shadow max-w-3xl mx-auto">
+        Nous intervenons là où la théorie se brise : dans les <span class="font-semibold">interstices du pouvoir</span>.
+        Crises RH, repositionnement exécutif, domination narrative, <span class="font-semibold">IA opérante</span>.
+        <br class="hidden md:block">Objectif : transformer une situation instable en avantage maîtrisé.
+      </p>
+      <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+        <a href="#domaines" class="px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">Voir nos domaines</a>
+        <a href="#engagement" class="px-6 py-3 rounded-md bg-white/10 hover:bg-white/15 transition font-semibold text-shadow">Modalités d’engagement</a>
+      </div>
     </div>
   </section>
 
-  <footer>
-    &copy; 2025 GhostOps IA — Conseil RH & Stratégique
+  <!-- PREUVES / CE QUE VOUS OBTENEZ -->
+  <section class="py-16 px-6 md:px-24" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto">
+      <div class="bg-gray-800/70 rounded-xl p-6 md:p-10">
+        <h2 class="text-2xl md:text-3xl font-bold text-white text-shadow">Ce que vous obtenez</h2>
+        <div class="mt-6 grid md:grid-cols-3 gap-6 text-sm">
+          <div>
+            <div class="text-xl font-semibold">Décision & vitesse</div>
+            <p class="text-gray-300 mt-2">Diagnostic sous 48 h, angles d’attaque exploitables, exécution en boucles courtes. Le temps redevient un atout.</p>
+          </div>
+          <div>
+            <div class="text-xl font-semibold">Contrôle narratif</div>
+            <p class="text-gray-300 mt-2">Récits qui structurent le réel. Messages, séquences, preuves, canaux — opérés et mesurés.</p>
+          </div>
+          <div>
+            <div class="text-xl font-semibold">Gouvernance assainie</div>
+            <p class="text-gray-300 mt-2">Chaînes de décision clarifiées, contre-pouvoirs neutralisés, risques humains maîtrisés.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 DOMAINES -->
+  <section id="domaines" class="py-20 px-6 md:px-24" data-aos="fade-up">
+    <h2 class="text-3xl md:text-4xl font-bold mb-12 text-white text-shadow">Domaines d’intervention</h2>
+
+    <div class="grid md:grid-cols-3 gap-8">
+      <!-- 1 -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow">
+        <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Crises RH & verrouillages</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Contenir avant l’explosion. Diagnostic 48 h, isolement des foyers de tension, trajectoires de résolution sous contrôle. Gouvernance, documentation opposable, exécution sans bruit inutile.
+        </p>
+        <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Déployer la war-room</a>
+      </div>
+
+      <!-- 2 -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow">
+        <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Repositionnement exécutif</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Reconfigurer le champ de perception autour d’une figure clé. Cartographie des forces, preuves d’autorité au bon endroit, calendrier d’apparitions stratégiques.
+        </p>
+        <a href="#dirigeants" class="text-sm font-medium text-blue-400 hover:underline">Engager le repositionnement</a>
+      </div>
+
+      <!-- 3 -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow">
+        <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Domination narrative & IA opérante</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Narratifs qui structurent le réel. Architecture de messages, cadence d’interventions, playbooks IA (écoute, génération, tests, itération) pilotés par indicateurs.
+        </p>
+        <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Activer la séquence</a>
+      </div>
+
+      <!-- 4 -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow">
+        <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Due diligence RH & gouvernance</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Mettre à nu l’architecture humaine : personnes-clés, risques opérationnels et réputationnels, conformité (RGPD), remédiations. Décisif avant/après deal.
+        </p>
+        <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Lancer un audit</a>
+      </div>
+
+      <!-- 5 -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow">
+        <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Gestion d’alliances invisibles</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Rendre lisibles loyautés et pactes tacites. Activer les alliances utiles, desserrer les coalitions toxiques, réorienter les intérêts.
+        </p>
+        <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Cartographier & mobiliser</a>
+      </div>
+
+      <!-- 6 -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow">
+        <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Sorties & transitions sensibles</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Atterrissages sans ondes de choc : narratif de sortie, maîtrise des risques internes/externes, passations contrôlées. Continuité de l’autorité.
+        </p>
+        <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Sécuriser la transition</a>
+      </div>
+
+      <!-- 7 -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow">
+        <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Neutralisation des contre-pouvoirs</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Dissocier la résistance au lieu de l’affronter. Anatomie des blocages, exposition des coûts, recomposition des circuits décisionnels.
+        </p>
+        <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Neutraliser un blocage</a>
+      </div>
+
+      <!-- 8 -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow">
+        <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Résilience post-crise</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Prévenir la rechute : séquences de stabilisation, rituels de reprise, garde-fous de gouvernance, métriques d’adhésion.
+        </p>
+        <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Structurer la relance</a>
+      </div>
+
+      <!-- 9 -->
+      <div class="bg-gray-800 p-6 rounded-xl shadow">
+        <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Scénarisation d’influence externe</h3>
+        <p class="text-gray-300 text-sm mb-4">
+          Séquences qui cadrent l’interprétation des parties prenantes (actionnaires, médias spécialisés, autorités). Messages, preuves, timing, canaux.
+        </p>
+        <a href="#entreprise" class="text-sm font-medium text-blue-400 hover:underline">Concevoir l’offensive</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARCOURS ENTREPRISE -->
+  <section id="entreprise" class="py-20 px-6 md:px-24" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold text-white text-shadow">Pour l’Entreprise / le Board</h2>
+      <p class="mt-4 text-gray-300 max-w-3xl">
+        Nous traitons les situations où la trajectoire d’une unité, d’un deal ou d’un dirigeant est menacée par des dynamiques humaines instables.
+        L’objectif est simple : <span class="font-semibold">rendre l’issue prévisible</span> en votre faveur, avec le minimum d’exposition.
+      </p>
+
+      <div class="mt-10 grid md:grid-cols-3 gap-8 text-sm">
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
+          <div class="text-lg font-semibold">War-room 30/60/90</div>
+          <p class="text-gray-300 mt-2">Cadence, priorités, boucles de correction. Une cellule opérationnelle, pas une task force de plus.</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
+          <div class="text-lg font-semibold">Playbooks opérants</div>
+          <p class="text-gray-300 mt-2">Décisions actionnables, messages prêts à l’emploi, circuits validés. Zéro artefact décoratif.</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
+          <div class="text-lg font-semibold">Pare-feux réputationnels</div>
+          <p class="text-gray-300 mt-2">Gestion des fuites, cohérence interne/externe, documentation opposable au besoin.</p>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <a href="#engagement" class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
+          Demander un brief confidentiel
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- PARCOURS DIRIGEANTS / CANDIDATS -->
+  <section id="dirigeants" class="py-20 px-6 md:px-24" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold text-white text-shadow">Pour les Dirigeants / profils clés</h2>
+      <p class="mt-4 text-gray-300 max-w-3xl">
+        Repositionnement fin, restauration d’autorité, maîtrise des fenêtres d’apparition.
+        Nous travaillons sur votre <span class="font-semibold">pouvoir d’attraction</span> — pas sur votre “CV”.
+      </p>
+
+      <div class="mt-10 grid md:grid-cols-3 gap-8 text-sm">
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
+          <div class="text-lg font-semibold">Narratif exécutif</div>
+          <p class="text-gray-300 mt-2">Bio, angles, preuves d’autorité. Ce qui se dit de vous, orchestré.</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
+          <div class="text-lg font-semibold">Apparitions stratégiques</div>
+          <p class="text-gray-300 mt-2">Cadrage des moments, canaux, séquences. On montre ce qui doit être vu.</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
+          <div class="text-lg font-semibold">Négociations sensibles</div>
+          <p class="text-gray-300 mt-2">Clauses, trajectoires de sortie, relais discret. Aucun angle mort critique.</p>
+        </div>
+      </div>
+
+      <div class="mt-8">
+        <a href="#engagement" class="inline-block px-6 py-3 rounded-md bg-white/10 hover:bg-white/15 transition font-semibold text-shadow">
+          Exposer votre situation
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- MODALITÉS D’ENGAGEMENT -->
+  <section id="engagement" class="py-20 px-6 md:px-24" data-aos="fade-up">
+    <div class="max-w-6xl mx-auto">
+      <h2 class="text-3xl md:text-4xl font-bold text-white text-shadow">Modalités d’engagement</h2>
+      <div class="mt-8 grid lg:grid-cols-3 gap-8 text-sm">
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
+          <div class="text-lg font-semibold">Prise d’empreinte (48 h)</div>
+          <p class="text-gray-300 mt-2">Cartographie acteurs/tensions, hypothèses exploitables, points d’appui immédiats.</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
+          <div class="text-lg font-semibold">Exécution sous contrôle</div>
+          <p class="text-gray-300 mt-2">Cellule opérationnelle, playbooks, boucles courtes. Mesure des effets en temps réel.</p>
+        </div>
+        <div class="bg-gray-800 p-6 rounded-xl shadow">
+          <div class="text-lg font-semibold">Stabilisation & relais</div>
+          <p class="text-gray-300 mt-2">Pare-chocs de fin de mission, prévention des rechutes, documentation utile — sans déballage.</p>
+        </div>
+      </div>
+
+      <div class="mt-10 text-center">
+        <a href="/contact.html" class="inline-block px-7 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
+          Brief confidentiel — réponse sous 24 h ouvrées
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER LÉGER (optionnel) -->
+  <footer class="px-6 md:px-24 pb-12">
+    <div class="max-w-6xl mx-auto text-sm text-gray-400">
+      © GhostOps — Interventions confidentielles. <a href="/mentions-legales.html" class="hover:text-white">Mentions légales</a> · <a href="/politique-confidentialite.html" class="hover:text-white">Confidentialité</a>
+    </div>
   </footer>
 </body>
 </html>
