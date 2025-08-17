@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
+    <!-- JSON-LD WebSite (conservé) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -18,20 +19,43 @@
       }
     }
     </script>
+
+    <!-- JSON-LD Organization (ajouté) -->
+    <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"Organization",
+      "name":"GhostOps",
+      "url":"https://www.ghostops.tech",
+      "description":"Cellule d’opérations tactiques : crises RH, repositionnement de dirigeants, domination narrative, IA appliquée.",
+      "sameAs":["https://www.linkedin.com/company/ghostops-ia/"]
+    }
+    </script>
+
     <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>GhostOps – Cellule tactique d’influence, de repositionnement et de neutralisation RH</title>
-    <meta name="description" content="GhostOps est une cellule confidentielle d’intervention. Nous orchestrons des opérations de pouvoir : repositionnement de dirigeants, démantèlement RH et influence stratégique sur les zones de tension organisationnelles." />
-    <meta name="keywords" content="repositionnement dirigeant, influence narrative, neutralisation RH, GhostOps, cellule stratégique, intervention tactique, gouvernance de crise, manipulation RH, restructuration de pouvoir" />
+
+    <!-- SEO mis à jour (sans impacter le visuel) -->
+    <title>GhostOps – Cellule d’opérations tactiques (crises RH, repositionnement, influence)</title>
+    <meta name="description" content="Cellule d’opérations tactiques : crises RH, repositionnement de dirigeants, domination narrative, IA appliquée. Interventions discrètes, résultats mesurables." />
+    <link rel="canonical" href="https://www.ghostops.tech/" />
+    <meta name="robots" content="index, follow">
     <meta name="author" content="GhostOps IA" />
-    <meta property="og:title" content="GhostOps – Cellule tactique d’intervention RH et narrative" />
-    <meta property="og:description" content="GhostOps intervient là où les structures se fissurent : influence, repositionnement, déverrouillage RH. Une approche offensive au service du pouvoir." />
+
+    <!-- Open Graph / Twitter (conservant tes visuels) -->
+    <meta property="og:title" content="GhostOps – Cellule d’opérations tactiques" />
+    <meta property="og:description" content="Crises RH, repositionnement de dirigeants, domination narrative, IA appliquée. Interventions discrètes, résultats mesurables." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.ghostops.tech" />
     <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
-    <meta name="robots" content="index, follow">
+    <meta name="twitter:card" content="summary_large_image" />
+
+    <!-- (Optionnel) keywords conservés si tu y tiens -->
+    <meta name="keywords" content="repositionnement dirigeant, influence narrative, neutralisation RH, GhostOps, cellule stratégique, intervention tactique, gouvernance de crise, restructuration de pouvoir, IA RH" />
+
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -72,82 +96,82 @@
         transform: scale(1.05);
         box-shadow: 0 8px 24px rgba(0,0,0,0.3);
       }
-      html {
-        scroll-behavior: smooth;
-      }
-      .scroll-snap {
-        scroll-snap-type: x mandatory;
-      }
-      .testimonial-card {
-        scroll-snap-align: center;
-      }
+      html { scroll-behavior: smooth; }
+      .scroll-snap { scroll-snap-type: x mandatory; }
+      .testimonial-card { scroll-snap-align: center; }
       @keyframes bgPulse {
         0% { filter: brightness(1) contrast(1); }
         100% { filter: brightness(1.05) contrast(1.05); }
       }
-      .no-scrollbar::-webkit-scrollbar {
-        display: none;
-      }
-      .no-scrollbar {
-        -ms-overflow-style: none;
-        scrollbar-width: none;
-      }
-      .text-shadow {
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-      }
-      header, main, section, footer {
-        position: relative;
-        z-index: 1;
-      }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .text-shadow { text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6); }
+      header, main, section, footer { position: relative; z-index: 1; }
     </style>
   </head>
-  <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init();">
-    <section class="w-full min-h-[60vh] flex items-center justify-center text-center px-6">
-  <div class="z-10 max-w-4xl">
-    <h1 class="text-4xl md:text-6xl font-bold leading-tight text-shadow">
-  <span class="text-white">GHOST</span><span class="text-gray-400"> OPS</span>
-</h1>
-    <p class="mt-6 text-lg md:text-xl text-gray-300 text-shadow max-w-3xl mx-auto">
-      Une cellule d’opérations tactiques à haute valeur décisionnelle.<br>
-      GhostOps intervient dans les interstices du pouvoir,<br>
-      là où les lignes de commandement vacillent et où les trajectoires se reconfigurent.
-    </p>
-    <p class="mt-6 text-md md:text-lg text-gray-400 text-shadow max-w-3xl mx-auto">
-      Repositionnement de figures clés, démantèlement de verrouillages RH,<br>
-      scénarisation d’alliances invisibles et de narratifs d’influence.<br>
-      Notre approche n’a pas pour but de rassurer, mais de repositionner.
-    </p>
-    <p class="mt-4 text-md md:text-base text-gray-400 italic text-shadow">
-      GhostOps ne conseille pas. GhostOps modifie la carte du pouvoir.
-    </p>
-    <a href="#zones-intervention"
-       class="mt-10 inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
-      D&eacute;couvrir nos interventions
-    </a>
-  </div>
-</section>
 
-<section id="interventions" class="py-24 px-6 md:px-24 bg-gray-900 text-left" data-aos="fade-up">
-  <h2 class="text-3xl md:text-4xl font-bold mb-12 text-white text-shadow">
-    Interventions confidentielles GhostOps
-  </h2>
-  <div class="grid md:grid-cols-3 gap-8">
-    <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-      <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Repositionnement de dirigeants</h3>
-      <p class="text-gray-300 text-sm mb-4">Nous redéployons votre légitimité là où elle est attaquée : trajectoires d'autorité, narratif de pouvoir, stratégies de réapparition ciblée.</p>
-      <a href="#" class="text-sm font-medium text-blue-400 hover:underline">Activer une opération</a>
-    </div>
-    <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-      <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Neutralisation RH</h3>
-      <p class="text-gray-300 text-sm mb-4">Nous identifions, exposons et déverrouillons les lignes RH bloquantes. Silence, documentation, retournement stratégique.</p>
-      <a href="#" class="text-sm font-medium text-blue-400 hover:underline">Déployer une neutralisation</a>
-    </div>
-    <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
-      <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Influence narrative</h3>
-      <p class="text-gray-300 text-sm mb-4">Nous construisons des narratifs à effet de levier : discours, alliances, présence digitale. Pour faire plier le réel.</p>
-      <a href="#" class="text-sm font-medium text-blue-400 hover:underline">Entrer en phase d'influence</a>
-    </div>
-  </div>
-</section>
+  <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init();">
+    <!-- HERO (texte ajusté uniquement) -->
+    <section class="w-full min-h-[60vh] flex items-center justify-center text-center px-6">
+      <div class="z-10 max-w-4xl">
+        <h1 class="text-4xl md:text-6xl font-bold leading-tight text-shadow">
+          <span class="text-white">GHOST</span><span class="text-gray-400"> OPS</span>
+        </h1>
+
+        <p class="mt-6 text-lg md:text-xl text-gray-300 text-shadow max-w-3xl mx-auto">
+          Une cellule d’opérations tactiques à haute valeur décisionnelle.<br>
+          GhostOps intervient dans les <span class="font-semibold">interstices du pouvoir</span>,<br>
+          là où les lignes de commandement vacillent et où les trajectoires se reconfigurent.
+        </p>
+
+        <p class="mt-6 text-md md:text-lg text-gray-400 text-shadow max-w-3xl mx-auto">
+          Crises RH, repositionnement de dirigeants, <span class="font-semibold">domination narrative</span> et <span class="font-semibold">IA appliquée</span>.<br>
+          Notre objectif n’est pas de rassurer, mais de <span class="font-semibold">repositionner</span>.
+        </p>
+
+        <p class="mt-4 text-md md:text-base text-gray-400 italic text-shadow">
+          GhostOps ne conseille pas. GhostOps modifie la carte du pouvoir.
+        </p>
+
+        <!-- CTA : renvoie vers expertise.html comme souhaité -->
+        <a href="/expertise.html"
+           class="mt-10 inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
+          Découvrir l’expertise
+        </a>
+      </div>
+    </section>
+
+    <!-- INTERVENTIONS (wording affûté, visuel intact) -->
+    <section id="interventions" class="py-24 px-6 md:px-24 bg-gray-900 text-left" data-aos="fade-up">
+      <h2 class="text-3xl md:text-4xl font-bold mb-12 text-white text-shadow">
+        Interventions confidentielles GhostOps
+      </h2>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Crises RH & verrouillages</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Contenir, isoler, déminer. War-room 30/60/90 et trajectoires de sortie contrôlées.
+          </p>
+          <a href="/expertise-entreprise.html" class="text-sm font-medium text-blue-400 hover:underline">Activer une opération</a>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Repositionnement exécutif</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Restaurer la légitimité, reconfigurer la perception, accélérer la transition.
+          </p>
+          <a href="/expertise-candidat.html" class="text-sm font-medium text-blue-400 hover:underline">Déployer un repositionnement</a>
+        </div>
+
+        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">Domination narrative & IA</h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Reprendre le récit interne/externe. Playbooks d’IA qui s’exécutent, pas des slides.
+          </p>
+          <a href="/expertise.html" class="text-sm font-medium text-blue-400 hover:underline">Entrer en phase d'influence</a>
+        </div>
+      </div>
+    </section>
   </body>
 </html>
