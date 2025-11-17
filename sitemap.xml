@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <!-- Page d'accueil -->
+
+  <!--  Page d'accueil  -->
   <url>
     <loc>https://www.ghostops.tech/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
-  <!-- Expertise -->
+  <!--  Expertise  -->
   <url>
     <loc>https://www.ghostops.tech/expertise.html</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
 
-  <!-- Pages domaines d'intervention -->
+  <!--  Pages domaines d'intervention  -->
   <url>
     <loc>https://www.ghostops.tech/crises-rh-war-room.html</loc>
     <changefreq>monthly</changefreq>
@@ -69,10 +70,11 @@
     <priority>0.8</priority>
   </url>
 
-  <!-- Contact -->
+  <!--  Contact  -->
   <url>
     <loc>https://www.ghostops.tech/contact.html</loc>
     <changefreq>monthly</changefreq>
     <priority>0.6</priority>
   </url>
+
 </urlset>
