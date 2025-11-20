@@ -1,85 +1,54 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-
-  <!-- Page d'accueil -->
+<urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
+  <!-- Page d'accueil (canonique : /) -->
   <url>
     <loc>https://www.ghostops.tech/</loc>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
   </url>
 
-  <!-- Expertise -->
+  <!-- Noyau offre / expertise -->
   <url>
     <loc>https://www.ghostops.tech/expertise.html</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://www.ghostops.tech/contact.html</loc>
   </url>
 
-  <!-- Pages domaines d'intervention -->
+  <!-- Domaines d’intervention -->
   <url>
     <loc>https://www.ghostops.tech/crises-rh-war-room.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.ghostops.tech/repositionnement-executif.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.ghostops.tech/due-diligence-rh-gouvernance.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.ghostops.tech/gestion-alliances-invisibles.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.ghostops.tech/sorties-transitions-sensibles.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.ghostops.tech/neutralisation-contre-pouvoirs.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.ghostops.tech/resilience-post-crise.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
-  </url>
-  <url>
-    <loc>https://www.ghostops.tech/scenarisation-influence-externe.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
     <loc>https://www.ghostops.tech/domination-narrative-ia-operante.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.8</priority>
   </url>
   <url>
-  <loc>https://www.ghostops.tech/fonction-juridique-risque-gouvernance.html</loc>
-  <changefreq>monthly</changefreq>
-  <priority>0.7</priority>
-</url>
-
-
-  <!-- Contact -->
+    <loc>https://www.ghostops.tech/due-diligence-rh-gouvernance.html</loc>
+  </url>
   <url>
-    <loc>https://www.ghostops.tech/contact.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.6</priority>
+    <loc>https://www.ghostops.tech/gestion-alliances-invisibles.html</loc>
+  </url>
+  <url>
+    <loc>https://www.ghostops.tech/sorties-transitions-sensibles.html</loc>
+  </url>
+  <url>
+    <loc>https://www.ghostops.tech/neutralisation-contre-pouvoirs.html</loc>
+  </url>
+  <url>
+    <loc>https://www.ghostops.tech/resilience-post-crise.html</loc>
+  </url>
+  <url>
+    <loc>https://www.ghostops.tech/scenarisation-influence-externe.html</loc>
   </url>
 
-  <!-- Mentions légales -->
+  <!-- Contenu éditorial / article juridique -->
+  <url>
+    <loc>https://www.ghostops.tech/fonction-juridique-risque-gouvernance.html</loc>
+  </url>
+
+  <!-- Légal -->
   <url>
     <loc>https://www.ghostops.tech/mentions-legales.html</loc>
-    <changefreq>yearly</changefreq>
-    <priority>0.3</priority>
   </url>
-
 </urlset>
