@@ -1,1 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <title>Commandement perdu – Quand la ligne hiérarchique se désagrège – Chronique GhostOps</title>
+    <meta name="description" content="Analyse GhostOps : comment une ligne hiérarchique peut se désagréger en silence, jusqu’à rendre le commandement inopérant en situation de crise RH, sociale ou opérationnelle." />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://www.ghostops.tech/commandement-perdu-ligne-hierarchique-desagregee.html" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Commandement perdu – Quand la ligne hiérarchique se désagrège – Chronique GhostOps" />
+    <meta property="og:description" content="Dans certaines organisations, le commandement ne tient plus : la ligne hiérarchique se fissure, les loyautés se déplacent et les décisions ne descendent plus. Lecture GhostOps pour dirigeants, boards et DRH." />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="https://www.ghostops.tech/commandement-perdu-ligne-hierarchique-desagregee.html" />
+    <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
+
+    <!-- Breadcrumbs Article -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Accueil",
+          "item": "https://www.ghostops.tech/"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Commandement perdu : quand la ligne hiérarchique se désagrège",
+          "item": "https://www.ghostops.tech/commandement-perdu-ligne-hierarchique-desagregee.html"
+        }
+      ]
+    }
+    </script>
+
+    <!-- Article structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Article",
+      "headline": "Commandement perdu : quand la ligne hiérarchique se désagrège",
+      "alternativeHeadline": "Commandement perdu en zone de crise : lire les fissures de la ligne hiérarchique",
+      "description": "Analyse GhostOps : comment une ligne hiérarchique peut se désagréger en silence, jusqu’à rendre le commandement inopérant en situation de crise RH, sociale ou opérationnelle – et comment un board ou un dirigeant peuvent reprendre la main.",
+      "articleSection": "Gouvernance & lignes hiérarchiques",
+      "keywords": [
+        "commandement",
+        "ligne hiérarchique",
+        "crise RH",
+        "gouvernance",
+        "board",
+        "comité exécutif",
+        "GhostOps"
+      ],
+      "author": {
+        "@type": "Organization",
+        "name": "GhostOps",
+        "url": "https://www.ghostops.tech/"
+      },
+      "publisher": {
+        "@type": "Organization",
+        "name": "GhostOps",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.ghostops.tech/assets/ghostops-preview.jpg"
+        }
+      },
+      "url": "https://www.ghostops.tech/commandement-perdu-ligne-hierarchique-desagregee.html",
+      "mainEntityOfPage": {
+        "@type": "WebPage",
+        "@id": "https://www.ghostops.tech/commandement-perdu-ligne-hierarchique-desagregee.html"
+      },
+      "image": [
+        "https://www.ghostops.tech/assets/ghostops-opengraph.jpg"
+      ],
+      "inLanguage": "fr-FR",
+      "datePublished": "2025-11-24",
+      "dateModified": "2025-11-24"
+    }
+    </script>
+
+    <!-- Fonts & Tailwind -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } }
+      };
+    </script>
+
+    <style>
+      body::before {
+        content: "";
+        background: url('/assets/background-ghostops.jpg') no-repeat center center fixed;
+        background-color: #0f172a;
+        background-size: cover;
+        animation: bgPulse 10s ease-in-out infinite alternate;
+        position: fixed; inset: 0; opacity: 0.25; z-index: -1;
+        transition: opacity .4s ease;
+      }
+      @keyframes bgPulse {
+        0% { filter: brightness(1) contrast(1); }
+        100% { filter: brightness(1.05) contrast(1.05); }
+      }
+      .text-shadow { text-shadow: 1px 1px 4px rgba(0,0,0,.6); }
+      html { scroll-behavior: smooth; }
+      header, main, section, footer { position: relative; z-index: 1; }
+    </style>
+  </head>
+
+  <body class="bg-gray-900 text-white font-sans leading-relaxed">
+    <!-- HEADER -->
+    <header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
+      <a href="/" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
+        GHOST<span class="text-gray-400">OPS</span>
+      </a>
+      <nav class="flex items-center gap-4 text-xs md:text-sm">
+        <a href="/" class="text-gray-300 hover:text-white">Accueil</a>
+        <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
+        <a href="/contact.html"
+           class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition">
+          Contact confidentiel
+        </a>
+      </nav>
+    </header>
+
+    <main class="px-6 md:px-24 pb-24">
+      <article class="max-w-5xl mx-auto mt-6 mb-16">
+        <header class="mb-8">
+          <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">
+            Chronique GhostOps – Commandement &amp; lignes hiérarchiques
+          </p>
+          <h1 class="text-3xl md:text-4xl font-bold mb-4 text-shadow">
+            Commandement perdu : quand la ligne hiérarchique se désagrège
+          </h1>
+          <p class="text-gray-200 text-sm md:text-base mb-3">
+            Sur les organigrammes, la ligne hiérarchique est claire : un PDG, un comité exécutif, des directions,
+            des managers relais. Dans la réalité, surtout en zone de crise, cette ligne peut se fissurer silencieusement
+            jusqu’à ce que le commandement ne tienne plus. Les décisions “descendent” mal, les signaux du terrain
+            remontent filtrés, et chacun finit par improviser sa propre boussole.
+          </p>
+          <p class="text-gray-300 text-sm md:text-base">
+            Cette chronique propose une grille de lecture des situations où le commandement est, de fait, perdu :
+            la hiérarchie continue d’exister formellement, mais l’autorité effective s’est déplacée ailleurs.
+            L’enjeu pour un board, un PDG ou un DRH n’est plus seulement de “reprendre la main”, mais de comprendre
+            par quels mécanismes la chaîne s’est désagrégée pour la reconstruire sans déclencher une crise ouverte.
+          </p>
+          <p class="text-gray-400 text-[11px] md:text-xs mt-3">
+            Dernière mise à jour : 24 novembre 2025 · Lecture estimée : 9 minutes
+          </p>
+        </header>
+
+        <div class="mt-8 grid lg:grid-cols-[minmax(0,3fr)_minmax(0,1.15fr)] gap-10 items-start">
+          <!-- Colonne principale -->
+          <div class="space-y-10 text-gray-300 text-sm md:text-base">
+            <!-- SECTION 1 -->
+            <section>
+              <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
+                1. Quand l’organigramme ne dit plus la vérité
+              </h2>
+              <p class="mb-4">
+                Pendant longtemps, les organisations ont supposé que le schéma de commandement “tenait” tant que
+                l’organigramme tenait. Un directeur officiellement nommé, une équipe rattachée, des lignes de
+                reporting tracées : le reste serait affaire de style managérial. Or, en zone de tension prolongée,
+                cette fiction se fissure vite.
+              </p>
+              <p class="mb-4">
+                Trois glissements sont fréquents :
+              </p>
+              <ul class="list-disc list-inside space-y-1 mb-4">
+                <li>
+                  l’autorité formelle n’est plus alignée avec l’<span class="font-semibold">autorité perçue</span> :
+                  un manager conserve son titre, mais plus la confiance ;
+                </li>
+                <li>
+                  des acteurs non visibles sur l’organigramme (experts clés, relais informels, anciens dirigeants
+                  restés dans l’ombre) deviennent les <span class="font-semibold">vrais points de référence</span> ;
+                </li>
+                <li>
+                  la peur de l’erreur ou de l’exposition personnelle incite certains niveaux hiérarchiques à
+                  <span class="font-semibold">ne plus décider</span>, mais à transmettre les problèmes vers le haut ou le bas.
+                </li>
+              </ul>
+              <p>
+                À ce stade, le commandement n’est pas officiellement remis en cause, mais il ne produit plus
+                ce qu’on attend de lui : une direction claire, assumée, lisible pour le terrain comme pour le board.
+              </p>
+            </section>
+
+            <!-- SECTION 2 – Symptômes -->
+            <section>
+              <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
+                2. Cinq symptômes d’un commandement perdu
+              </h2>
+              <p class="mb-4">
+                Un dirigeant ou un conseil d’administration ne voit pas toujours immédiatement que la ligne se délite.
+                Pourtant, certains symptômes reviennent systématiquement dans les dossiers où GhostOps intervient.
+              </p>
+
+              <div class="space-y-4">
+                <div>
+                  <h3 class="font-semibold mb-1">Symptôme n°1 – Décisions votées, décisions non appliquées</h3>
+                  <p>
+                    Les comités valident des plans, les slides circulent, les arbitrages sont “actés”. Mais sur le terrain,
+                    l’exécution est fragmentée, lente ou cosmétique. Chacun fait “à sa manière”, en fonction de ce qu’il
+                    juge tenable localement. Le commandement existe en séance, mais plus dans les actes.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 class="font-semibold mb-1">Symptôme n°2 – Circuits parallèles d’information</h3>
+                  <p>
+                    Les collaborateurs ne passent plus par la voie hiérarchique, mais par des circuits informels :
+                    anciens managers, pairs, réseaux de confiance internes. Les informations critiques remontent
+                    tard ou partiellement jusqu’aux décideurs officiels, tandis que certains niveaux hiérarchiques
+                    apprennent les choses “après tout le monde”.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 class="font-semibold mb-1">Symptôme n°3 – Loyautés réorientées</h3>
+                  <p>
+                    Les loyautés ne sont plus alignées sur la structure officielle, mais sur des personnes ou des
+                    groupes jugés plus solides : un ancien directeur général, un directeur d’usine charismatique,
+                    une fonction support devenue centre de gravité. Le réflexe n’est plus de “remonter à son N+1”,
+                    mais de consulter cette autre référence.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 class="font-semibold mb-1">Symptôme n°4 – Multiplication des arbitrages “en off”</h3>
+                  <p>
+                    Les décisions structurantes ne sont plus prises dans les instances dédiées, mais en marge :
+                    coups de fil entre deux personnes, échanges informels, SMS de dernière minute. Les instances
+                    servent alors à entériner un consensus déjà construit ailleurs – ou à faire semblant de décider.
+                  </p>
+                </div>
+
+                <div>
+                  <h3 class="font-semibold mb-1">Symptôme n°5 – Silence stratégique</h3>
+                  <p>
+                    Enfin, le signe le plus inquiétant : le silence. Managers qui évitent les sujets sensibles,
+                    directions qui “prennent note” sans se positionner, comités où l’on parle de tout sauf du cœur
+                    du problème. Quand le commandement ne produit plus de récit explicite, d’autres récits prennent
+                    la place : rumeurs, interprétations, narratifs de repli.
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <!-- SECTION 3 – Comment l’organisation compense -->
+            <section>
+              <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
+                3. Ce que l’organisation met en place pour compenser
+              </h2>
+              <p class="mb-4">
+                Une organisation ne reste pas indéfiniment sans commandement. Quand la ligne officielle se fragilise,
+                des mécanismes de compensation apparaissent. Ils permettent de continuer à fonctionner, mais au prix
+                d’une distorsion croissante entre le réel et ce que voit la gouvernance.
+              </p>
+              <ul class="list-disc list-inside space-y-1 mb-4">
+                <li>
+                  <span class="font-semibold">Micro-chefferies locales</span> : des managers intermédiaires ou experts
+                  prennent de facto la main, avec des styles très contrastés (protecteurs, autoritaires, cyniques…).
+                </li>
+                <li>
+                  <span class="font-semibold">Contournements de procédure</span> : pour “faire avancer les choses”,
+                  on s’affranchit de certains processus, au risque de créer des zones d’ombre et des angles morts.
+                </li>
+                <li>
+                  <span class="font-semibold">Inflation de comités</span> : pour pallier la difficulté à décider,
+                  on crée de nouvelles instances, nouvelles réunions, nouvelles routes de validation – qui ralentissent
+                  encore l’action.
+                </li>
+                <li>
+                  <span class="font-semibold">Narratifs parallèles</span> : les équipes élaborent leurs propres
+                  explications sur ce qui se passe réellement, souvent plus tranchées que la communication officielle.
+                </li>
+              </ul>
+              <p>
+                Tant que ces mécanismes restent invisibles au niveau du board, la gouvernance peut croire que
+                “le commandement tient”, alors que l’entreprise fonctionne en réalité sur un régime d’économie parallèle
+                du pouvoir.
+              </p>
+            </section>
+
+            <!-- SECTION 4 – Effets sur dirigeants et board -->
+            <section>
+              <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
+                4. Les effets d’un commandement perdu sur les dirigeants et le board
+              </h2>
+              <p class="mb-4">
+                Un commandement perdu ne se voit pas uniquement dans les indicateurs sociaux ou opérationnels.
+                Il affecte directement la qualité des décisions prises par les dirigeants eux-mêmes.
+              </p>
+              <ul class="list-disc list-inside space-y-1 mb-4">
+                <li>
+                  <span class="font-semibold">Décisions mal calibrées</span> : les dirigeants tranchent sur la base
+                  d’informations incomplètes, trop “lissées” ou filtrées, ce qui augmente la probabilité de mauvais choix.
+                </li>
+                <li>
+                  <span class="font-semibold">Sur-confiance dans certaines fonctions</span> : la gouvernance s’appuie
+                  excessivement sur quelques relais jugés fiables (juridique, finance, RH, etc.), qui finissent par
+                  tenir un rôle de quasi-commande parallèle.
+                </li>
+                <li>
+                  <span class="font-semibold">Fatigue décisionnelle</span> : la répétition de décisions peu suivies
+                  d’effet finit par user les dirigeants, qui renoncent à certaines batailles ou les délèguent
+                  sans vrai suivi.
+                </li>
+                <li>
+                  <span class="font-semibold">Exposition personnelle accrue</span> : faute de relais solides,
+                  certains dirigeants se retrouvent en première ligne sur des dossiers qu’ils ne maîtrisent que
+                  partiellement, avec un risque individuel important.
+                </li>
+              </ul>
+              <p>
+                L’impression d’“avoir tout essayé” vient souvent de là : ce n’est pas la stratégie qui a échoué, mais
+                la capacité réelle du commandement à l’incarner et à la faire vivre dans l’organisation.
+              </p>
+            </section>
+
+            <!-- SECTION 5 – Questions pour réévaluer la ligne -->
+            <section>
+              <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
+                5. Cinq questions pour réévaluer la ligne hiérarchique en zone de crise
+              </h2>
+              <p class="mb-4">
+                Sans lancer un audit lourd ni humilier la ligne managériale, un PDG, un DRH ou un board peuvent
+                réévaluer la solidité du commandement en se posant quelques questions simples.
+              </p>
+              <ol class="list-decimal list-inside space-y-1 mb-4">
+                <li>
+                  <span class="font-semibold">Où se prennent réellement les décisions critiques&nbsp;?</span><br />
+                  Dans les comités formels, dans des échanges bilatéraux, ou dans des réseaux informels&nbsp;?
+                </li>
+                <li>
+                  <span class="font-semibold">Qui sont les trois personnes que le terrain consulte vraiment&nbsp;?</span><br />
+                  Sont-elles dans la ligne officielle, ou à côté&nbsp;?
+                </li>
+                <li>
+                  <span class="font-semibold">Quels messages ne redescendent plus&nbsp;?</span><br />
+                  Sur quels sujets la ligne intermédiaire “neutralise” ou euphémise les décisions de la direction&nbsp;?
+                </li>
+                <li>
+                  <span class="font-semibold">Quelles décisions reviennent systématiquement sur la table&nbsp;?</span><br />
+                  Une décision qui doit être “réaffirmée” plusieurs fois n’est, en réalité, pas intégrée.
+                </li>
+                <li>
+                  <span class="font-semibold">Quelles sont les peurs inavouées de la ligne managériale&nbsp;?</span><br />
+                  Perte de poste, exposition personnelle, conflit avec un collectif, mise en cause future…
+                  Tant que ces peurs ne sont pas nommées, elles pilotent silencieusement les comportements.
+                </li>
+              </ol>
+              <p>
+                Ces questions ne visent pas à distribuer des blâmes, mais à rendre visible ce qui gouverne réellement
+                l’organisation à un instant T : structures officielles, réseaux d’influence, ou combinaison des deux.
+              </p>
+            </section>
+
+            <!-- SECTION 6 – Position GhostOps -->
+            <section>
+              <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
+                6. Où intervient GhostOps quand le commandement est perdu&nbsp;?
+              </h2>
+              <p class="mb-4">
+                GhostOps n’a pas vocation à “évaluer les managers” au sens classique. Notre rôle est de
+                <span class="font-semibold">cartographier la réalité du commandement</span> dans un contexte donné :
+                qui décide quoi, qui écoute qui, qui bloque quoi, qui protège qui.
+              </p>
+              <p class="mb-4">
+                Concrètement, dans les situations de commandement perdu, nous intervenons&nbsp;:
+              </p>
+              <ul class="list-disc list-inside space-y-1 mb-4">
+                <li>
+                  en <span class="font-semibold">lecture croisée</span> des circuits de décision formels et informels&nbsp;;
+                </li>
+                <li>
+                  en <span class="font-semibold">recomposition de la ligne effective</span> de commandement à partir
+                  des loyautés et de l’autorité perçue&nbsp;;
+                </li>
+                <li>
+                  en <span class="font-semibold">scénarisation de trajectoires</span> (remobilisation, repositionnement,
+                  sorties, renforts) compatibles avec le calendrier social, opérationnel et réputationnel&nbsp;;
+                </li>
+                <li>
+                  en appui discret d’un sponsor (PDG, board, DRH groupe) qui souhaite disposer d’une vision non filtrée
+                  avant d’engager des mouvements visibles.
+                </li>
+              </ul>
+              <p>
+                L’objectif n’est pas d’ajouter une couche de reporting, mais de permettre à la gouvernance de
+                <span class="font-semibold">reprendre un commandement crédible</span> : clair pour le terrain,
+                assumé par les dirigeants, soutenable dans la durée. Pour une vue globale de nos terrains
+                d’intervention, vous pouvez consulter la page
+                <a href="/expertise.html" class="text-blue-400 hover:underline">Expertise GhostOps</a>.
+              </p>
+            </section>
+          </div>
+
+          <!-- ASIDE -->
+          <aside class="bg-gray-800/70 rounded-2xl p-5 md:p-6 text-xs md:text-sm text-gray-300">
+            <p class="text-[11px] uppercase tracking-[.25em] text-gray-400 mb-3">
+              À propos de cette chronique
+            </p>
+            <p class="mb-3">
+              Ce texte s’adresse aux dirigeants, boards, DRH et directions de sites confrontés à une situation
+              où “tout semble encore en place” sur le papier, mais où la ligne hiérarchique ne produit plus
+              de commandement réel.
+            </p>
+            <p class="mb-4">
+              Il ne décrit pas une entreprise précise. Il synthétise des schémas récurrents observés dans
+              des environnements industriels, de services et de groupes internationaux en tension prolongée.
+            </p>
+            <div class="border-t border-gray-700 my-4"></div>
+            <p class="text-[11px] uppercase tracking-[.25em] text-gray-400 mb-3">
+              GhostOps en bref
+            </p>
+            <p class="mb-3">
+              GhostOps est une cellule confidentielle d’intervention positionnée à l’interface des RH, de la
+              gouvernance et de l’IA opérante. Nous intervenons lorsque le commandement est fragilisé, que
+              les lignes officielles ne suffisent plus et que les décisions à venir engageront fortement
+              la trajectoire d’un site, d’une filiale ou d’un dirigeant.
+            </p>
+            <ul class="list-disc list-inside space-y-1 mb-4">
+              <li>Crises RH et tensions sur sites.</li>
+              <li>Repositionnement de dirigeants et trajectoires exécutives.</li>
+              <li>Cartographie des loyautés et neutralisation des contre-pouvoirs.</li>
+            </ul>
+            <a href="/contact.html"
+               class="inline-block w-full text-center px-4 py-2 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold mb-2">
+              Décrire une situation confidentielle
+            </a>
+            <a href="/expertise.html"
+               class="block text-center text-blue-400 hover:underline mt-1">
+              Consulter l’expertise GhostOps
+            </a>
+          </aside>
+        </div>
+      </article>
+
+      <!-- LIENS VERS DOMAINES -->
+      <section class="max-w-5xl mx-auto mb-12">
+        <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
+          Pour aller plus loin : domaines d’intervention GhostOps liés à ces situations
+        </h2>
+        <div class="grid md:grid-cols-2 gap-6 text-sm">
+          <div class="bg-gray-800/70 rounded-xl p-5">
+            <h3 class="font-semibold mb-2">Crises RH &amp; war-room de commandement</h3>
+            <p class="text-gray-300 mb-3">
+              Sites en tension, climat social dégradé, managers en difficulté, risques de rupture.
+              Dispositif court, scénarios d’issue et stabilisation du commandement.
+            </p>
+            <a href="/crises-rh-war-room.html" class="text-blue-400 hover:underline">
+              Découvrir la war-room GhostOps
+            </a>
+          </div>
+          <div class="bg-gray-800/70 rounded-xl p-5">
+            <h3 class="font-semibold mb-2">Repositionnement exécutif &amp; trajectoires</h3>
+            <p class="text-gray-300 mb-3">
+              Dirigeants fragilisés, comités contestés, nouvelles lignes à installer.
+              Travail sur le narratif exécutif, les fenêtres d’apparition et les relais de commandement.
+            </p>
+            <a href="/repositionnement-executif.html" class="text-blue-400 hover:underline">
+              Voir le dispositif de repositionnement
+            </a>
+          </div>
+          <div class="bg-gray-800/70 rounded-xl p-5">
+            <h3 class="font-semibold mb-2">Neutralisation des contre-pouvoirs</h3>
+            <p class="text-gray-300 mb-3">
+              Quand certaines fonctions ou groupes deviennent des veto de facto.
+              Recomposition des circuits d’arbitrage et restauration d’une ligne d’autorité claire.
+            </p>
+            <a href="/neutralisation-contre-pouvoirs.html" class="text-blue-400 hover:underline">
+              Explorer ce domaine
+            </a>
+          </div>
+          <div class="bg-gray-800/70 rounded-xl p-5">
+            <h3 class="font-semibold mb-2">Cartographie des loyautés &amp; lignes invisibles</h3>
+            <p class="text-gray-300 mb-3">
+              Analyse fine des réseaux d’influence, des loyautés réelles et des lignes de fracture,
+              pour éclairer les décisions de gouvernance à venir.
+            </p>
+            <a href="/expertise.html#domaines" class="text-blue-400 hover:underline">
+              Accéder aux domaines d’expertise
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA FINAL -->
+      <section class="max-w-5xl mx-auto mt-8">
+        <div class="bg-gray-800/80 rounded-xl p-6 text-center">
+          <h2 class="text-xl md:text-2xl font-semibold mb-2 text-shadow">
+            Exposer une situation où la ligne hiérarchique ne tient plus
+          </h2>
+          <p class="text-gray-300 text-sm mb-4">
+            Sans entrer d’emblée dans les détails nominaux, vous pouvez décrire la configuration : périmètre,
+            niveaux hiérarchiques en tension, symptômes observés, échéances critiques. GhostOps revient vers vous
+            sous 24&nbsp;h ouvrées avec une première lecture et, si pertinent, une proposition de dispositif.
+          </p>
+          <a href="/contact.html"
+             class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-sm">
+            Accéder à la page contact
+          </a>
+        </div>
+      </section>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="w-full px-6 md:px-24 pb-8 text-xs text-gray-400">
+      <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <p>© GhostOps – Tous droits réservés.</p>
+        <a href="/mentions-legales.html" class="hover:underline">
+          Mentions légales &amp; confidentialité
+        </a>
+      </div>
+    </footer>
+  </body>
+</html>
