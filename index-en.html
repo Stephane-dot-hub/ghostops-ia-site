@@ -1,1 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- JSON-LD WebSite -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "GhostOps",
+      "url": "https://www.ghostops.tech",
+      "description": "Confidential elite unit specialised in executive repositioning, HR neutralisation and influence engineering. GhostOps intervenes where structures are wavering and power needs to be redefined.",
+      "publisher": {
+        "@type": "Organization",
+        "name": "GhostOps",
+        "logo": {
+          "@type": "ImageObject",
+          "url": "https://www.ghostops.tech/assets/ghostops-preview.jpg"
+        }
+      }
+    }
+    </script>
 
+    <!-- JSON-LD Organization -->
+    <script type="application/ld+json">
+    {
+      "@context":"https://schema.org",
+      "@type":"Organization",
+      "name":"GhostOps",
+      "url":"https://www.ghostops.tech",
+      "description":"Tactical operations cell: HR crises, executive repositioning, narrative dominance, applied AI.",
+      "sameAs":["https://www.linkedin.com/company/ghostops-ia/"]
+    }
+    </script>
+
+    <!-- AOS (optional) -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GhostOps – HR crises, leadership & power influence operations</title>
+    <meta name="description" content="Confidential elite cell to handle HR crises, reposition exposed executives and orchestrate internal and external influence operations." />
+
+    <meta name="keywords" content="GhostOps, HR crises, executive repositioning, confidential cell, HR neutralisation, narrative dominance, operational AI, crisis governance, power influence, tactical operations, HR due diligence" />
+    <meta name="author" content="GhostOps IA" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1">
+    <link rel="canonical" href="https://www.ghostops.tech/index-en.html" />
+
+    <!-- Open Graph / Twitter -->
+    <meta property="og:title" content="GhostOps – Elite influence & executive repositioning" />
+    <meta property="og:description" content="Tactical intervention cell: HR crises, executive repositioning, narrative dominance and operational AI. GhostOps does not give advice. GhostOps reshapes the power map." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.ghostops.tech/index-en.html" />
+    <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GhostOps – Confidential tactical intervention cell" />
+    <meta name="twitter:description" content="Elite repositioning, HR neutralisation, narrative warfare and AI operations. We deliver the outcome, not slides." />
+    <meta name="twitter:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
+
+    <!-- Fonts & Tailwind -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } }
+      };
+    </script>
+
+    <style>
+      body::before {
+        content: "";
+        background: url('/assets/background-ghostops.jpg') no-repeat center center fixed;
+        background-color: #0f172a;
+        background-size: cover;
+        animation: bgPulse 10s ease-in-out infinite alternate;
+        position: fixed; inset: 0; opacity: 0.25; z-index: -1;
+        transition: opacity .4s ease;
+      }
+      @keyframes bgPulse { 0% { filter: brightness(1) contrast(1); } 100% { filter: brightness(1.05) contrast(1.05); } }
+      .text-shadow { text-shadow: 1px 1px 4px rgba(0,0,0,.6); }
+      html { scroll-behavior: smooth; }
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      header, main, section, footer { position: relative; z-index: 1; }
+    </style>
+  </head>
+
+  <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init && AOS.init();">
+    <!-- HERO -->
+    <section class="w-full min-h-[60vh] flex items-center justify-center text-center px-6">
+      <div class="z-10 max-w-4xl">
+        <h1 class="text-4xl md:text-6xl font-bold leading-tight text-shadow">
+          <span class="text-white">GHOST</span><span class="text-gray-400"> OPS</span>
+        </h1>
+        <p class="mt-6 text-lg md:text-xl text-gray-300 text-shadow max-w-3xl mx-auto">
+          Elite tactical operations cell for
+          <span class="font-semibold">complex HR crises, exposed leaders and internal power plays</span>.<br>
+          We operate in the <span class="font-semibold">interstices of power</span> — where outcomes are actually decided.
+        </p>
+        <p class="mt-6 text-md md:text-lg text-gray-400 text-shadow max-w-3xl mx-auto">
+          HR crises, executive repositioning and <span class="font-semibold">leadership trajectories</span>,
+          <span class="font-semibold">narrative dominance</span> and <span class="font-semibold">operational AI</span>:
+          we intervene when the question is no longer to “think”, but to secure a controlled outcome.<br>
+          Our role is not to advise; it is to <span class="font-semibold">produce the outcome</span>.
+        </p>
+        <p class="mt-4 text-md md:text-base text-gray-400 italic text-shadow">
+          GhostOps does not advise. GhostOps reshapes the power map — especially in
+          <span class="font-semibold">high-stakes HR crises</span> and <span class="font-semibold">executive trajectories</span>.
+        </p>
+        <a href="/expertise.html"
+           class="mt-10 inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
+          Discover our expertise
+        </a>
+      </div>
+    </section>
+
+    <!-- WHO DOES GHOSTOPS SERVE? -->
+    <section id="pour-qui" class="py-12 px-6 md:px-24">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
+          Who does GhostOps serve?
+        </h2>
+        <p class="text-gray-300 text-sm md:text-base mb-6">
+          GhostOps works with decision-makers on the front line of situations with high human,
+          political or reputational stakes. We intervene when the risk goes beyond the scope
+          of standard advisory work.
+        </p>
+        <div class="grid md:grid-cols-3 gap-6 text-sm">
+          <div class="bg-gray-800/70 rounded-xl p-5">
+            <h3 class="font-semibold mb-2">CEOs & general management</h3>
+            <p class="text-gray-300">
+              HR or social crises, governance conflicts, sensitive post-acquisition integration,
+              strong media or political exposure around a site, subsidiary or key executive.
+            </p>
+          </div>
+          <div class="bg-gray-800/70 rounded-xl p-5">
+            <h3 class="font-semibold mb-2">Group HR & HR leadership</h3>
+            <p class="text-gray-300">
+              Isolation between a tense field and a hesitant board, support functions in crisis,
+              internal lock-ins, situations where HR can no longer remain “neutral”.
+            </p>
+          </div>
+          <div class="bg-gray-800/70 rounded-xl p-5">
+            <h3 class="font-semibold mb-2">Boards, committees & shareholders</h3>
+            <p class="text-gray-300">
+              Doubts about the real quality of information reported, concerns about an executive
+              or subsidiary trajectory, need for an independent reading of human, narrative and
+              governance risks.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FIGURES & FOOTPRINT -->
+    <section id="impact" class="py-12 px-6 md:px-24 border-t border-b border-gray-800/60">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
+          GhostOps figures & footprint
+        </h2>
+        <p class="text-gray-300 text-sm md:text-base mb-8 max-w-3xl">
+          GhostOps is built on long-term experience in critical environments and highly exposed dossiers.
+          The indicators below provide an order of magnitude of the fields on which we have intervened.
+          Company names and sectors are deliberately omitted to preserve confidentiality.
+        </p>
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="bg-gray-800/80 rounded-xl p-6">
+            <p class="text-3xl md:text-4xl font-bold text-white mb-2">25+</p>
+            <p class="text-gray-300 text-sm">
+              years of intervention in situations with high human, social or political intensity.
+            </p>
+          </div>
+          <div class="bg-gray-800/80 rounded-xl p-6">
+            <p class="text-3xl md:text-4xl font-bold text-white mb-2">100+</p>
+            <p class="text-gray-300 text-sm">
+              dossiers involving executives, executive committees or support functions that have become sensitive
+              (HR, legal, finance, operations).
+            </p>
+          </div>
+          <div class="bg-gray-800/80 rounded-xl p-6">
+            <p class="text-3xl md:text-4xl font-bold text-white mb-2">Europe</p>
+            <p class="text-gray-300 text-sm">
+              interventions primarily in Western Europe, for international groups and multi-site environments under tension.
+            </p>
+          </div>
+        </div>
+        <p class="text-gray-400 text-xs md:text-sm mt-4 max-w-3xl">
+          These orders of magnitude can be detailed in a confidential meeting, when the expected level of confidentiality
+          and non-disclosure clauses allow it.
+        </p>
+      </div>
+    </section>
+
+    <!-- CONFIDENTIAL INTERVENTIONS (3 PILLARS) -->
+    <section id="interventions" class="py-24 px-6 md:px-24 text-left">
+      <h2 class="text-3xl md:text-4xl font-bold mb-8 text-white text-shadow">
+        Confidential GhostOps interventions
+      </h2>
+      <p class="text-gray-300 max-w-3xl mb-10 text-sm md:text-base">
+        GhostOps intervenes when the human, political and narrative balances of an organisation
+        become a strategic risk for the company: open or latent HR crises, internal power plays,
+        sensitive repositioning of executives on key perimeters (HQ, business units, operations,
+        structuring deals).
+        We turn these tension zones into controlled trajectories around three axes:
+        securing crises and HR lock-ins, executive repositioning and leadership trajectories,
+        narrative dominance powered by operational AI.
+        The Expertise page details all our intervention domains and concrete implementation methods.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <!-- Pillar 1 -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">
+            HR crises & power lock-ins
+          </h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Contain, isolate, defuse. 48-hour war-room, locked exit scenarios, graduated neutralisation
+            of counter-powers, post-crisis stabilisation. Crisis governance documented and, if needed,
+            opposable.
+          </p>
+          <a href="/crises-rh-war-room.html" class="text-sm font-medium text-blue-400 hover:underline">
+            See how we operate
+          </a>
+        </div>
+
+        <!-- Pillar 2 -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">
+            Executive repositioning & trajectories
+          </h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Reconfigure the perception field around an executive or a committee. Executive narrative,
+            proof of authority, windows of appearance, management of sensitive exits and transitions,
+            without loss of control or reputational damage.
+          </p>
+          <a href="/repositionnement-executif.html" class="text-sm font-medium text-blue-400 hover:underline">
+            Explore executive levers
+          </a>
+        </div>
+
+        <!-- Pillar 3 -->
+        <div class="bg-gray-800 p-6 rounded-xl shadow text-left">
+          <h3 class="text-xl font-semibold mb-3 text-white text-shadow">
+            Narrative dominance, AI & external influence
+          </h3>
+          <p class="text-gray-300 text-sm mb-4">
+            Architect the narratives that structure reality. AI playbooks (listening, generation, testing, iterations),
+            message and sequence framing, internal/external alignment, management of critical stakeholders
+            (shareholders, specialised media, authorities).
+          </p>
+          <a href="/expertise.html#domaines" class="text-sm font-medium text-blue-400 hover:underline">
+            Access all domains
+          </a>
+        </div>
+      </div>
+
+      <!-- HOW A GHOSTOPS ACTIVATION WORKS -->
+      <div class="mt-12 border-t border-gray-700 pt-8">
+        <h2 class="text-2xl md:text-3xl font-semibold mb-4 text-white text-shadow">
+          How does a GhostOps activation work?
+        </h2>
+        <p class="text-gray-300 text-sm md:text-base mb-4 max-w-3xl">
+          The dispositif is designed to be deployable quickly by a CEO, a board or an HR leadership team,
+          without building a consulting “factory”. Each activation follows a clear sequence, formalised in writing.
+        </p>
+        <ol class="list-decimal list-inside text-gray-300 text-sm md:text-base space-y-2 max-w-3xl">
+          <li>
+            <span class="font-semibold">Confidential brief</span> via the
+            <a href="/contact.html" class="text-blue-400 hover:underline">contact page</a>:
+            perimeter concerned, current situation, key actors, critical deadlines.
+          </li>
+          <li>
+            <span class="font-semibold">Reading & reply within 24 business hours</span>:
+            assessment of whether a GhostOps intervention is relevant, initial risk mapping,
+            potential options (short crisis, governance, executive trajectory, etc.).
+          </li>
+          <li>
+            <span class="font-semibold">Framed intervention sequence</span>
+            (30, 60 or 90 days, or trajectory support):
+            perimeter, schedule, deliverables and fee framework formalised and validated before any deployment.
+          </li>
+        </ol>
+        <p class="text-gray-400 text-xs md:text-sm mt-3 max-w-3xl">
+          If the situation does not fall within the GhostOps perimeter, this is stated explicitly, without trying
+          to “hold on” to the dossier. The objective is to focus our interventions on configurations where our
+          value added is real and assumable.
+        </p>
+      </div>
+
+      <div class="mt-10">
+        <a href="/expertise.html#domaines" class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold">
+          View all intervention domains
+        </a>
+      </div>
+    </section>
+
+    <!-- SITUATIONS HANDLED – SOCIAL PROOF -->
+    <section id="situations" class="max-w-6xl mx-auto py-16">
+      <h2 class="text-2xl md:text-3xl font-bold mb-4 text-shadow">
+        Situations handled (anonymised examples)
+      </h2>
+      <p class="text-gray-300 text-sm md:text-base mb-8 max-w-3xl">
+        GhostOps operations are, by nature, confidential. The examples below are deliberately
+        anonymised and simplified. They illustrate the types of configurations for which we are
+        engaged by general management, boards or HR leadership.
+      </p>
+
+      <div class="grid md:grid-cols-3 gap-6 text-sm">
+        <!-- Case 1 -->
+        <div class="bg-gray-800/80 rounded-xl p-5 flex flex-col">
+          <p class="text-xs uppercase tracking-[.2em] text-gray-400 mb-2">
+            HR crisis & industrial site
+          </p>
+          <h3 class="font-semibold text-white mb-2 text-shadow">
+            Multi-team industrial site – Western Europe
+          </h3>
+          <p class="text-gray-300 mb-3">
+            Latent conflict, high turnover, isolated local HR, deteriorated relations with group management.
+            Risk of escalation into open conflict and media exposure.
+          </p>
+          <ul class="text-gray-300 space-y-1 mb-3">
+            <li><span class="font-semibold">Issue:</span> avoid social escalation and secure production.</li>
+            <li><span class="font-semibold">Intervention:</span> 60-day war-room, exit scenarios, gradual neutralisation of bottlenecks.</li>
+          </ul>
+          <p class="text-gray-400 text-xs mt-auto">
+            Result: negotiated exit, no media crisis, stabilised social trajectory.
+          </p>
+        </div>
+
+        <!-- Case 2 -->
+        <div class="bg-gray-800/80 rounded-xl p-5 flex flex-col">
+          <p class="text-xs uppercase tracking-[.2em] text-gray-400 mb-2">
+            Exposed executive & degraded perception
+          </p>
+          <h3 class="font-semibold text-white mb-2 text-shadow">
+            Executive committee member – Listed group
+          </h3>
+          <p class="text-gray-300 mb-3">
+            Contested appointment, internal resistance, weak signals of mistrust from the board and key teams.
+            Risk of brutal sidelining or high-tension departure.
+          </p>
+          <ul class="text-gray-300 space-y-1 mb-3">
+            <li><span class="font-semibold">Issue:</span> restore authority and clarity of mandate.</li>
+            <li><span class="font-semibold">Intervention:</span> perception diagnosis, executive narrative,
+                sequencing of messages and appearances.</li>
+          </ul>
+          <p class="text-gray-400 text-xs mt-auto">
+            Result: consolidated trajectory, mandate maintained, repositioning perceived as legitimate.
+          </p>
+        </div>
+
+        <!-- Case 3 -->
+        <div class="bg-gray-800/80 rounded-xl p-5 flex flex-col">
+          <p class="text-xs uppercase tracking-[.2em] text-gray-400 mb-2">
+            Internal counter-power & governance
+          </p>
+          <h3 class="font-semibold text-white mb-2 text-shadow">
+            Support function turned de facto veto
+          </h3>
+          <p class="text-gray-300 mb-3">
+            Central function (support / HQ) systematically filtering and slowing down operational decisions,
+            to the point of becoming an unacknowledged counter-power.
+          </p>
+          <ul class="text-gray-300 space-y-1 mb-3">
+            <li><span class="font-semibold">Issue:</span> restore decision-making capacity without triggering an open crisis.</li>
+            <li><span class="font-semibold">Intervention:</span> mapping of decision circuits,
+                recomposition of roles, scripted transition.</li>
+          </ul>
+          <p class="text-gray-400 text-xs mt-auto">
+            Result: decision circuits clarified, role reframed, reduced inter-function tensions.
+          </p>
+        </div>
+      </div>
+
+      <p class="text-gray-400 text-xs md:text-sm mt-6 max-w-3xl">
+        The cases presented combine several real situations to guarantee client confidentiality.
+        They provide a snapshot of the typical level of stakes in dossiers handled by GhostOps.
+      </p>
+
+      <div class="mt-6">
+        <a href="/contact.html"
+           class="inline-block w-full text-center px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-xs md:text-sm">
+          Describe a situation in confidence
+        </a>
+      </div>
+    </section>
+
+    <!-- GHOSTOPS CHRONICLES -->
+    <section id="chroniques" class="px-6 md:px-24 pb-16">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
+          GhostOps chronicles: reading the system
+        </h2>
+        <p class="text-gray-300 text-sm md:text-base mb-8 max-w-3xl">
+          Beyond operations, GhostOps produces analyses for executives, boards and central functions.
+          These chronicles illuminate blind spots in governance, support functions and power games
+          in tense contexts.
+        </p>
+        <div class="grid md:grid-cols-3 gap-6 text-sm">
+          <!-- Chronicle 1 -->
+          <article class="bg-gray-800/80 rounded-xl p-5 flex flex-col">
+            <p class="text-xs uppercase tracking-[.2em] text-gray-400 mb-2">
+              Governance & legal function
+            </p>
+            <h3 class="font-semibold text-white mb-2 text-shadow">
+              When the legal function becomes a governance risk
+            </h3>
+            <p class="text-gray-300 mb-3">
+              How an in-house legal team, meant to secure the company, can end up validating HR
+              or governance mechanisms that actually weaken the system it is supposed to protect.
+            </p>
+            <a href="/fonction-juridique-risque-gouvernance.html"
+               class="mt-auto text-xs md:text-sm font-semibold text-blue-400 hover:underline">
+              Read the chronicle
+            </a>
+          </article>
+
+          <!-- Chronicle 2 – Lost command -->
+          <article class="bg-gray-800/80 rounded-xl p-5 flex flex-col">
+            <p class="text-xs uppercase tracking-[.2em] text-gray-400 mb-2">
+              Crises & command
+            </p>
+            <h3 class="font-semibold text-white mb-2 text-shadow">
+              Lost command: when the chain of command unravels
+            </h3>
+            <p class="text-gray-300 mb-3">
+              The weak signals of a chain of command that is losing grip, fragmented loyalties,
+              and the very concrete consequences for a CEO or board that reacts too late.
+            </p>
+            <a href="/commandement-perdu-ligne-hierarchique-desagregee.html"
+               class="mt-auto text-xs md:text-sm font-semibold text-blue-400 hover:underline">
+              Read the chronicle
+            </a>
+          </article>
+
+          <!-- Chronicle 3 – Invisible loyalties -->
+          <article class="bg-gray-800/80 rounded-xl p-5 flex flex-col">
+            <p class="text-xs uppercase tracking-[.2em] text-gray-400 mb-2">
+              Invisible alliances
+            </p>
+            <h3 class="font-semibold text-white mb-2 text-shadow">
+              Mapping invisible loyalties before a crisis
+            </h3>
+            <p class="text-gray-300 mb-3">
+              Why an HR or governance crisis is never played out solely on the org chart,
+              and how to identify influence networks that actually decide the outcome.
+            </p>
+            <a href="/cartographier-loyautes-invisibles-avant-crise.html"
+               class="mt-auto text-xs md:text-sm font-semibold text-blue-400 hover:underline">
+              Read the chronicle
+            </a>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT (SEO / BUSINESS CARD) -->
+    <section id="apropos" class="pb-20 px-6 md:px-24">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-bold mb-6 text-white text-shadow">
+          About GhostOps
+        </h2>
+        <p class="text-gray-200 text-sm md:text-base mb-4">
+          GhostOps is an independent <strong>tactical HR & narrative intervention cell</strong>,
+          positioned at the interface of human resources, governance and <strong>operational artificial intelligence</strong>.
+          We intervene for companies, boards and exposed executives when traditional consulting patterns are no longer
+          sufficient and the issue is no longer to “think”, but to <strong>produce a controlled outcome</strong>.
+        </p>
+        <p class="text-gray-300 text-sm md:text-base mb-4">
+          Our operations cover <strong>HR crises</strong>, internal conflicts, decision bottlenecks,
+          <strong>executive repositioning</strong>, management of invisible alliances, sensitive transitions,
+          as well as <strong>narrative dominance</strong> in unstable environments. Generative AI is not a gadget:
+          it is embedded in our playbooks to listen, simulate, test and continuously adjust action scenarios.
+        </p>
+        <p class="text-gray-300 text-sm md:text-base mb-4">
+          The GhostOps method relies on three principles: a <strong>rapid footprint</strong> (48 hours) to map tensions
+          and key actors, <strong>short execution loops</strong> to align decisions with reality, and
+          <strong>minimal exposure</strong> for our clients, with calibrated documentation (opposable when needed,
+          discreet by default).
+        </p>
+        <p class="text-gray-300 text-sm md:text-base">
+          We always operate within a legal framework, with a constant concern for <strong>clean governance</strong>,
+          compliance (including <strong>GDPR</strong>) and long-term reputation. GhostOps does not replace decision-making bodies:
+          we equip them to regain control, discreetly, in contexts where a mis-reading can cost a mandate,
+          a deal or a career trajectory.
+        </p>
+        <p class="text-gray-300 text-sm md:text-base mt-4">
+          For a deeper reading of potential drifts in crisis contexts,
+          particularly on the legal side, you can read our chronicle:
+          <a href="/fonction-juridique-risque-gouvernance.html" class="text-blue-400 hover:underline">
+            When the legal function becomes a governance risk
+          </a>.
+        </p>
+      </div>
+    </section>
+
+    <!-- FINAL CTA -->
+    <section id="contact-cta" class="pb-24 px-6 md:px-24">
+      <div class="max-w-5xl mx-auto bg-gray-800/80 rounded-2xl p-8 md:p-10">
+        <div class="grid md:grid-cols-2 gap-8 items-start">
+          <div>
+            <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
+              Share your situation with us
+            </h2>
+            <p class="text-gray-300 text-sm md:text-base mb-3">
+              GhostOps intervenes on a limited number of situations, when human, political
+              and reputational stakes are high enough to justify a dedicated tactical dispositif.
+            </p>
+            <p class="text-gray-400 text-xs md:text-sm">
+              An initial exchange does not commit you. It allows us to assess whether your issue
+              genuinely falls within the GhostOps perimeter and, if not, to orient you towards a
+              more suitable path.
+            </p>
+          </div>
+          <div class="space-y-4">
+            <div class="bg-gray-900/70 rounded-xl p-4">
+              <h3 class="text-sm font-semibold mb-2 text-white">
+                You are a CEO, board member or shareholder
+              </h3>
+              <p class="text-gray-300 text-xs md:text-sm">
+                HR or social crisis, contested executive, internal blockages, unacknowledged counter-powers,
+                risk of public degradation or loss of control over a key subsidiary or site.
+              </p>
+            </div>
+            <div class="bg-gray-900/70 rounded-xl p-4">
+              <h3 class="text-sm font-semibold mb-2 text-white">
+                You are HR, legal or an exposed support function
+              </h3>
+              <p class="text-gray-300 text-xs md:text-sm">
+                Isolation between field and HQ, contradictory injunctions, lock-ins by other functions,
+                tension with governance, need for an external view without staged “consulting theatre”.
+              </p>
+            </div>
+            <div class="pt-2">
+              <a href="/contact.html"
+                 class="inline-block w-full text-center px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-xs md:text-sm">
+                Describe a situation in confidence
+              </a>
+              <p class="text-gray-500 text-[11px] mt-2">
+                Information shared via the contact page is processed in strict confidence,
+                in line with applicable legal and compliance requirements.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="w-full px-6 md:px-24 pb-8 text-xs text-gray-400">
+      <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <p>© GhostOps – All rights reserved.</p>
+        <a href="/mentions-legales.html" class="hover:underline">
+          Legal notice & privacy
+        </a>
+      </div>
+    </footer>
+
+    <!-- GhostOps Chat Widget -->
+    <div id="ghostops-chat-root">
+      <!-- Floating button -->
+      <button id="ghostops-chat-toggle"
+              class="fixed bottom-6 right-6 z-40 rounded-full px-4 py-3 text-sm font-semibold bg-gray-800 text-white border border-gray-500 shadow-lg hover:bg-white hover:text-black transition">
+        GhostOps Chat
+      </button>
+
+      <!-- Chat window -->
+      <div id="ghostops-chat-window"
+           class="hidden fixed bottom-20 right-6 z-40 w-80 max-h-[70vh] bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl flex flex-col">
+        <div class="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
+          <div>
+            <p class="text-[10px] uppercase tracking-[.25em] text-gray-400 mb-0.5">Assistant</p>
+            <p class="text-sm font-semibold text-white">GhostOps – Confidential chat</p>
+          </div>
+          <button id="ghostops-chat-close" class="text-gray-400 hover:text-white text-lg leading-none">&times;</button>
+        </div>
+
+        <!-- Messages area -->
+        <div id="ghostops-chat-messages"
+             class="flex-1 px-4 py-3 space-y-3 overflow-y-auto text-xs bg-gray-950/80">
+          <div class="text-gray-300">
+            <span class="font-semibold">GhostOps:</span>
+            <span>
+              You can describe your situation in a few lines (HR crisis, exposed leader, internal power plays).
+              The GhostOps AI assistant provides an initial operational reading. It does not replace legal advice.
+            </span>
+          </div>
+        </div>
+
+        <!-- Input form -->
+        <form id="ghostops-chat-form" class="border-t border-gray-800 px-3 py-2 flex items-center gap-2">
+          <textarea id="ghostops-chat-input"
+                    class="flex-1 text-xs bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-1 resize-none focus:outline-none focus:border-gray-400"
+                    rows="2"
+                    placeholder="Briefly describe your situation…"></textarea>
+          <button type="submit"
+                  class="text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
+            Send
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- GhostOps Chat Script -->
+    <script>
+      (function () {
+        const toggleBtn  = document.getElementById('ghostops-chat-toggle');
+        const panel      = document.getElementById('ghostops-chat-window');
+        const closeBtn   = document.getElementById('ghostops-chat-close');
+        const form       = document.getElementById('ghostops-chat-form');
+        const input      = document.getElementById('ghostops-chat-input');
+        const messages   = document.getElementById('ghostops-chat-messages');
+
+        if (!toggleBtn || !panel || !closeBtn || !form || !input || !messages) return;
+
+        function scrollToBottom() {
+          messages.scrollTop = messages.scrollHeight;
+        }
+
+        function addMessage(sender, text) {
+          const wrapper = document.createElement('div');
+          wrapper.className = sender === 'user'
+            ? 'mb-2 text-right'
+            : 'mb-2 text-left';
+
+          const bubble = document.createElement('div');
+          bubble.className = sender === 'user'
+            ? 'inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg'
+            : 'inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg';
+
+          bubble.textContent = text;
+          wrapper.appendChild(bubble);
+          messages.appendChild(wrapper);
+          scrollToBottom();
+          return wrapper;
+        }
+
+        toggleBtn.addEventListener('click', () => {
+          panel.classList.toggle('hidden');
+          if (!panel.classList.contains('hidden')) {
+            input.focus();
+            scrollToBottom();
+          }
+        });
+
+        closeBtn.addEventListener('click', () => {
+          panel.classList.add('hidden');
+        });
+
+        async function sendMessage() {
+          const userMessage = (input.value || '').trim();
+          if (!userMessage) return;
+
+          addMessage('user', userMessage);
+          input.value = '';
+
+          const waitingElem = addMessage('bot', 'Analysing…');
+
+          try {
+            const response = await fetch('/api/ghostops-chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ message: userMessage })
+            });
+
+            let data = {};
+            try {
+              data = await response.json();
+            } catch (_) {}
+
+            if (waitingElem && waitingElem.parentNode) {
+              waitingElem.parentNode.removeChild(waitingElem);
+            }
+
+            if (!response.ok || !data.reply) {
+              const errText = data.error || 'An error occurred on the GhostOps engine.';
+              addMessage('bot', errText);
+              return;
+            }
+
+            addMessage('bot', data.reply);
+          } catch (err) {
+            console.error('Error calling /api/ghostops-chat:', err);
+            if (waitingElem && waitingElem.parentNode) {
+              waitingElem.parentNode.removeChild(waitingElem);
+            }
+            addMessage('bot', 'Connection error to the GhostOps engine. Please try again later.');
+          }
+        }
+
+        form.addEventListener('submit', (e) => {
+          e.preventDefault();
+          sendMessage();
+        });
+
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
