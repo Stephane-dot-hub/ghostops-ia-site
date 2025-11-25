@@ -232,7 +232,9 @@
             sans perte de contrôle ni dégradation de l’image.
           </p>
           <a href="/repositionnement-executif.html" class="text-sm font-medium text-blue-400 hover:underline">
-            Explorer les leviers exécutifs
+            Explore
+
+r les leviers exécutifs
           </a>
         </div>
 
@@ -553,7 +555,7 @@
       </div>
     </footer>
 
-    <!-- Widget GhostOps Chat – version démo (sans IA) -->
+    <!-- Widget GhostOps Chat -->
     <div id="ghostops-chat-root">
       <!-- Bouton flottant -->
       <button id="ghostops-chat-toggle"
@@ -579,7 +581,7 @@
             <span class="font-semibold">GhostOps&nbsp;:</span>
             <span>
               Vous pouvez décrire en quelques lignes votre situation (crise RH, dirigeant exposé, jeux de pouvoir internes).
-              Cette version de démonstration ne traite pas encore les cas réels.
+              L’assistant GhostOps IA produit une première lecture à visée opérationnelle. Il ne remplace pas un avis juridique.
             </span>
           </div>
         </div>
@@ -589,70 +591,123 @@
           <textarea id="ghostops-chat-input"
                     class="flex-1 text-xs bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-1 resize-none focus:outline-none focus:border-gray-400"
                     rows="2"
-                    placeholder="Posez une question (démonstration)…"></textarea>
+                    placeholder="Décrivez brièvement votre situation…"></textarea>
           <button type="submit"
-                  class="text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
+                  class="text-xs px-3 py-2 bg:white bg-white text-black font-semibold rounded-md hover:bg-gray-200">
             Envoyer
           </button>
         </form>
       </div>
     </div>
 
+    <!-- Script GhostOps Chat connecté à /api/ghostops-chat -->
     <script>
       (function () {
         const toggleBtn  = document.getElementById('ghostops-chat-toggle');
-        const windowEl   = document.getElementById('ghostops-chat-window');
+        const panel      = document.getElementById('ghostops-chat-window');
         const closeBtn   = document.getElementById('ghostops-chat-close');
         const form       = document.getElementById('ghostops-chat-form');
         const input      = document.getElementById('ghostops-chat-input');
         const messages   = document.getElementById('ghostops-chat-messages');
 
-        if (!toggleBtn || !windowEl || !closeBtn || !form || !input || !messages) return;
+        if (!toggleBtn || !panel || !closeBtn || !form || !input || !messages) return;
 
         function scrollToBottom() {
           messages.scrollTop = messages.scrollHeight;
         }
 
-        // Ouvrir / fermer
+        // Ajout d’un message dans la fenêtre
+        function addMessage(sender, text) {
+          const wrapper = document.createElement('div');
+          wrapper.className = sender === 'user'
+            ? 'mb-2 text-right'
+            : 'mb-2 text-left';
+
+          const bubble = document.createElement('div');
+          bubble.className = sender === 'user'
+            ? 'inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg'
+            : 'inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg';
+
+          bubble.textContent = text;
+          wrapper.appendChild(bubble);
+          messages.appendChild(wrapper);
+          scrollToBottom();
+          return wrapper;
+        }
+
+        // Ouvrir / fermer le chat
         toggleBtn.addEventListener('click', () => {
-          windowEl.classList.toggle('hidden');
-          if (!windowEl.classList.contains('hidden')) {
+          panel.classList.toggle('hidden');
+          if (!panel.classList.contains('hidden')) {
             input.focus();
             scrollToBottom();
           }
         });
 
         closeBtn.addEventListener('click', () => {
-          windowEl.classList.add('hidden');
+          panel.classList.add('hidden');
         });
 
-        // Version démo : pas d’IA, juste réponse standard
+        // Envoi du message utilisateur (appel API)
+        async function sendMessage() {
+          const userMessage = (input.value || '').trim();
+          if (!userMessage) return;
+
+          // Afficher le message utilisateur
+          addMessage('user', userMessage);
+          input.value = '';
+
+          // Message temporaire d’attente
+          const waitingElem = addMessage('bot', 'Analyse en cours…');
+
+          try {
+            const response = await fetch('/api/ghostops-chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ message: userMessage })
+            });
+
+            let data = {};
+            try {
+              data = await response.json();
+            } catch (_) {
+              // réponse non-JSON
+            }
+
+            // Retirer le message "Analyse en cours…"
+            if (waitingElem && waitingElem.parentNode) {
+              waitingElem.parentNode.removeChild(waitingElem);
+            }
+
+            if (!response.ok || !data.reply) {
+              const errText = data.error || 'Une erreur est survenue côté moteur GhostOps.';
+              addMessage('bot', errText);
+              return;
+            }
+
+            // Afficher la réponse du backend
+            addMessage('bot', data.reply);
+          } catch (err) {
+            console.error('Erreur lors de l’appel /api/ghostops-chat :', err);
+            if (waitingElem && waitingElem.parentNode) {
+              waitingElem.parentNode.removeChild(waitingElem);
+            }
+            addMessage('bot', 'Erreur de connexion au moteur GhostOps. Veuillez réessayer ultérieurement.');
+          }
+        }
+
+        // Soumission du formulaire (clic sur "Envoyer")
         form.addEventListener('submit', (e) => {
           e.preventDefault();
-          const text = input.value.trim();
-          if (!text) return;
+          sendMessage();
+        });
 
-          // Message utilisateur
-          const userDiv = document.createElement('div');
-          userDiv.className = 'text-gray-100 text-right';
-          userDiv.innerHTML =
-            '<span class="font-semibold">Vous&nbsp;:</span> <span>' +
-            text.replace(/</g, '&lt;').replace(/>/g, '&gt;') +
-            '</span>';
-          messages.appendChild(userDiv);
-          input.value = '';
-          scrollToBottom();
-
-          // Réponse “statique”
-          const botDiv = document.createElement('div');
-          botDiv.className = 'text-gray-300 mt-1';
-          botDiv.innerHTML =
-            '<span class="font-semibold">GhostOps&nbsp;:</span> ' +
-            '<span>Cette version du chat est une démonstration. ' +
-            'La version opérationnelle GhostOps pourra analyser votre situation (crise RH, gouvernance, dirigeant exposé) ' +
-            'et, si nécessaire, vous orienter vers un contact confidentiel via le formulaire dédié.</span>';
-          messages.appendChild(botDiv);
-          scrollToBottom();
+        // Touche Entrée (sans Shift) pour envoyer
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
         });
       })();
     </script>
