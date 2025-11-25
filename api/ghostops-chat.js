@@ -1,105 +1,99 @@
-// /api/ghostops-chat.js
+// api/ghostops-chat.js
 
 export default async function handler(req, res) {
-  // Autoriser uniquement POST
+  // Autoriser uniquement le POST
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
-    return res
-      .status(405)
-      .json({ error: 'Méthode non autorisée. Utilisez POST.' });
-    }
+    return res.status(405).json({ error: 'Méthode non autorisée. Utilisez POST.' });
+  }
 
-  // Récupération de la clé API OpenAI
+  // Vérification de la clé API côté serveur
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({
-      error:
-        'Clé API OpenAI manquante côté serveur (variable OPENAI_API_KEY non définie dans Vercel).'
+      error: 'OPENAI_API_KEY non configurée sur le serveur (Vercel > Variables d’environnement).'
     });
   }
 
-  // Lecture du message utilisateur
-  let userMessage = '';
+  const { message } = req.body;
 
-  try {
-    if (req.body && typeof req.body === 'object') {
-      // Cas standard Vercel/Next : body déjà parsé
-      userMessage = req.body.message || req.body.userMessage || '';
-    } else if (typeof req.body === 'string') {
-      // Cas éventuel où body est une string JSON
-      const parsed = JSON.parse(req.body || '{}');
-      userMessage = parsed.message || parsed.userMessage || '';
-    }
-  } catch (err) {
-    console.error('Erreur parsing body GhostOps :', err);
-    return res
-      .status(400)
-      .json({ error: 'Requête invalide (JSON non lisible côté serveur).' });
+  if (!message || typeof message !== 'string') {
+    return res.status(400).json({ error: 'Le champ "message" est manquant ou invalide.' });
   }
 
-  if (!userMessage || typeof userMessage !== 'string') {
-    return res
-      .status(400)
-      .json({ error: 'Message utilisateur manquant dans la requête.' });
-  }
+  // Prompt GhostOps combiné dans un seul input (format simple 100 % compatible /responses)
+  const prompt = `
+Tu es "GhostOps", une cellule d'intervention confidentielle spécialisée en :
+- crises RH complexes,
+- dirigeants exposés,
+- jeux de pouvoir internes,
+- gouvernance et influence.
 
-  // Prompt système GhostOps
-  const instructions =
-    "Tu es GhostOps IA, cellule tactique d’analyse de situations sensibles : " +
-    "crises RH, dirigeants exposés, jeux de pouvoir internes, gouvernance. " +
-    "Tu réponds en français, sur un ton professionnel, structuré et concis. " +
-    "Tu identifies clairement les angles d’analyse (risques, acteurs, scénarios possibles). " +
-    "Tu ne donnes pas de conseils juridiques, mais tu peux suggérer de consulter un avocat spécialisé si nécessaire. " +
-    "Tu évites les généralités creuses et tu restes orienté action.";
+Règles de réponse :
+- Réponds toujours en français, de manière très professionnelle, sobre et structurée.
+- Tu n’es PAS un avocat : tu peux aider à analyser, cadrer les risques et proposer des pistes,
+  mais tu ne fournis pas de conseil juridique formel.
+- Tu dois systématiquement inviter à utiliser le formulaire de contact du site GhostOps
+  si la situation paraît réellement critique ou nominative.
+
+Contexte de la question posée par un décideur (PDG / board / DRH / fonction support exposée) :
+"""${message}"""
+
+Tâche :
+1. Reformuler brièvement la situation telle que tu la comprends.
+2. Identifier les risques humains / de gouvernance / narratifs (sans faire de droit pur).
+3. Proposer 2 à 3 pistes de clarification ou d’action concrètes.
+4. Conclure en une phrase en indiquant que la situation pourrait nécessiter,
+   le cas échéant, un échange plus confidentiel via le formulaire de contact GhostOps.
+`;
 
   try {
-    // Appel à l’API OpenAI (endpoint /v1/responses)
     const openaiResponse = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`
+        // IMPORTANT : clé de projet ou clé personnelle au format "sk-..."
+        'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
-        model: 'gpt-5.1-mini',
-        instructions,
-        input: userMessage
+        // Utilisez un modèle supporté par /v1/responses.
+        // Si votre clé de test a été générée avec "gpt-5-nano", vous pouvez aussi mettre "gpt-5-nano".
+        model: 'gpt-5-nano',
+        input: prompt,
+        max_output_tokens: 500
       })
     });
 
+    const data = await openaiResponse.json();
+
+    // Si OpenAI renvoie une erreur, on remonte le message exact pour debugging
     if (!openaiResponse.ok) {
-      const errorText = await openaiResponse.text();
-      console.error('Erreur HTTP OpenAI :', openaiResponse.status, errorText);
-      return res.status(500).json({
-        error: `Erreur OpenAI (HTTP ${openaiResponse.status}).`
+      console.error('Erreur OpenAI:', data);
+      return res.status(openaiResponse.status).json({
+        error: data?.error?.message || `Erreur OpenAI (HTTP ${openaiResponse.status})`
       });
     }
 
-    const data = await openaiResponse.json();
+    // Extraction robuste du texte dans la structure "responses"
+    let reply = 'Je n’ai pas pu générer de réponse utile.';
 
-    // Extraction du texte de réponse : data.output[0].content[0].text
-    let replyText = '';
-    try {
-      replyText =
-        data?.output?.[0]?.content?.[0]?.text ||
-        data?.output_text ||
-        '';
-    } catch (e) {
-      console.error('Erreur extraction texte OpenAI :', e);
+    if (
+      data.output &&
+      Array.isArray(data.output) &&
+      data.output[0] &&
+      data.output[0].content &&
+      Array.isArray(data.output[0].content) &&
+      data.output[0].content[0] &&
+      typeof data.output[0].content[0].text === 'string'
+    ) {
+      reply = data.output[0].content[0].text;
     }
 
-    if (!replyText) {
-      replyText =
-        "Je n’ai pas pu générer de réponse exploitable à partir des éléments fournis. " +
-        "Merci de reformuler en précisant le contexte (type de crise, acteurs impliqués, horizon de temps).";
-    }
-
-    return res.status(200).json({ reply: replyText });
+    return res.status(200).json({ reply });
   } catch (err) {
-    console.error('Erreur lors de l’appel OpenAI :', err);
+    console.error('Erreur lors de l’appel à OpenAI:', err);
     return res.status(500).json({
-      error:
-        'Erreur de connexion au moteur GhostOps (OpenAI).'
+      error: 'Une erreur interne est survenue lors de l’appel au moteur GhostOps.'
     });
   }
 }
