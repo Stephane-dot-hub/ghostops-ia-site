@@ -3,78 +3,101 @@
 export default async function handler(req, res) {
   // On n'accepte que le POST
   if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
+    res.setHeader('Allow', 'POST');
     return res.status(405).json({ error: 'Méthode non autorisée' });
   }
 
-  try {
-    const { message, messages } = req.body || {};
+  const apiKey = process.env.OPENAI_API_KEY;
 
-    // On accepte soit:
-    // - un simple champ "message": string
-    // - soit un tableau "messages": [{ role, content }, ...]
-    let chatMessages;
+  if (!apiKey) {
+    console.error('OPENAI_API_KEY manquante dans les variables Vercel.');
+    return res.status(500).json({
+      error:
+        "Configuration serveur incomplète : la clé OpenAI n'est pas disponible côté serveur.",
+    });
+  }
 
-    if (Array.isArray(messages) && messages.length > 0) {
-      chatMessages = messages;
-    } else if (typeof message === 'string' && message.trim() !== '') {
-      chatMessages = [
-        {
-          role: 'user',
-          content: message.trim(),
-        },
-      ];
-    } else {
-      return res.status(400).json({ error: 'Aucun message fourni.' });
+  // Récupération du corps de la requête (selon l'environnement : objet ou string)
+  let body = req.body || {};
+  if (typeof body === 'string') {
+    try {
+      body = JSON.parse(body);
+    } catch (e) {
+      body = {};
     }
+  }
 
-    // Cadre "system" pour le ton GhostOps
-    const systemMessage = {
-      role: 'system',
-      content:
-        "Tu es le chatbot GhostOps. Tu réponds en français, avec un ton professionnel, " +
-        "sobre et précis. Tu expliques les services GhostOps (crises RH complexes, " +
-        "repositionnement de dirigeants, domination narrative, IA opérante). " +
-        "Tu peux renvoyer vers la page /expertise.html pour le détail des domaines " +
-        "et vers /contact.html pour un brief confidentiel lorsqu'un cas concret est évoqué. " +
-        "Tu ne promets jamais de résultats irréalistes et tu restes factuel.",
-    };
+  const { message } = body;
 
-    const payloadMessages = [systemMessage, ...chatMessages];
+  if (!message || typeof message !== 'string') {
+    return res
+      .status(400)
+      .json({ error: 'Aucun message valide transmis au chatbot.' });
+  }
 
-    // Appel à l’API OpenAI
-    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+  // Persona / garde-fous du chatbot GhostOps
+  const instructions = `
+Tu es "GhostOps Chat", une interface d'orientation confidentielle.
+
+Ton rôle :
+- Aider les visiteurs à clarifier leur situation (crise RH, dirigeant exposé, verrouillage interne, jeu de pouvoir, etc.).
+- Poser des questions structurantes, sans chercher à tout régler dans le chat.
+- Proposer des angles de lecture (humain, politique, narratif, gouvernance) de façon professionnelle et factuelle.
+- Inviter, quand c'est pertinent, à utiliser la page de contact GhostOps pour un brief confidentiel plus poussé.
+
+Contraintes :
+- Tu restes sobre, professionnel, sans effet de manche.
+- Tu ne donnes pas de conseils juridiques personnalisés, ni d’avis médicaux ou fiscaux.
+- Tu ne cites jamais de vrais noms d’entreprises ou de personnes : tu restes générique.
+- Tu ne promets pas de "résoudre" une affaire dans le chat : tu aides à cadrer la situation et les options.
+
+Style :
+- Tu réponds en français.
+- Tu restitues en 1 à 3 paragraphes courts maximum, éventuellement avec des listes à puces.
+- Tu peux conclure, lorsque c’est pertinent, par une phrase du type :
+  "Si vous souhaitez un cadrage confidentiel plus poussé, vous pouvez passer par le formulaire de contact GhostOps."
+  (sans lien cliquable, ce sera géré côté interface).
+`;
+
+  try {
+    const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${process.env.OPENAI_API_KEY}`, // clé stockée sur Vercel
+        Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-4.1-mini', // ajustable: gpt-4.1, gpt-4o-mini, etc.
-        messages: payloadMessages,
-        temperature: 0.25,
+        model: 'gpt-4.1-mini', // vous pouvez changer de modèle si besoin
+        instructions,
+        input: message,
       }),
     });
 
-    if (!openaiResponse.ok) {
-      const errorText = await openaiResponse.text();
-      console.error('Erreur OpenAI:', errorText);
+    if (!response.ok) {
+      const errText = await response.text().catch(() => '');
+      console.error('Erreur OpenAI:', response.status, errText);
       return res.status(500).json({
-        error: 'Erreur lors de l’appel à OpenAI.',
-        details: errorText,
+        error:
+          "Une erreur est survenue lors de la génération de la réponse du modèle.",
       });
     }
 
-    const data = await openaiResponse.json();
+    const data = await response.json();
 
+    // Extraction du texte (premier bloc de sortie)
     const reply =
-      data.choices?.[0]?.message?.content?.trim() ||
-      "Je rencontre une difficulté momentanée pour répondre. Merci de réessayer dans un instant.";
+      data.output?.[0]?.content?.[0]?.text ||
+      data.output_text ||
+      "Je n'ai pas pu générer de réponse utile pour cette demande.";
 
-    // Réponse envoyée au front (widget sur index.html)
-    return res.status(200).json({ reply });
-  } catch (err) {
-    console.error('Erreur dans /api/ghostops-chat :', err);
-    return res.status(500).json({ error: 'Erreur serveur interne.' });
+    return res.status(200).json({
+      reply: reply.trim(),
+    });
+  } catch (error) {
+    console.error('Erreur serveur / OpenAI:', error);
+    return res.status(500).json({
+      error:
+        'Erreur interne lors de la communication avec le modèle. Veuillez réessayer ultérieurement.',
+    });
   }
 }
