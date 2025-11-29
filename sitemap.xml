@@ -58,6 +58,30 @@
     <priority>0.8</priority>
   </url>
 
+  <url>
+    <loc>https://www.ghostops.tech/domination-narrative-ia-operante.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.ghostops.tech/gestion-alliances-invisibles.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.ghostops.tech/sorties-transitions-sensibles.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://www.ghostops.tech/resilience-post-crise.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
   <!-- Chroniques GhostOps -->
   <url>
     <loc>https://www.ghostops.tech/fonction-juridique-risque-gouvernance.html</loc>
