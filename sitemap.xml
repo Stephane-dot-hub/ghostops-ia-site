@@ -106,6 +106,12 @@
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
+
+  <url>
+    <loc>https://www.ghostops.tech/fonction-rh-multiplicateur-risque-gouvernance.html</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
   <!--
     Si votre fichier est en .htm et non .html, remplacez la ligne ci-dessus par :
     <loc>https://www.ghostops.tech/cartographier-loyautes-invisibles-avant-crise.htm</loc>
