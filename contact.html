@@ -152,21 +152,20 @@
 
   <body class="bg-gray-900 text-white font-sans leading-relaxed">
     <!-- HEADER -->
-<header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
-  <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
-    GHOST<span class="text-gray-400">OPS</span>
-  </a>
-  <nav class="flex items-center gap-4 text-xs md:text-sm">
-    <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
-    <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
-    <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
-    <a href="/contact.html"
-       class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition">
-      Contact confidentiel
-    </a>
-  </nav>
-</header>
-
+    <header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
+      <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
+        GHOST<span class="text-gray-400">OPS</span>
+      </a>
+      <nav class="flex items-center gap-4 text-xs md:text-sm">
+        <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
+        <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
+        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
+        <a href="/contact.html"
+           class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition">
+          Contact confidentiel
+        </a>
+      </nav>
+    </header>
 
     <main class="px-6 md:px-24 pb-24">
       <!-- HERO / INTRO – PAGE D’ACTIVATION -->
@@ -183,30 +182,210 @@
           crise RH, jeu de pouvoir interne, dirigeant fragilisé, contre-pouvoir toxique, opération d’influence sensible.
         </p>
         <p class="text-gray-300 text-sm md:text-base">
-          Vos informations ne sont ni revendues, ni exploitées à des fins marketing. Elles servent exclusivement à évaluer
+          Les informations transmises via ce formulaire sont traitées dans un cadre
+          <span class="font-semibold">strictement confidentiel</span>. Elles servent exclusivement à évaluer
           la pertinence d’une intervention GhostOps et, le cas échéant, à préparer un premier échange utile.
         </p>
       </section>
 
-      <!-- COORDONNÉES + CTA PRINCIPAL -->
-      <section class="max-w-4xl mx-auto mb-12">
-        <div class="bg-gray-800/80 rounded-xl p-6 md:p-8">
+      <!-- FORMULAIRE SECURISÉ -->
+      <section id="formulaire" class="max-w-4xl mx-auto mb-12">
+        <div class="bg-gray-800/80 rounded-2xl p-6 md:p-8">
           <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
-            Coordonnées de contact
+            Formulaire sécurisé GhostOps
           </h2>
-          <div class="space-y-3 text-sm">
-            <p class="text-gray-300">
-              Pour initier un brief confidentiel, utilisez le bouton ci-dessous.
-              Votre message sera redirigé vers la boîte dédiée GhostOps.
-            </p>
-            <p class="text-gray-400 text-xs md:text-sm">
-              Objet recommandé&nbsp;: <em>Brief confidentiel GhostOps – [crise / dirigeant / site / BU]</em>
-            </p>
-            <a id="contact-link-main"
-               class="inline-block mt-2 px-4 py-2 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-sm cursor-pointer">
-              Envoyer un brief confidentiel
-            </a>
-          </div>
+          <p class="text-gray-300 text-sm md:text-base mb-6">
+            Merci de décrire la situation de manière factuelle. Évitez, si vous le souhaitez, les noms complets
+            au premier contact&nbsp;: vous pourrez préciser les identités et les pièces lors d’un échange ultérieur
+            si une intervention se confirme.
+          </p>
+
+          <form id="contact-form" class="space-y-5">
+            <!-- Identité -->
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label for="nom" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
+                  Nom / Prénom
+                </label>
+                <input
+                  type="text"
+                  id="nom"
+                  name="nom"
+                  required
+                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                  placeholder="Nom complet ou initiales"
+                />
+              </div>
+              <div>
+                <label for="fonction" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
+                  Fonction &amp; niveau de responsabilité
+                </label>
+                <input
+                  type="text"
+                  id="fonction"
+                  name="fonction"
+                  required
+                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                  placeholder="PDG, membre de board, DRH groupe, etc."
+                />
+              </div>
+            </div>
+
+            <!-- Organisation -->
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label for="organisation" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
+                  Organisation / Groupe
+                </label>
+                <input
+                  type="text"
+                  id="organisation"
+                  name="organisation"
+                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                  placeholder="Nom de la société ou du groupe"
+                />
+              </div>
+              <div>
+                <label for="email" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
+                  E-mail professionnel
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  required
+                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                  placeholder="vous@entreprise.com"
+                />
+              </div>
+            </div>
+
+            <!-- Téléphone & Urgence -->
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label for="telephone" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
+                  Téléphone (optionnel)
+                </label>
+                <input
+                  type="tel"
+                  id="telephone"
+                  name="telephone"
+                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                  placeholder="+33 ..."
+                />
+              </div>
+              <div>
+                <label for="urgence" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
+                  Niveau d’urgence perçu
+                </label>
+                <select
+                  id="urgence"
+                  name="urgence"
+                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                >
+                  <option value="Sous-3-mois">Sous 3 mois</option>
+                  <option value="Sous-30-jours">Sous 30 jours</option>
+                  <option value="Sous-7-jours">Sous 7 jours</option>
+                  <option value="Immediat">Immédiat / en cours</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Type de situation -->
+            <div class="grid md:grid-cols-2 gap-4">
+              <div>
+                <label for="type" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
+                  Nature principale de la situation
+                </label>
+                <select
+                  id="type"
+                  name="type"
+                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                >
+                  <option value="Crise-RH">Crise RH / site en tension</option>
+                  <option value="Dirigeant-fragilise">Dirigeant fragilisé / trajectoire exécutive</option>
+                  <option value="Conflit-gouvernance">Conflit de gouvernance / contre-pouvoirs internes</option>
+                  <option value="Fusion-acquisition">Fusion / post-acquisition sensible</option>
+                  <option value="Autre">Autre configuration complexe</option>
+                </select>
+              </div>
+              <div>
+                <label for="canal" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
+                  Préférence de contact
+                </label>
+                <select
+                  id="canal"
+                  name="canal"
+                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                >
+                  <option value="Email">E-mail</option>
+                  <option value="Telephone">Téléphone</option>
+                  <option value="A-decider">À décider après première lecture</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Description -->
+            <div>
+              <label for="description" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
+                Description confidentielle de la situation
+              </label>
+              <p class="text-gray-400 text-xs mb-2">
+                Indiquez les grandes lignes&nbsp;: périmètre concerné (site, filiale, fonction), acteurs clés,
+                risques perçus (business, sociaux, image, gouvernance) et échéances critiques.
+              </p>
+              <textarea
+                id="description"
+                name="description"
+                rows="7"
+                required
+                class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                placeholder="Décrivez la situation de manière factuelle, sans pièces jointes pour l’instant."
+              ></textarea>
+            </div>
+
+            <!-- RGPD / consentement -->
+            <div class="space-y-2">
+              <div class="flex items-start gap-2">
+                <input
+                  id="consent"
+                  name="consent"
+                  type="checkbox"
+                  required
+                  class="mt-1 w-4 h-4 bg-gray-900 border-gray-700 rounded"
+                />
+                <label for="consent" class="text-gray-300 text-xs md:text-sm">
+                  Je comprends que les informations fournies seront utilisées exclusivement pour analyser ma demande
+                  et, le cas échéant, me proposer une intervention GhostOps, conformément aux
+                  <a href="/mentions-legales.html" class="text-blue-400 hover:underline">
+                    mentions légales &amp; confidentialité
+                  </a>.
+                </label>
+              </div>
+              <p class="text-[11px] text-gray-500">
+                Les données sont traitées dans un cadre strictement confidentiel, sans prospection de masse et sans
+                revente à des tiers.
+              </p>
+            </div>
+
+            <!-- Champs techniques / anti-spam -->
+            <input type="hidden" name="source" value="Formulaire contact GhostOps" />
+            <div class="hidden">
+              <label for="website">Ne pas remplir ce champ (anti-spam)</label>
+              <input id="website" name="website" type="text" />
+            </div>
+
+            <!-- Bouton & statut -->
+            <div class="pt-2">
+              <button
+                type="submit"
+                class="w-full md:w-auto px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-sm"
+              >
+                Transmettre en toute confidentialité
+              </button>
+              <p id="contact-status" class="mt-3 text-xs text-gray-400"></p>
+            </div>
+          </form>
         </div>
       </section>
 
@@ -218,7 +397,7 @@
         <ol class="list-decimal list-inside text-gray-300 text-sm md:text-base space-y-2 max-w-3xl mb-4">
           <li>
             <span class="font-semibold">Envoi de votre brief confidentiel</span>&nbsp;:
-            vous décrivez le périmètre, la situation actuelle, les acteurs clés et les échéances critiques.
+            via le formulaire, vous décrivez le périmètre, la situation actuelle, les acteurs clés et les échéances critiques.
           </li>
           <li>
             <span class="font-semibold">Lecture structurée &amp; réponse sous 24&nbsp;h ouvrées</span>&nbsp;:
@@ -313,7 +492,7 @@
           <div class="bg-gray-800/70 rounded-xl p-5">
             <h3 class="font-semibold mb-2">Traitement du brief</h3>
             <ul class="list-disc list-inside text-gray-300 space-y-1">
-              <li>Lecture structurée de votre e-mail et, si nécessaire, courte demande de précisions.</li>
+              <li>Lecture structurée de votre formulaire et, si nécessaire, courte demande de précisions.</li>
               <li>Première appréciation : intervention GhostOps pertinente ou non.</li>
               <li>Le cas échéant, proposition de créneau pour un échange confidentiel ciblé.</li>
             </ul>
@@ -403,51 +582,73 @@
             Quelques lignes bien structurées valent mieux qu’un récit très long. Si la configuration entre
             dans le champ GhostOps, vous obtenez une réponse sous 24&nbsp;h ouvrées.
           </p>
-          <a id="contact-link-cta"
-             class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-sm cursor-pointer">
-            Envoyer mon brief
+          <a href="#formulaire"
+             class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-sm">
+            Accéder au formulaire sécurisé
           </a>
         </div>
       </section>
     </main>
 
     <footer class="w-full px-6 md:px-24 pb-8 text-xs text-gray-400">
-  <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-    <p>© GhostOps – Tous droits réservés.</p>
-    <nav class="flex flex-wrap items-center gap-3">
-      <a href="/" class="hover:underline">Accueil</a>
-      <a href="/expertise.html" class="hover:underline">Expertise</a>
-      <a href="/qui-sommes-nous.html" class="hover:underline">Qui sommes-nous&nbsp;?</a>
-      <a href="/contact.html" class="hover:underline">Contact</a>
-      <a href="/mentions-legales.html" class="hover:underline">
-        Mentions légales &amp; confidentialité
-      </a>
-    </nav>
-  </div>
-</footer>
+      <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <p>© GhostOps – Tous droits réservés.</p>
+        <nav class="flex flex-wrap items-center gap-3">
+          <a href="/" class="hover:underline">Accueil</a>
+          <a href="/expertise.html" class="hover:underline">Expertise</a>
+          <a href="/qui-sommes-nous.html" class="hover:underline">Qui sommes-nous&nbsp;?</a>
+          <a href="/contact.html" class="hover:underline">Contact</a>
+          <a href="/mentions-legales.html" class="hover:underline">
+            Mentions légales &amp; confidentialité
+          </a>
+        </nav>
+      </div>
+    </footer>
 
-
-    <!-- SCRIPT D'OBFUSCATION MAILTO -->
+    <!-- Script d’envoi du formulaire vers /api/contact -->
     <script>
-      (function() {
-        var user = "contact";
-        var domain = "ghostops.tech";
-        var email = user + "@" + domain;
-        var subject = "Brief confidentiel GhostOps";
+      (function () {
+        const form   = document.getElementById('contact-form');
+        const status = document.getElementById('contact-status');
+        const honey  = document.getElementById('website');
 
-        function buildMailto() {
-          return "mailto:" + email + "?subject=" + encodeURIComponent(subject);
-        }
+        if (!form || !status) return;
 
-        var linkMain = document.getElementById("contact-link-main");
-        if (linkMain) {
-          linkMain.href = buildMailto();
-        }
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          status.textContent = '';
 
-        var linkCta = document.getElementById("contact-link-cta");
-        if (linkCta) {
-          linkCta.href = buildMailto();
-        }
+          // Anti-spam simple
+          if (honey && honey.value) {
+            status.textContent = 'Envoi impossible.';
+            return;
+          }
+
+          const formData = new FormData(form);
+          const payload  = Object.fromEntries(formData.entries());
+
+          status.textContent = 'Envoi en cours…';
+
+          try {
+            const res = await fetch('/api/contact', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+
+            if (res.ok) {
+              status.textContent = 'Votre message a bien été transmis. Réponse GhostOps sous 24 h ouvrées.';
+              form.reset();
+            } else {
+              status.textContent =
+                'Une erreur est survenue. Vous pouvez, en dernier recours, contacter contact@ghostops.tech.';
+            }
+          } catch (err) {
+            console.error(err);
+            status.textContent =
+              'Erreur de connexion. Vous pouvez, en dernier recours, contacter contact@ghostops.tech.';
+          }
+        });
       })();
     </script>
   </body>
