@@ -182,208 +182,131 @@
           crise RH, jeu de pouvoir interne, dirigeant fragilisé, contre-pouvoir toxique, opération d’influence sensible.
         </p>
         <p class="text-gray-300 text-sm md:text-base">
-          Les informations transmises via ce formulaire sont traitées dans un cadre
-          <span class="font-semibold">strictement confidentiel</span>. Elles servent exclusivement à évaluer
+          Vos informations ne sont ni revendues, ni exploitées à des fins marketing. Elles servent exclusivement à évaluer
           la pertinence d’une intervention GhostOps et, le cas échéant, à préparer un premier échange utile.
         </p>
       </section>
 
-      <!-- FORMULAIRE SECURISÉ -->
-      <section id="formulaire" class="max-w-4xl mx-auto mb-12">
-        <div class="bg-gray-800/80 rounded-2xl p-6 md:p-8">
+      <!-- FORMULAIRE DE BRIEF CONFIDENTIEL -->
+      <section class="max-w-4xl mx-auto mb-12">
+        <div class="bg-gray-800/80 rounded-xl p-6 md:p-8">
           <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
-            Formulaire sécurisé GhostOps
+            Formulaire de brief confidentiel
           </h2>
-          <p class="text-gray-300 text-sm md:text-base mb-6">
-            Merci de décrire la situation de manière factuelle. Évitez, si vous le souhaitez, les noms complets
-            au premier contact&nbsp;: vous pourrez préciser les identités et les pièces lors d’un échange ultérieur
-            si une intervention se confirme.
+          <p class="text-gray-300 text-sm md:text-base mb-4">
+            Merci de remplir les champs ci-dessous avec un niveau de détail suffisant pour comprendre le contexte.
+            Évitez de joindre des pièces sensibles à ce stade&nbsp;; si nécessaire, un canal d’échange sécurisé
+            pourra être organisé ensuite.
           </p>
 
-          <form id="contact-form" class="space-y-5">
-            <!-- Identité -->
+          <form id="ghostops-contact-form" class="space-y-4">
             <div class="grid md:grid-cols-2 gap-4">
               <div>
-                <label for="nom" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
-                  Nom / Prénom
+                <label for="nom" class="block text-xs font-semibold text-gray-200 mb-1">
+                  Nom et prénom *
                 </label>
                 <input
-                  type="text"
                   id="nom"
                   name="nom"
-                  required
-                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                  placeholder="Nom complet ou initiales"
-                />
-              </div>
-              <div>
-                <label for="fonction" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
-                  Fonction &amp; niveau de responsabilité
-                </label>
-                <input
                   type="text"
-                  id="fonction"
-                  name="fonction"
                   required
-                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                  placeholder="PDG, membre de board, DRH groupe, etc."
-                />
-              </div>
-            </div>
-
-            <!-- Organisation -->
-            <div class="grid md:grid-cols-2 gap-4">
-              <div>
-                <label for="organisation" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
-                  Organisation / Groupe
-                </label>
-                <input
-                  type="text"
-                  id="organisation"
-                  name="organisation"
-                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                  placeholder="Nom de la société ou du groupe"
+                  class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
                 />
               </div>
               <div>
-                <label for="email" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
-                  E-mail professionnel
+                <label for="email" class="block text-xs font-semibold text-gray-200 mb-1">
+                  E-mail professionnel *
                 </label>
                 <input
-                  type="email"
                   id="email"
                   name="email"
+                  type="email"
                   required
-                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                  placeholder="vous@entreprise.com"
+                  class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
                 />
               </div>
             </div>
 
-            <!-- Téléphone & Urgence -->
             <div class="grid md:grid-cols-2 gap-4">
               <div>
-                <label for="telephone" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
-                  Téléphone (optionnel)
+                <label for="organisation" class="block text-xs font-semibold text-gray-200 mb-1">
+                  Organisation / groupe
                 </label>
                 <input
-                  type="tel"
-                  id="telephone"
-                  name="telephone"
-                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                  placeholder="+33 ..."
+                  id="organisation"
+                  name="organisation"
+                  type="text"
+                  class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
                 />
               </div>
               <div>
-                <label for="urgence" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
-                  Niveau d’urgence perçu
+                <label for="fonction" class="block text-xs font-semibold text-gray-200 mb-1">
+                  Fonction / rôle
                 </label>
-                <select
-                  id="urgence"
-                  name="urgence"
-                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                >
-                  <option value="Sous-3-mois">Sous 3 mois</option>
-                  <option value="Sous-30-jours">Sous 30 jours</option>
-                  <option value="Sous-7-jours">Sous 7 jours</option>
-                  <option value="Immediat">Immédiat / en cours</option>
-                </select>
+                <input
+                  id="fonction"
+                  name="fonction"
+                  type="text"
+                  class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                />
               </div>
             </div>
 
-            <!-- Type de situation -->
-            <div class="grid md:grid-cols-2 gap-4">
-              <div>
-                <label for="type" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
-                  Nature principale de la situation
-                </label>
-                <select
-                  id="type"
-                  name="type"
-                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                >
-                  <option value="Crise-RH">Crise RH / site en tension</option>
-                  <option value="Dirigeant-fragilise">Dirigeant fragilisé / trajectoire exécutive</option>
-                  <option value="Conflit-gouvernance">Conflit de gouvernance / contre-pouvoirs internes</option>
-                  <option value="Fusion-acquisition">Fusion / post-acquisition sensible</option>
-                  <option value="Autre">Autre configuration complexe</option>
-                </select>
-              </div>
-              <div>
-                <label for="canal" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
-                  Préférence de contact
-                </label>
-                <select
-                  id="canal"
-                  name="canal"
-                  class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                >
-                  <option value="Email">E-mail</option>
-                  <option value="Telephone">Téléphone</option>
-                  <option value="A-decider">À décider après première lecture</option>
-                </select>
-              </div>
-            </div>
-
-            <!-- Description -->
             <div>
-              <label for="description" class="block text-xs font-semibold uppercase tracking-[.2em] text-gray-400 mb-1">
-                Description confidentielle de la situation
+              <label for="sujet" class="block text-xs font-semibold text-gray-200 mb-1">
+                Sujet principal de la situation
               </label>
-              <p class="text-gray-400 text-xs mb-2">
-                Indiquez les grandes lignes&nbsp;: périmètre concerné (site, filiale, fonction), acteurs clés,
-                risques perçus (business, sociaux, image, gouvernance) et échéances critiques.
-              </p>
+              <select
+                id="sujet"
+                name="sujet"
+                class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+              >
+                <option value="">Sélectionnez une catégorie</option>
+                <option value="crise-rh">Crise RH / sociale</option>
+                <option value="dirigeant-fragilise">Dirigeant fragilisé / contesté</option>
+                <option value="contre-pouvoir">Contre-pouvoir interne / verrouillage</option>
+                <option value="gouvernance">Blocage de gouvernance / board</option>
+                <option value="influence">Influence / perception externe</option>
+                <option value="autre">Autre configuration</option>
+              </select>
+            </div>
+
+            <div>
+              <label for="message" class="block text-xs font-semibold text-gray-200 mb-1">
+                Détails de la situation (contexte, acteurs clés, échéances) *
+              </label>
               <textarea
-                id="description"
-                name="description"
-                rows="7"
+                id="message"
+                name="message"
+                rows="6"
                 required
-                class="w-full bg-gray-900 border border-gray-700 rounded-md px-3 py-2 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                placeholder="Décrivez la situation de manière factuelle, sans pièces jointes pour l’instant."
+                class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                placeholder="Décrivez la situation de manière factuelle : périmètre concerné, événements déclencheurs, acteurs impliqués, principaux risques perçus…"
               ></textarea>
             </div>
 
-            <!-- RGPD / consentement -->
-            <div class="space-y-2">
-              <div class="flex items-start gap-2">
-                <input
-                  id="consent"
-                  name="consent"
-                  type="checkbox"
-                  required
-                  class="mt-1 w-4 h-4 bg-gray-900 border-gray-700 rounded"
-                />
-                <label for="consent" class="text-gray-300 text-xs md:text-sm">
-                  Je comprends que les informations fournies seront utilisées exclusivement pour analyser ma demande
-                  et, le cas échéant, me proposer une intervention GhostOps, conformément aux
-                  <a href="/mentions-legales.html" class="text-blue-400 hover:underline">
-                    mentions légales &amp; confidentialité
-                  </a>.
-                </label>
-              </div>
-              <p class="text-[11px] text-gray-500">
-                Les données sont traitées dans un cadre strictement confidentiel, sans prospection de masse et sans
-                revente à des tiers.
-              </p>
+            <div class="flex items-start gap-2 text-xs text-gray-300">
+              <input
+                id="consent"
+                type="checkbox"
+                required
+                class="mt-1 h-3 w-3 rounded border-gray-600 bg-gray-900"
+              />
+              <label for="consent">
+                Je comprends que ce formulaire est traité de manière confidentielle et qu’il ne constitue pas un
+                engagement automatique de mission. Les informations fournies servent à évaluer la pertinence d’une
+                intervention GhostOps, dans le respect du cadre légal et du RGPD.
+              </label>
             </div>
 
-            <!-- Champs techniques / anti-spam -->
-            <input type="hidden" name="source" value="Formulaire contact GhostOps" />
-            <div class="hidden">
-              <label for="website">Ne pas remplir ce champ (anti-spam)</label>
-              <input id="website" name="website" type="text" />
-            </div>
-
-            <!-- Bouton & statut -->
             <div class="pt-2">
               <button
                 type="submit"
-                class="w-full md:w-auto px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-sm"
+                class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-sm"
               >
-                Transmettre en toute confidentialité
+                Envoyer le brief confidentiel
               </button>
-              <p id="contact-status" class="mt-3 text-xs text-gray-400"></p>
+              <p id="ghostops-contact-status" class="mt-3 text-xs text-gray-300"></p>
             </div>
           </form>
         </div>
@@ -397,7 +320,7 @@
         <ol class="list-decimal list-inside text-gray-300 text-sm md:text-base space-y-2 max-w-3xl mb-4">
           <li>
             <span class="font-semibold">Envoi de votre brief confidentiel</span>&nbsp;:
-            via le formulaire, vous décrivez le périmètre, la situation actuelle, les acteurs clés et les échéances critiques.
+            vous décrivez le périmètre, la situation actuelle, les acteurs clés et les échéances critiques.
           </li>
           <li>
             <span class="font-semibold">Lecture structurée &amp; réponse sous 24&nbsp;h ouvrées</span>&nbsp;:
@@ -458,31 +381,6 @@
         </div>
       </section>
 
-      <!-- TYPES DE SITUATIONS PERTINENTES -->
-      <section class="max-w-5xl mx-auto mb-12">
-        <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
-          Situations pour lesquelles GhostOps est pertinent
-        </h2>
-        <div class="grid md:grid-cols-2 gap-8 text-sm">
-          <div>
-            <ul class="list-disc list-inside text-gray-300 space-y-1">
-              <li>Crise RH ou sociale localisée, avec risque de propagation.</li>
-              <li>DRH ou dirigeant opérationnel isolé face à une gouvernance hésitante.</li>
-              <li>Repositionnement d’un dirigeant clé fragilisé par des jeux de pouvoir internes.</li>
-              <li>Contre-pouvoir interne devenu de facto un veto sur les décisions.</li>
-            </ul>
-          </div>
-          <div>
-            <ul class="list-disc list-inside text-gray-300 space-y-1">
-              <li>Fusion, acquisition ou intégration avec risques humains sous-évalués.</li>
-              <li>Crise de perception : récit externe défavorable, doute sur la gouvernance.</li>
-              <li>Besoins d’influence ciblée auprès d’un board, d’un actionnaire ou d’un régulateur.</li>
-              <li>Nécessité d’un dispositif discret, hors des circuits de conseil classiques.</li>
-            </ul>
-          </div>
-        </div>
-      </section>
-
       <!-- CONFIDENTIALITÉ & CADRE -->
       <section class="max-w-5xl mx-auto mb-12">
         <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
@@ -492,7 +390,7 @@
           <div class="bg-gray-800/70 rounded-xl p-5">
             <h3 class="font-semibold mb-2">Traitement du brief</h3>
             <ul class="list-disc list-inside text-gray-300 space-y-1">
-              <li>Lecture structurée de votre formulaire et, si nécessaire, courte demande de précisions.</li>
+              <li>Lecture structurée de votre message et, si nécessaire, courte demande de précisions.</li>
               <li>Première appréciation : intervention GhostOps pertinente ou non.</li>
               <li>Le cas échéant, proposition de créneau pour un échange confidentiel ciblé.</li>
             </ul>
@@ -582,15 +480,15 @@
             Quelques lignes bien structurées valent mieux qu’un récit très long. Si la configuration entre
             dans le champ GhostOps, vous obtenez une réponse sous 24&nbsp;h ouvrées.
           </p>
-          <a href="#formulaire"
+          <a href="#ghostops-contact-form"
              class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-sm">
-            Accéder au formulaire sécurisé
+            Accéder au formulaire
           </a>
         </div>
       </section>
     </main>
 
-    <footer class="w-full px-6 md:px-24 pb-8 text-xs text-gray-400">
+    <footer class="w-full px-6 md:px-24 pb-8 mt-8 md:mt-12 text-xs text-gray-400">
       <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <p>© GhostOps – Tous droits réservés.</p>
         <nav class="flex flex-wrap items-center gap-3">
@@ -605,63 +503,60 @@
       </div>
     </footer>
 
-    <!-- Script d’envoi du formulaire vers /api/contact -->
-   <script>
-  (function () {
-    const form = document.getElementById("contact-form");
-    const status = document.getElementById("form-status");
+    <!-- SCRIPT FORMULAIRE → API VERCEL -->
+    <script>
+      (function () {
+        const form = document.getElementById('ghostops-contact-form');
+        const statusEl = document.getElementById('ghostops-contact-status');
+        if (!form || !statusEl) return;
 
-    if (!form) return;
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
 
-    form.addEventListener("submit", async function (e) {
-      e.preventDefault();
+          statusEl.textContent = 'Envoi en cours…';
+          statusEl.classList.remove('text-red-400');
+          statusEl.classList.add('text-gray-300');
 
-      if (status) {
-        status.textContent = "Envoi en cours…";
-        status.classList.remove("text-green-400", "text-red-400");
-        status.classList.add("text-gray-300");
-      }
+          const formData = new FormData(form);
+          const payload = {
+            nom: formData.get('nom') || '',
+            email: formData.get('email') || '',
+            organisation: formData.get('organisation') || '',
+            fonction: formData.get('fonction') || '',
+            sujet: formData.get('sujet') || '',
+            message: formData.get('message') || ''
+          };
 
-      const formData = new FormData(form);
-      const payload = {
-        name: formData.get("name") || "",
-        email: formData.get("email") || "",
-        role: formData.get("role") || "",
-        company: formData.get("company") || "",
-        message: formData.get("message") || "",
-      };
+          try {
+            const response = await fetch('https://www.ghostops.tech/api/ghostops-contact', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(payload)
+            });
 
-      try {
-        const response = await fetch("/api/ghostops-contact", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+            if (!response.ok) {
+              let info = '';
+              try {
+                const data = await response.json();
+                info = data && data.error ? ' – ' + data.error : '';
+              } catch (_) {}
+              throw new Error('Erreur API (' + response.status + ')' + info);
+            }
+
+            statusEl.textContent = 'Votre message a été envoyé. Nous revenons vers vous sous 24 h ouvrées.';
+            statusEl.classList.remove('text-red-400');
+            statusEl.classList.add('text-green-400');
+            form.reset();
+          } catch (err) {
+            console.error('Erreur envoi formulaire GhostOps :', err);
+            statusEl.textContent = 'Une erreur est survenue. Vous pouvez, en dernier recours, contacter contact@ghostops.tech.';
+            statusEl.classList.remove('text-gray-300');
+            statusEl.classList.add('text-red-400');
+          }
         });
-
-        if (!response.ok) {
-          throw new Error("Réponse non valide de l’API");
-        }
-
-        if (status) {
-          status.textContent =
-            "Votre brief a bien été transmis. Vous recevrez un retour GhostOps sous 24 h ouvrées.";
-          status.classList.remove("text-gray-300", "text-red-400");
-          status.classList.add("text-green-400");
-        }
-
-        form.reset();
-      } catch (err) {
-        console.error("Erreur lors de l’envoi du brief GhostOps :", err);
-        if (status) {
-          status.textContent =
-            "Une erreur est survenue. Vous pouvez, en dernier recours, contacter contact@ghostops.tech.";
-          status.classList.remove("text-gray-300", "text-green-400");
-          status.classList.add("text-red-400");
-        }
-      }
-    });
-  })();
-</script>
-
+      })();
+    </script>
   </body>
 </html>
