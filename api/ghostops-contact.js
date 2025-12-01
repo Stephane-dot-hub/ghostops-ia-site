@@ -1,100 +1,117 @@
-// api/ghostops-contact.js
-const nodemailer = require("nodemailer");
+const nodemailer = require('nodemailer');
+
+function escapeHtml(str = '') {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
 module.exports = async (req, res) => {
-  // 1) Méthode HTTP
-  if (req.method !== "POST") {
-    return res.status(405).json({ error: "Méthode non autorisée" });
+  // 1) Méthode HTTP autorisée
+  if (req.method !== 'POST') {
+    res.status(405).json({ error: 'Méthode non autorisée' });
+    return;
   }
 
+  // 2) Lecture du corps brut (Vercel Node function "pure", sans framework)
+  let rawBody = '';
   try {
-    const { name, email, role, company, message } = req.body || {};
-
-    // 2) Validation minimale
-    if (!name || !email || !message) {
-      return res
-        .status(400)
-        .json({ error: "Merci de renseigner au minimum nom, e-mail et message." });
+    for await (const chunk of req) {
+      rawBody += chunk;
     }
+  } catch (err) {
+    console.error('Erreur lecture du corps de requête :', err);
+    res.status(400).json({ error: 'Requête invalide (lecture du corps)' });
+    return;
+  }
 
-    // 3) Lecture des variables d'environnement
-    const {
-      SMTP_HOST,
-      SMTP_PORT,
-      SMTP_USER,
-      SMTP_PASS,
-      CONTACT_RECEIVER,
-    } = process.env;
+  // 3) Parsing JSON
+  let data;
+  try {
+    data = JSON.parse(rawBody || '{}');
+  } catch (err) {
+    console.error('JSON invalide :', err);
+    res.status(400).json({ error: 'Requête invalide (JSON mal formé)' });
+    return;
+  }
 
-    if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !CONTACT_RECEIVER) {
-      console.error("Configuration SMTP incomplète :", {
-        hasHost: !!SMTP_HOST,
-        hasPort: !!SMTP_PORT,
-        hasUser: !!SMTP_USER,
-        hasPass: !!SMTP_PASS,
-        hasReceiver: !!CONTACT_RECEIVER,
-      });
+  const { nom, email, organisation, fonction, sujet, message } = data || {};
 
-      return res.status(500).json({
-        error: "Configuration serveur incomplète (SMTP).",
-      });
-    }
+  // 4) Vérification des champs obligatoires
+  if (!nom || !email || !message) {
+    console.warn('Champs manquants :', { nom, email, message });
+    res.status(400).json({ error: 'Champs obligatoires manquants (nom, email, message)' });
+    return;
+  }
 
-    // 4) Transporteur SMTP
-    const transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: Number(SMTP_PORT),
-      secure: Number(SMTP_PORT) === 465, // true si port 465 (SSL)
-      auth: {
-        user: SMTP_USER,
-        pass: SMTP_PASS,
-      },
+  // 5) Vérification configuration SMTP (variables d’environnement Vercel)
+  const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_TO } = process.env;
+
+  if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS || !SMTP_TO) {
+    console.error('Configuration SMTP incomplète :', {
+      SMTP_HOST: !!SMTP_HOST,
+      SMTP_PORT: !!SMTP_PORT,
+      SMTP_USER: !!SMTP_USER,
+      SMTP_PASS: !!SMTP_PASS,
+      SMTP_TO: !!SMTP_TO
     });
+    res.status(500).json({ error: 'Configuration e-mail incomplète côté serveur' });
+    return;
+  }
 
-    // 5) Contenu de l’email
-    const subject = `Nouveau brief GhostOps – ${name}`;
-    const textBody = `
-Nouveau brief GhostOps via le formulaire.
+  // 6) Transport Nodemailer
+  const transporter = nodemailer.createTransport({
+    host: SMTP_HOST,
+    port: Number(SMTP_PORT),
+    secure: Number(SMTP_PORT) === 465, // true pour 465 (SSL)
+    auth: {
+      user: SMTP_USER,
+      pass: SMTP_PASS
+    }
+  });
 
-Nom : ${name}
-E-mail : ${email}
-Rôle : ${role || "(non précisé)"}
-Entreprise : ${company || "(non précisé)"}
+  const mailSubject = `Brief confidentiel GhostOps – ${sujet || 'Situation'}`;
+
+  const textBody = `Nouveau brief GhostOps reçu via le formulaire :
+
+Nom        : ${nom}
+E-mail     : ${email}
+Organisation : ${organisation || '-'}
+Fonction   : ${fonction || '-'}
+Sujet      : ${sujet || '-'}
 
 Message :
 ${message}
-    `.trim();
+`;
 
-    const htmlBody = `
-      <p><strong>Nouveau brief GhostOps via le formulaire.</strong></p>
-      <p><strong>Nom :</strong> ${name}</p>
-      <p><strong>E-mail :</strong> ${email}</p>
-      <p><strong>Rôle :</strong> ${role || "(non précisé)"}</p>
-      <p><strong>Entreprise :</strong> ${company || "(non précisé)"}</p>
-      <p><strong>Message :</strong></p>
-      <p>${(message || "").replace(/\n/g, "<br>")}</p>
-    `;
+  const htmlBody = `
+    <p>Nouveau brief GhostOps reçu via le formulaire :</p>
+    <ul>
+      <li><strong>Nom :</strong> ${escapeHtml(nom)}</li>
+      <li><strong>E-mail :</strong> ${escapeHtml(email)}</li>
+      <li><strong>Organisation :</strong> ${escapeHtml(organisation || '-')}</li>
+      <li><strong>Fonction :</strong> ${escapeHtml(fonction || '-')}</li>
+      <li><strong>Sujet :</strong> ${escapeHtml(sujet || '-')}</li>
+    </ul>
+    <p><strong>Message :</strong></p>
+    <pre style="white-space:pre-wrap;font-family:monospace;">${escapeHtml(message)}</pre>
+  `;
 
-    const mailOptions = {
+  // 7) Envoi de l’e-mail
+  try {
+    await transporter.sendMail({
       from: `"GhostOps – Formulaire" <${SMTP_USER}>`,
-      to: CONTACT_RECEIVER, // <= adresse de réception réelle (cachée du front)
-      replyTo: email,       // <= si vous répondez, ça partira vers l’expéditeur
-      subject: subject,
+      to: SMTP_TO,
+      replyTo: email,
+      subject: mailSubject,
       text: textBody,
-      html: htmlBody,
-    };
-
-    // 6) Envoi
-    await transporter.sendMail(mailOptions);
-
-    return res.status(200).json({
-      ok: true,
-      message: "Brief transmis avec succès.",
+      html: htmlBody
     });
+
+    res.status(200).json({ ok: true });
   } catch (err) {
-    console.error("Erreur GhostOps contact :", err);
-    return res
-      .status(500)
-      .json({ error: "Erreur interne lors de l’envoi de votre brief." });
+    console.error('Erreur lors de l’envoi du mail GhostOps :', err);
+    res.status(500).json({ error: 'Erreur lors de l’envoi de votre message' });
   }
 };
