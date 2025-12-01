@@ -606,50 +606,62 @@
     </footer>
 
     <!-- Script d’envoi du formulaire vers /api/contact -->
-    <script>
-      (function () {
-        const form   = document.getElementById('contact-form');
-        const status = document.getElementById('contact-status');
-        const honey  = document.getElementById('website');
+   <script>
+  (function () {
+    const form = document.getElementById("contact-form");
+    const status = document.getElementById("form-status");
 
-        if (!form || !status) return;
+    if (!form) return;
 
-        form.addEventListener('submit', async function (e) {
-          e.preventDefault();
-          status.textContent = '';
+    form.addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-          // Anti-spam simple
-          if (honey && honey.value) {
-            status.textContent = 'Envoi impossible.';
-            return;
-          }
+      if (status) {
+        status.textContent = "Envoi en cours…";
+        status.classList.remove("text-green-400", "text-red-400");
+        status.classList.add("text-gray-300");
+      }
 
-          const formData = new FormData(form);
-          const payload  = Object.fromEntries(formData.entries());
+      const formData = new FormData(form);
+      const payload = {
+        name: formData.get("name") || "",
+        email: formData.get("email") || "",
+        role: formData.get("role") || "",
+        company: formData.get("company") || "",
+        message: formData.get("message") || "",
+      };
 
-          status.textContent = 'Envoi en cours…';
-
-          try {
-            const res = await fetch('/api/contact', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload)
-            });
-
-            if (res.ok) {
-              status.textContent = 'Votre message a bien été transmis. Réponse GhostOps sous 24 h ouvrées.';
-              form.reset();
-            } else {
-              status.textContent =
-                'Une erreur est survenue. Vous pouvez, en dernier recours, contacter contact@ghostops.tech.';
-            }
-          } catch (err) {
-            console.error(err);
-            status.textContent =
-              'Erreur de connexion. Vous pouvez, en dernier recours, contacter contact@ghostops.tech.';
-          }
+      try {
+        const response = await fetch("/api/ghostops-contact", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
         });
-      })();
-    </script>
+
+        if (!response.ok) {
+          throw new Error("Réponse non valide de l’API");
+        }
+
+        if (status) {
+          status.textContent =
+            "Votre brief a bien été transmis. Vous recevrez un retour GhostOps sous 24 h ouvrées.";
+          status.classList.remove("text-gray-300", "text-red-400");
+          status.classList.add("text-green-400");
+        }
+
+        form.reset();
+      } catch (err) {
+        console.error("Erreur lors de l’envoi du brief GhostOps :", err);
+        if (status) {
+          status.textContent =
+            "Une erreur est survenue. Vous pouvez, en dernier recours, contacter contact@ghostops.tech.";
+          status.classList.remove("text-gray-300", "text-green-400");
+          status.classList.add("text-red-400");
+        }
+      }
+    });
+  })();
+</script>
+
   </body>
 </html>
