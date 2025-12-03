@@ -1,5 +1,50 @@
 // /api/ghostops-contact.js
 const nodemailer = require('nodemailer');
+const querystring = require('querystring');
+
+// Helper pour récupérer un body exploitable, quel que soit le format
+async function getParsedBody(req) {
+  // Si Vercel a déjà mis quelque chose dans req.body
+  if (req.body) {
+    if (typeof req.body === 'string') {
+      try {
+        return JSON.parse(req.body);
+      } catch {
+        // Si ce n'est pas du JSON, on continue plus bas
+      }
+    } else if (typeof req.body === 'object') {
+      return req.body;
+    }
+  }
+
+  // Sinon on lit le flux brut
+  const chunks = [];
+  for await (const chunk of req) {
+    chunks.push(chunk);
+  }
+  const raw = Buffer.concat(chunks).toString('utf8') || '';
+
+  if (!raw) return {};
+
+  const contentType = (req.headers['content-type'] || '').toLowerCase();
+
+  // JSON
+  if (contentType.includes('application/json')) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      return {};
+    }
+  }
+
+  // Formulaire classique
+  if (contentType.includes('application/x-www-form-urlencoded')) {
+    return querystring.parse(raw);
+  }
+
+  // Par défaut, on ne sait pas : on renvoie la chaîne brute
+  return { raw };
+}
 
 module.exports = async function handler(req, res) {
   // Health-check en GET
@@ -29,13 +74,13 @@ module.exports = async function handler(req, res) {
 
   // Refuser les autres méthodes
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Méthode non autorisée' });
+    return res.status(405).json({ ok: false, error: 'Méthode non autorisée' });
   }
 
   try {
-    // --- 1) Récupération des données envoyées par le formulaire ---
-    // Vercel parse normalement le JSON automatiquement si le Content-Type est application/json
-    const { name, email, company, role, subject, message } = req.body || {};
+    // 1) Récupération et parsing du body
+    const body = await getParsedBody(req);
+    const { name, email, company, role, subject, message } = body || {};
 
     if (!name || !email || !message) {
       return res.status(400).json({
@@ -44,7 +89,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // --- 2) Vérification de la configuration SMTP ---
+    // 2) Vérification de la configuration SMTP
     const {
       SMTP_HOST,
       SMTP_PORT,
@@ -57,39 +102,26 @@ module.exports = async function handler(req, res) {
     if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
       return res.status(500).json({
         ok: false,
-        error: "Configuration e-mail incomplète côté serveur (SMTP).",
+        error: 'Configuration e-mail incomplète côté serveur (SMTP).',
       });
     }
 
     const toAddress = CONTACT_TO || SMTP_USER;
-    const fromAddress =
-      CONTACT_FROM || `GhostOps Contact <${SMTP_USER}>`;
+    const fromAddress = CONTACT_FROM || `GhostOps Contact <${SMTP_USER}>`;
 
-    // --- 3) Création du transporteur Nodemailer ---
-    const portNumber = parseInt(SMTP_PORT, 10) || 465;
+    // 3) Création du transporteur Nodemailer
+    const portNumber = parseInt(SMTP_PORT, 10) || 587;
     const transporter = nodemailer.createTransport({
       host: SMTP_HOST,
       port: portNumber,
-      secure: portNumber === 465, // true pour 465, false pour 587
+      secure: portNumber === 465, // true pour 465 (SSL), false pour 587 (STARTTLS)
       auth: {
         user: SMTP_USER,
         pass: SMTP_PASS,
       },
     });
 
-    // (Optionnel) Vérifier la connexion SMTP pour un debug plus fin
-    try {
-      await transporter.verify();
-    } catch (verifyError) {
-      console.error('Erreur de vérification SMTP GhostOps :', verifyError);
-      return res.status(500).json({
-        ok: false,
-        error: "Impossible de se connecter au serveur SMTP (vérifier HOST / PORT / USER / PASS).",
-        details: verifyError.message || null,
-      });
-    }
-
-    // --- 4) Construction du contenu du mail ---
+    // 4) Construction du contenu du mail
     const subjectLine =
       subject && subject.trim().length > 0
         ? `[GhostOps] ${subject.trim()}`
@@ -118,26 +150,17 @@ ${message}
       <p style="white-space:pre-line;">${message}</p>
     `;
 
-    // --- 5) Envoi du mail ---
-    try {
-      await transporter.sendMail({
-        from: fromAddress,
-        to: toAddress,
-        replyTo: email, // pour répondre directement au décideur
-        subject: subjectLine,
-        text: textBody,
-        html: htmlBody,
-      });
-    } catch (sendError) {
-      console.error('Erreur envoi mail GhostOps :', sendError);
-      return res.status(500).json({
-        ok: false,
-        error: "Erreur lors de l’envoi de l’e-mail.",
-        details: sendError.message || null,
-      });
-    }
+    // 5) Envoi du mail
+    await transporter.sendMail({
+      from: fromAddress,
+      to: toAddress,
+      replyTo: email,
+      subject: subjectLine,
+      text: textBody,
+      html: htmlBody,
+    });
 
-    // --- 6) Réponse OK au front ---
+    // 6) Réponse OK au front
     return res.status(200).json({
       ok: true,
       message: 'Brief envoyé avec succès.',
@@ -146,7 +169,7 @@ ${message}
     console.error('Erreur inattendue GhostOps contact :', err);
     return res.status(500).json({
       ok: false,
-      error: "Erreur serveur inattendue.",
+      error: 'Erreur serveur inattendue.',
       details: err.message || null,
     });
   }
