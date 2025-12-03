@@ -2,7 +2,7 @@
 const nodemailer = require('nodemailer');
 const querystring = require('querystring');
 
-// Helper pour récupérer un body exploitable, quel que soit le format
+// Helper pour parser le body de manière robuste
 async function getParsedBody(req) {
   // Si Vercel a déjà mis quelque chose dans req.body
   if (req.body) {
@@ -10,7 +10,7 @@ async function getParsedBody(req) {
       try {
         return JSON.parse(req.body);
       } catch {
-        // Si ce n'est pas du JSON, on continue plus bas
+        // pas du JSON, on continue
       }
     } else if (typeof req.body === 'object') {
       return req.body;
@@ -42,7 +42,7 @@ async function getParsedBody(req) {
     return querystring.parse(raw);
   }
 
-  // Par défaut, on ne sait pas : on renvoie la chaîne brute
+  // Par défaut
   return { raw };
 }
 
@@ -79,8 +79,43 @@ module.exports = async function handler(req, res) {
 
   try {
     // 1) Récupération et parsing du body
-    const body = await getParsedBody(req);
-    const { name, email, company, role, subject, message } = body || {};
+    const body = await getParsedBody(req) || {};
+
+    // Tolérance sur les noms de champs
+    const name =
+      body.name ||
+      body.nom ||
+      body.fullName ||
+      body.fullname ||
+      body['full-name'];
+
+    const email =
+      body.email ||
+      body.mail ||
+      body['e-mail'];
+
+    const message =
+      body.message ||
+      body.msg ||
+      body.contenu ||
+      body.commentaire;
+
+    const company =
+      body.company ||
+      body.structure ||
+      body.societe ||
+      body.entreprise;
+
+    const role =
+      body.role ||
+      body.fonction ||
+      body.poste ||
+      body.titre;
+
+    const subject =
+      body.subject ||
+      body.sujet ||
+      '';
 
     if (!name || !email || !message) {
       return res.status(400).json({
@@ -91,30 +126,25 @@ module.exports = async function handler(req, res) {
 
     // 2) Vérification de la configuration SMTP
     const {
-      SMTP_HOST,
-      SMTP_PORT,
       SMTP_USER,
       SMTP_PASS,
       CONTACT_TO,
       CONTACT_FROM,
     } = process.env;
 
-    if (!SMTP_HOST || !SMTP_PORT || !SMTP_USER || !SMTP_PASS) {
+    if (!SMTP_USER || !SMTP_PASS) {
       return res.status(500).json({
         ok: false,
-        error: 'Configuration e-mail incomplète côté serveur (SMTP).',
+        error: 'Configuration e-mail incomplète côté serveur (SMTP_USER / SMTP_PASS).',
       });
     }
 
     const toAddress = CONTACT_TO || SMTP_USER;
     const fromAddress = CONTACT_FROM || `GhostOps Contact <${SMTP_USER}>`;
 
-    // 3) Création du transporteur Nodemailer
-    const portNumber = parseInt(SMTP_PORT, 10) || 587;
+    // 3) Création du transporteur Nodemailer (Gmail + mot de passe d’application)
     const transporter = nodemailer.createTransport({
-      host: SMTP_HOST,
-      port: portNumber,
-      secure: portNumber === 465, // true pour 465 (SSL), false pour 587 (STARTTLS)
+      service: 'gmail',
       auth: {
         user: SMTP_USER,
         pass: SMTP_PASS,
@@ -123,8 +153,8 @@ module.exports = async function handler(req, res) {
 
     // 4) Construction du contenu du mail
     const subjectLine =
-      subject && subject.trim().length > 0
-        ? `[GhostOps] ${subject.trim()}`
+      subject && subject.toString().trim().length > 0
+        ? `[GhostOps] ${subject.toString().trim()}`
         : `[GhostOps] Nouveau brief confidentiel de ${name}`;
 
     const textBody = `
@@ -170,7 +200,7 @@ ${message}
     return res.status(500).json({
       ok: false,
       error: 'Erreur serveur inattendue.',
-      details: err.message || null,
+      details: err && err.message ? err.message : String(err),
     });
   }
 };
