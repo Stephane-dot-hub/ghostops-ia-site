@@ -185,16 +185,19 @@
             });
 
             const data = await response.json();
+if (!response.ok || !data.url) {
+  let msg = data.error || 'Erreur de connexion au service de paiement. Veuillez réessayer dans quelques instants.';
 
-            if (!response.ok || !data.url) {
-              const errText = data.error || 'Impossible de créer la session de paiement Stripe.';
-              statusEl.textContent = errText;
-              statusEl.className = 'mt-3 text-xs text-red-400';
-              button.textContent = originalLabel;
-              button.disabled = false;
-              button.dataset.loading = '0';
-              return;
-            }
+  // On ajoute le détail retourné par le backend Stripe, si présent
+  if (data.details) {
+    msg += ' — Détail technique : ' + data.details;
+    console.error('Stripe details:', data.details);
+  }
+
+  statusEl.textContent = msg;
+  return;
+}
+
 
             // Redirection vers la page Stripe
             window.location.href = data.url;
