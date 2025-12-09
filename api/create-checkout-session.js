@@ -2,10 +2,11 @@
 const Stripe = require('stripe');
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const priceId = process.env.STRIPE_PRICE_ID_DIAGNOSTIC_IA || ''; // ID du prix Stripe
+const priceId = process.env.STRIPE_PRICE_ID_DIAGNOSTIC_IA || '';
+
+const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
 
 module.exports = async function handler(req, res) {
-  // Sécurité : uniquement POST
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res
@@ -13,19 +14,17 @@ module.exports = async function handler(req, res) {
       .json({ error: 'Méthode non autorisée. Utilisez POST.' });
   }
 
-  // Vérification configuration Stripe
-  if (!stripeSecretKey) {
+  if (!stripeSecretKey || !stripe) {
     return res.status(500).json({
       error: 'STRIPE_SECRET_KEY non configurée dans les variables d’environnement.'
     });
   }
+
   if (!priceId) {
     return res.status(500).json({
       error: 'STRIPE_PRICE_ID_DIAGNOSTIC_IA non configuré dans les variables d’environnement.'
     });
   }
-
-  const stripe = new Stripe(stripeSecretKey);
 
   try {
     const origin =
@@ -37,13 +36,11 @@ module.exports = async function handler(req, res) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: priceId,  // géré côté Stripe
+          price: priceId,
           quantity: 1,
         },
       ],
-      // Après paiement OK → retour vers la page Diagnostic IA (avec ancre + flag)
       success_url: `${origin}/diagnostic-ia.html?paid=1#ghostops-diagnostic-ia-widget`,
-      // Si l’utilisateur annule → retour page de paiement
       cancel_url: `${origin}/paiement-diagnostic-ia.html?canceled=1`,
       metadata: {
         product: 'ghostops_diagnostic_ia_90min',
