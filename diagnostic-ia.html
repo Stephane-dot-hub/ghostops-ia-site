@@ -363,83 +363,94 @@
         </div>
       </section>
 
-      <!-- WIDGET PRE-DIAGNOSTIC IA GHOSTOPS (ACCESSIBLE UNIQUEMENT APRÈS PAIEMENT) -->
-      <section id="ghostops-diagnostic-ia-widget" class="max-w-4xl mx-auto my-10 hidden">
+      <!-- WIDGET PRE-DIAGNOSTIC IA GHOSTOPS (VERROUILLÉ PAR DÉFAUT) -->
+      <section id="ghostops-diagnostic-ia-widget" class="max-w-4xl mx-auto my-10">
         <div class="bg-gray-800/80 rounded-xl p-6 md:p-8">
           <h2 class="text-xl md:text-2xl font-semibold mb-2 text-shadow">
             Pré-diagnostic IA GhostOps
           </h2>
-          <p class="text-gray-300 text-sm md:text-base mb-2">
+          <p class="text-gray-300 text-sm md:text-base mb-4">
             Ce module vous permet de structurer votre situation avant un
             <span class="font-semibold">GhostOps Diagnostic IA – 90 minutes</span>.
             Il ne remplace pas une intervention humaine&nbsp;: il prépare le terrain en
             clarifiant les tensions et les questions à traiter.
           </p>
 
-          <!-- Message affiché uniquement au retour de Stripe -->
-          <p id="ghostops-diagnostic-ia-access-message"
-             class="hidden text-xs md:text-sm text-green-400 mb-4">
-            Paiement validé. Vous pouvez lancer votre pré-diagnostic IA GhostOps.
-          </p>
-
-          <form id="ghostops-diagnostic-ia-form" class="space-y-4">
-            <div>
-              <label class="block text-xs font-semibold text-gray-200 mb-1" for="diag-description">
-                Description de la situation (obligatoire)
-              </label>
-              <textarea
-                id="diag-description"
-                class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                rows="5"
-                placeholder="Exposez les faits principaux, sans entrer dans les détails nominaux inutiles…"
-                required
-              ></textarea>
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-gray-200 mb-1" for="diag-contexte">
-                Contexte et historique (optionnel)
-              </label>
-              <textarea
-                id="diag-contexte"
-                class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                rows="3"
-                placeholder="Précisez, si nécessaire, l’historique, les décisions antérieures, les acteurs impliqués…"
-              ></textarea>
-            </div>
-
-            <div>
-              <label class="block text-xs font-semibold text-gray-200 mb-1" for="diag-enjeu">
-                Enjeux et risques perçus (optionnel)
-              </label>
-              <textarea
-                id="diag-enjeu"
-                class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
-                rows="3"
-                placeholder="Qu’est-ce qui vous inquiète le plus ? Qu’est-ce qui se joue pour vous / votre structure ?"
-              ></textarea>
-            </div>
-
-            <div class="pt-2">
-              <button
-                type="submit"
-                class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-sm"
-              >
-                Lancer le pré-diagnostic IA
-              </button>
-              <p id="ghostops-diagnostic-ia-status" class="mt-3 text-xs text-gray-300"></p>
-            </div>
-          </form>
-
-          <div id="ghostops-diagnostic-ia-result"
-               class="mt-6 text-sm text-gray-100 whitespace-pre-line hidden bg-gray-900/70 border border-gray-700 rounded-lg p-4">
+          <!-- ÉTAT VERROUILLÉ (par défaut, si ?paid≠1) -->
+          <div id="ghostops-diagnostic-ia-locked" class="text-sm text-gray-300">
+            <p>
+              Ce module est accessible après validation d’un
+              <span class="font-semibold">paiement Diagnostic IA</span>.
+            </p>
+            <p class="mt-2">
+              Si ce n’est pas encore fait, vous pouvez
+              <a href="/paiement-diagnostic-ia.html" class="text-blue-400 hover:underline">
+                accéder à la page de paiement sécurisée
+              </a>.
+            </p>
           </div>
 
-          <p class="mt-4 text-[11px] text-gray-400">
-            Le contenu généré par l’IA GhostOps reste une aide à la réflexion. Il ne constitue ni un avis juridique,
-            ni une recommandation engageante. Pour un traitement complet et confidentiel de votre dossier,
-            le format de référence reste le <span class="font-semibold">GhostOps Diagnostic IA – 90 minutes</span>.
-          </p>
+          <!-- ÉTAT DÉVERROUILLÉ (après retour Stripe avec ?paid=1) -->
+          <div id="ghostops-diagnostic-ia-unlocked" class="hidden">
+            <form id="ghostops-diagnostic-ia-form" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold text-gray-200 mb-1" for="diag-description">
+                  Description de la situation (obligatoire)
+                </label>
+                <textarea
+                  id="diag-description"
+                  class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                  rows="5"
+                  placeholder="Exposez les faits principaux, sans entrer dans les détails nominaux inutiles…"
+                  required
+                ></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-200 mb-1" for="diag-contexte">
+                  Contexte et historique (optionnel)
+                </label>
+                <textarea
+                  id="diag-contexte"
+                  class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                  rows="3"
+                  placeholder="Précisez, si nécessaire, l’historique, les décisions antérieures, les acteurs impliqués…"
+                ></textarea>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold text-gray-200 mb-1" for="diag-enjeu">
+                  Enjeux et risques perçus (optionnel)
+                </label>
+                <textarea
+                  id="diag-enjeu"
+                  class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
+                  rows="3"
+                  placeholder="Qu’est-ce qui vous inquiète le plus ? Qu’est-ce qui se joue pour vous / votre structure ?"
+                ></textarea>
+              </div>
+
+              <div class="pt-2">
+                <button
+                  type="submit"
+                  class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-sm"
+                >
+                  Lancer le pré-diagnostic IA
+                </button>
+                <p id="ghostops-diagnostic-ia-status" class="mt-3 text-xs text-gray-300"></p>
+              </div>
+            </form>
+
+            <div id="ghostops-diagnostic-ia-result"
+                 class="mt-6 text-sm text-gray-100 whitespace-pre-line hidden bg-gray-900/70 border border-gray-700 rounded-lg p-4">
+            </div>
+
+            <p class="mt-4 text-[11px] text-gray-400">
+              Le contenu généré par l’IA GhostOps reste une aide à la réflexion. Il ne constitue ni un avis juridique,
+              ni une recommandation engageante. Pour un traitement complet et confidentiel de votre dossier,
+              le format de référence reste le <span class="font-semibold">GhostOps Diagnostic IA – 90 minutes</span>.
+            </p>
+          </div>
         </div>
       </section>
     </main>
@@ -459,28 +470,29 @@
       </div>
     </footer>
 
-    <!-- Script pré-diagnostic IA GhostOps -->
+    <!-- Script pré-diagnostic IA GhostOps (avec verrouillage par ?paid=1) -->
     <script>
       (function () {
-        const params = new URLSearchParams(window.location.search);
-        const isPaid = params.get('paid') === '1';
+        const urlParams = new URLSearchParams(window.location.search);
+        const paidFlag = urlParams.get('paid');
 
-        const widgetSection = document.getElementById('ghostops-diagnostic-ia-widget');
-        const accessMsg = document.getElementById('ghostops-diagnostic-ia-access-message');
+        const lockedBlock = document.getElementById('ghostops-diagnostic-ia-locked');
+        const unlockedBlock = document.getElementById('ghostops-diagnostic-ia-unlocked');
 
-        // Contrôle d'accès au widget : visible uniquement après paiement (paid=1)
-        if (widgetSection) {
+        // Si l’utilisateur revient de Stripe avec ?paid=1 → on déverrouille le module
+        const isPaid = paidFlag === '1';
+
+        if (lockedBlock && unlockedBlock) {
           if (isPaid) {
-            widgetSection.classList.remove('hidden');
-            if (accessMsg) {
-              accessMsg.classList.remove('hidden');
-            }
+            lockedBlock.classList.add('hidden');
+            unlockedBlock.classList.remove('hidden');
           } else {
-            widgetSection.classList.add('hidden');
+            lockedBlock.classList.remove('hidden');
+            unlockedBlock.classList.add('hidden');
           }
         }
 
-        // Si paiement non confirmé, on n'initialise pas le formulaire (aucun appel à l'API)
+        // Si non payé, on n’installe pas le comportement du formulaire
         if (!isPaid) {
           return;
         }
