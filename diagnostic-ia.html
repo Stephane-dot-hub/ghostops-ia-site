@@ -113,7 +113,7 @@
 
     <main class="px-6 md:px-24 pb-24">
       <!-- HERO / INTRO -->
-      <section class="max-w-5xl mx-auto mt-8 mb-10">
+      <section class="max-w-5xl mx-auto mt-8 mb-6">
         <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">
           Produit d’entrée GhostOps · Lecture IA en 90&nbsp;minutes
         </p>
@@ -137,6 +137,19 @@
           avec un tarif affiché de manière transparente avant validation. Il s’intègre dans un budget de direction
           (board, DRH, direction générale) sans engager d’emblée les montants d’une mission complète.
         </p>
+      </section>
+
+      <!-- BANDEAU PAIEMENT CONFIRMÉ (affiché uniquement si ?paid=1) -->
+      <section id="ghostops-paid-banner" class="max-w-5xl mx-auto mb-8 hidden">
+        <div class="bg-emerald-900/80 border border-emerald-500/70 rounded-xl px-4 py-3 md:px-6 md:py-4 text-sm md:text-base">
+          <p class="font-semibold text-emerald-200">
+            Paiement confirmé – Diagnostic IA GhostOps activé.
+          </p>
+          <p class="text-emerald-100 text-xs md:text-sm mt-1">
+            Vous pouvez maintenant utiliser le module de pré-diagnostic IA ci-dessous pour structurer votre situation.
+            Les éléments saisis serviront de base à la note produite dans le cadre de votre Diagnostic IA.
+          </p>
+        </div>
       </section>
 
       <!-- CE QUE VOUS OBTENEZ -->
@@ -337,7 +350,7 @@
       </section>
 
       <!-- CTA PAIEMENT / DEMARRAGE -->
-      <section class="max-w-5xl mx-auto mt-8">
+      <section id="ghostops-diagnostic-cta" class="max-w-5xl mx-auto mt-8">
         <div class="bg-gray-800/80 rounded-2xl p-6 md:p-8 text-center">
           <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">
             Démarrer un Diagnostic IA GhostOps
@@ -356,14 +369,20 @@
             Aucun prélèvement n’est effectué tant que vous n’avez pas validé le paiement sur cette page sécurisée.
           </p>
           <!-- Le bouton renvoie vers la page de paiement dédiée -->
-          <a href="/paiement-diagnostic-ia.html"
+          <a id="ghostops-diagnostic-pay-btn"
+             href="/paiement-diagnostic-ia.html"
              class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-xs md:text-sm">
             Consulter le tarif et démarrer le Diagnostic IA
           </a>
+          <p id="ghostops-diagnostic-cta-paid-msg"
+             class="mt-3 text-xs md:text-sm text-emerald-300 hidden">
+            Votre paiement pour le Diagnostic IA a été validé. Vous pouvez désormais utiliser le module de
+            pré-diagnostic IA plus bas sur cette page&nbsp;: les éléments saisis serviront de base à la note GhostOps.
+          </p>
         </div>
       </section>
 
-      <!-- WIDGET PRE-DIAGNOSTIC IA GHOSTOPS (VERROUILLÉ PAR DÉFAUT) -->
+      <!-- WIDGET PRE-DIAGNOSTIC IA GHOSTOPS -->
       <section id="ghostops-diagnostic-ia-widget" class="max-w-4xl mx-auto my-10">
         <div class="bg-gray-800/80 rounded-xl p-6 md:p-8">
           <h2 class="text-xl md:text-2xl font-semibold mb-2 text-shadow">
@@ -376,22 +395,17 @@
             clarifiant les tensions et les questions à traiter.
           </p>
 
-          <!-- ÉTAT VERROUILLÉ (par défaut, si ?paid≠1) -->
-          <div id="ghostops-diagnostic-ia-locked" class="text-sm text-gray-300">
-            <p>
-              Ce module est accessible après validation d’un
-              <span class="font-semibold">paiement Diagnostic IA</span>.
-            </p>
-            <p class="mt-2">
-              Si ce n’est pas encore fait, vous pouvez
-              <a href="/paiement-diagnostic-ia.html" class="text-blue-400 hover:underline">
-                accéder à la page de paiement sécurisée
-              </a>.
-            </p>
-          </div>
+          <!-- Message de verrouillage affiché tant que le paiement n’est pas confirmé -->
+          <p id="ghostops-diagnostic-ia-widget-locked"
+             class="text-[11px] md:text-xs text-amber-300 bg-amber-900/40 border border-amber-500/50 rounded-md px-3 py-2 mb-4">
+            Ce module est activé uniquement après validation d’un
+            <span class="font-semibold">paiement Diagnostic IA GhostOps</span>.
+            Pour lancer le processus, commencez par le paiement sécurisé. Le lien de retour après paiement
+            vous ramènera directement sur cette zone.
+          </p>
 
-          <!-- ÉTAT DÉVERROUILLÉ (après retour Stripe avec ?paid=1) -->
-          <div id="ghostops-diagnostic-ia-unlocked" class="hidden">
+          <!-- Contenu réel du widget, affiché uniquement si ?paid=1 -->
+          <div id="ghostops-diagnostic-ia-widget-inner" class="hidden">
             <form id="ghostops-diagnostic-ia-form" class="space-y-4">
               <div>
                 <label class="block text-xs font-semibold text-gray-200 mb-1" for="diag-description">
@@ -470,39 +484,65 @@
       </div>
     </footer>
 
-    <!-- Script pré-diagnostic IA GhostOps (avec verrouillage par ?paid=1) -->
+    <!-- Script pré-diagnostic IA GhostOps + gestion du flag ?paid=1 -->
     <script>
       (function () {
-        const urlParams = new URLSearchParams(window.location.search);
-        const paidFlag = urlParams.get('paid');
+        const params = new URLSearchParams(window.location.search || '');
+        const isPaid = params.get('paid') === '1';
 
-        const lockedBlock = document.getElementById('ghostops-diagnostic-ia-locked');
-        const unlockedBlock = document.getElementById('ghostops-diagnostic-ia-unlocked');
+        // Bandeau paiement confirmé
+        const paidBanner = document.getElementById('ghostops-paid-banner');
+        if (isPaid && paidBanner) {
+          paidBanner.classList.remove('hidden');
+        }
 
-        // Si l’utilisateur revient de Stripe avec ?paid=1 → on déverrouille le module
-        const isPaid = paidFlag === '1';
+        // Adaptation du CTA : cacher le bouton de paiement et afficher un message dédié
+        const payBtn = document.getElementById('ghostops-diagnostic-pay-btn');
+        const paidMsg = document.getElementById('ghostops-diagnostic-cta-paid-msg');
+        if (isPaid) {
+          if (payBtn) payBtn.classList.add('hidden');
+          if (paidMsg) paidMsg.classList.remove('hidden');
+        }
 
-        if (lockedBlock && unlockedBlock) {
-          if (isPaid) {
-            lockedBlock.classList.add('hidden');
-            unlockedBlock.classList.remove('hidden');
-          } else {
-            lockedBlock.classList.remove('hidden');
-            unlockedBlock.classList.add('hidden');
+        // Gestion de la visibilité du widget de pré-diagnostic
+        const widgetLocked = document.getElementById('ghostops-diagnostic-ia-widget-locked');
+        const widgetInner = document.getElementById('ghostops-diagnostic-ia-widget-inner');
+
+        if (isPaid) {
+          if (widgetInner) widgetInner.classList.remove('hidden');
+          if (widgetLocked) widgetLocked.classList.add('hidden');
+
+          // Optionnel : se placer automatiquement sur le widget si ancre présente
+          const hash = window.location.hash || '';
+          if (hash === '#ghostops-diagnostic-ia-widget') {
+            const widgetSection = document.getElementById('ghostops-diagnostic-ia-widget');
+            if (widgetSection && 'scrollIntoView' in widgetSection) {
+              widgetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
           }
+        } else {
+          if (widgetInner) widgetInner.classList.add('hidden');
+          if (widgetLocked) widgetLocked.classList.remove('hidden');
         }
 
-        // Si non payé, on n’installe pas le comportement du formulaire
-        if (!isPaid) {
-          return;
-        }
-
+        // Script du formulaire de pré-diagnostic IA
         const form = document.getElementById('ghostops-diagnostic-ia-form');
         const statusEl = document.getElementById('ghostops-diagnostic-ia-status');
         const resultEl = document.getElementById('ghostops-diagnostic-ia-result');
 
         if (!form || !statusEl || !resultEl) return;
 
+        // Si non payé : on bloque tout en expliquant
+        if (!isPaid) {
+          form.addEventListener('submit', function (e) {
+            e.preventDefault();
+            statusEl.textContent = 'Le pré-diagnostic IA sera accessible après validation de votre paiement Diagnostic IA.';
+            statusEl.className = 'mt-3 text-xs text-red-400';
+          });
+          return;
+        }
+
+        // Si payé : fonctionnement normal du pré-diagnostic
         form.addEventListener('submit', async function (e) {
           e.preventDefault();
 
@@ -537,7 +577,7 @@
               return;
             }
 
-            statusEl.textContent = 'Pré-diagnostic généré. À utiliser comme base pour un Diagnostic IA complet.';
+            statusEl.textContent = 'Pré-diagnostic généré. À utiliser comme base pour votre Diagnostic IA complet.';
             statusEl.className = 'mt-3 text-xs text-green-400';
 
             resultEl.textContent = data.reply;
