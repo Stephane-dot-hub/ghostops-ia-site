@@ -1,1 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <title>Paiement GhostOps Studio Scénarios – Options tactiques à partir de votre Diagnostic IA</title>
+    <meta name="description" content="Page de paiement sécurisé pour GhostOps Studio Scénarios : activation du niveau 2 de l’offre GhostOps IA, à partir d’un Diagnostic IA validé." />
+
+    <meta name="robots" content="noindex, nofollow" />
+
+    <!-- Fonts & Tailwind -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } }
+      };
+    </script>
+
+    <style>
+      body::before {
+        content: "";
+        background: url('/assets/background-ghostops.jpg') no-repeat center center fixed;
+        background-color: #0f172a;
+        background-size: cover;
+        animation: bgPulse 10s ease-in-out infinite alternate;
+        position: fixed; inset: 0; opacity: 0.25; z-index: -1;
+        transition: opacity .4s ease;
+      }
+      @keyframes bgPulse {
+        0% { filter: brightness(1) contrast(1); }
+        100% { filter: brightness(1.05) contrast(1.05); }
+      }
+      .text-shadow { text-shadow: 1px 1px 4px rgba(0,0,0,.6); }
+      html { scroll-behavior: smooth; }
+      header, main, section, footer { position: relative; z-index: 1; }
+    </style>
+  </head>
+
+  <body class="bg-gray-900 text-white font-sans leading-relaxed">
+    <!-- HEADER -->
+    <header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
+      <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
+        GHOST<span class="text-gray-400">OPS</span>
+      </a>
+      <nav class="flex items-center gap-4 text-xs md:text-sm">
+        <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
+        <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
+        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
+        <a href="/contact.html"
+           class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition">
+          Contact confidentiel
+        </a>
+      </nav>
+    </header>
+
+    <main class="px-6 md:px-24 pb-24">
+      <section class="max-w-3xl mx-auto mt-10 mb-10">
+        <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">
+          GhostOps IA – Niveau&nbsp;2 · Studio Scénarios
+        </p>
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-shadow">
+          Paiement sécurisé – GhostOps Studio Scénarios
+        </h1>
+        <p class="text-gray-200 text-sm md:text-base mb-3">
+          Vous êtes sur le point d’activer le <span class="font-semibold">Niveau&nbsp;2 de l’offre GhostOps IA</span>&nbsp;:
+          <span class="font-semibold">GhostOps Studio Scénarios</span>. Ce niveau s’appuie sur un
+          <span class="font-semibold">Diagnostic IA GhostOps préalablement réalisé et payé</span>.
+        </p>
+        <p class="text-gray-300 text-sm md:text-base mb-3">
+          Le Studio Scénarios a pour objectif de transformer votre diagnostic en <span class="font-semibold">2 à 3
+          scénarios tactiques détaillés</span>, avec matrices risques / gains / exposition, afin de préparer des
+          arbitrages assumables (direction générale, DRH, board, actionnaires).
+        </p>
+        <p class="text-gray-400 text-xs md:text-sm mb-4">
+          Le montant et les conditions précises de ce niveau sont gérés via Stripe (paiement sécurisé). Le détail
+          (tarif, devise, conditions éventuelles) est affiché sur la page Stripe avant validation.
+        </p>
+
+        <!-- Message si retour avec ?canceled=1 -->
+        <div id="ghostops-studio-canceled-banner"
+             class="hidden bg-amber-900/60 border border-amber-500/70 text-amber-100 text-xs md:text-sm px-4 py-3 rounded-xl mb-4">
+          <p class="font-semibold mb-1">
+            Paiement annulé.
+          </p>
+          <p>
+            Aucune somme n’a été débitée. Vous pouvez relancer le paiement ou revenir au
+            <a href="/studio-scenarios.html" class="underline text-amber-200 hover:text-amber-100">Studio Scénarios</a>.
+          </p>
+        </div>
+
+        <!-- Carte de paiement -->
+        <div class="bg-gray-800/80 rounded-2xl p-6 md:p-8 mt-4">
+          <h2 class="text-lg md:text-xl font-semibold mb-3 text-white text-shadow">
+            Procéder au paiement sécurisé avec Stripe
+          </h2>
+          <p class="text-gray-300 text-sm md:text-base mb-4">
+            Le règlement s’effectue via <span class="font-semibold">Stripe</span>, solution de paiement sécurisée.
+            Vous serez redirigé vers une page de paiement HTTPS, puis renvoyé automatiquement vers
+            <span class="font-semibold">GhostOps Studio Scénarios</span> une fois le paiement validé.
+          </p>
+          <p class="text-gray-400 text-xs md:text-sm mb-4">
+            Aucune information de carte bancaire n’est stockée sur le site GhostOps&nbsp;: tout est traité par Stripe.
+          </p>
+
+          <div class="text-center">
+            <button
+              id="ghostops-studio-pay-btn"
+              class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-xs md:text-sm"
+            >
+              Procéder au paiement sécurisé
+            </button>
+            <p id="ghostops-studio-pay-status" class="mt-3 text-xs text-gray-300"></p>
+          </div>
+        </div>
+
+        <p class="mt-4 text-[11px] text-gray-500">
+          En cas de difficulté technique, vous pouvez nous signaler le problème via la page
+          <a href="/contact.html" class="underline hover:text-gray-300">Contact</a>. Aucun débit n’est effectué tant
+          que vous n’avez pas validé le paiement sur la page Stripe.
+        </p>
+      </section>
+    </main>
+
+    <footer class="w-full px-6 md:px-24 pb-8 mt-8 md:mt-12 text-xs text-gray-400">
+      <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <p>© GhostOps – Tous droits réservés.</p>
+        <nav class="flex flex-wrap items-center gap-3">
+          <a href="/" class="hover:underline">Accueil</a>
+          <a href="/expertise.html" class="hover:underline">Expertise</a>
+          <a href="/qui-sommes-nous.html" class="hover:underline">Qui sommes-nous&nbsp;?</a>
+          <a href="/contact.html" class="hover:underline">Contact</a>
+          <a href="/mentions-legales.html" class="hover:underline">
+            Mentions légales &amp; confidentialité
+          </a>
+        </nav>
+      </div>
+    </footer>
+
+    <!-- Script : gestion ?canceled=1 + appel API Stripe -->
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const canceled = params.get('canceled');
+
+        const canceledBanner = document.getElementById('ghostops-studio-canceled-banner');
+        if (canceled === '1' && canceledBanner) {
+          canceledBanner.classList.remove('hidden');
+        }
+
+        const payBtn = document.getElementById('ghostops-studio-pay-btn');
+        const statusEl = document.getElementById('ghostops-studio-pay-status');
+
+        if (!payBtn || !statusEl) return;
+
+        payBtn.addEventListener('click', async function () {
+          statusEl.textContent = 'Connexion au service de paiement en cours…';
+          statusEl.className = 'mt-3 text-xs text-gray-300';
+
+          try {
+            const response = await fetch('/api/create-checkout-session-studio-scenarios', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' }
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.url) {
+              const errText = data.error || 'Erreur lors de la création de la session de paiement Stripe.';
+              statusEl.textContent = errText;
+              statusEl.className = 'mt-3 text-xs text-red-400';
+              return;
+            }
+
+            // Redirection vers Stripe Checkout
+            window.location.href = data.url;
+          } catch (err) {
+            console.error('Erreur lors de l’appel /api/create-checkout-session-studio-scenarios :', err);
+            statusEl.textContent = 'Erreur de connexion au service de paiement. Veuillez réessayer dans quelques instants.';
+            statusEl.className = 'mt-3 text-xs text-red-400';
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
