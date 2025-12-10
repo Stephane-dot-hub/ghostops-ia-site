@@ -87,21 +87,20 @@
 
   <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init && AOS.init();">
     <!-- HEADER -->
-<header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
-  <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
-    GHOST<span class="text-gray-400">OPS</span>
-  </a>
-  <nav class="flex items-center gap-4 text-xs md:text-sm">
-    <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
-    <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
-    <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
-    <a href="/contact.html"
-       class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition">
-      Contact confidentiel
-    </a>
-  </nav>
-</header>
-
+    <header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
+      <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
+        GHOST<span class="text-gray-400">OPS</span>
+      </a>
+      <nav class="flex items-center gap-4 text-xs md:text-sm">
+        <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
+        <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
+        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
+        <a href="/contact.html"
+           class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition">
+          Contact confidentiel
+        </a>
+      </nav>
+    </header>
 
     <!-- HERO -->
     <section class="w-full min-h-[60vh] flex items-center justify-center text-center px-6">
@@ -124,10 +123,15 @@
           GhostOps ne conseille pas. GhostOps modifie la carte du pouvoir notamment dans les
           <span class="font-semibold">crises RH à fort enjeu</span> et les <span class="font-semibold">trajectoires de dirigeants</span>.
         </p>
-        <a href="/expertise.html"
-           class="mt-10 inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
-          Découvrir l’expertise
-        </a>
+        <div class="mt-10 flex flex-col items-center gap-3">
+          <a href="/expertise.html"
+             class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-shadow">
+            Découvrir l’expertise GhostOps
+          </a>
+          <p class="text-xs md:text-sm text-gray-400">
+            Ou démarrer par la suite <a href="#ghostops-ia" class="text-blue-400 hover:underline font-semibold">GhostOps IA – 3 niveaux</a>.
+          </p>
+        </div>
       </div>
     </section>
 
@@ -309,6 +313,92 @@
       </div>
     </section>
 
+    <!-- GHOSTOPS IA – 3 NIVEAUX -->
+    <section id="ghostops-ia" class="py-16 px-6 md:px-24 bg-gray-950/70 border-t border-gray-800/60">
+      <div class="max-w-5xl mx-auto">
+        <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
+          GhostOps IA – Lecture tactique en 3 niveaux
+        </h2>
+        <p class="text-gray-300 text-sm md:text-base mb-6 max-w-3xl">
+          La suite <span class="font-semibold">GhostOps IA</span> permet de démarrer rapidement par une lecture tactique structurée,
+          sans engager immédiatement une opération complète. Chaque niveau peut être activé de manière autonome,
+          en fonction de l’urgence et du degré de maturité du dossier.
+        </p>
+
+        <div class="grid md:grid-cols-3 gap-6 text-sm md:text-base">
+          <!-- Niveau 1 -->
+          <article class="bg-gray-800/80 rounded-2xl p-5 flex flex-col h-full">
+            <p class="text-xs uppercase tracking-[.18em] text-gray-400 mb-1">
+              Niveau&nbsp;1
+            </p>
+            <h3 class="font-semibold mb-1">
+              Diagnostic IA – 90&nbsp;minutes
+            </h3>
+            <p class="text-gray-300 mb-3">
+              Lecture IA structurée d’une situation à fort enjeu&nbsp;:
+              reformulation, principaux risques humains, de gouvernance et narratifs,
+              <span class="font-semibold">2 à 3 options de lecture</span>.
+            </p>
+            <p class="text-gray-200 text-sm font-semibold mb-3">
+              Forfait&nbsp;: 790&nbsp;€ TTC
+            </p>
+            <a href="/diagnostic-ia.html"
+               class="mt-auto inline-block text-xs md:text-sm px-4 py-2 border border-white rounded-md hover:bg-white hover:text-black transition text-center">
+              Découvrir le Diagnostic IA
+            </a>
+          </article>
+
+          <!-- Niveau 2 -->
+          <article class="bg-gray-800/80 rounded-2xl p-5 flex flex-col h-full">
+            <p class="text-xs uppercase tracking-[.18em] text-gray-400 mb-1">
+              Niveau&nbsp;2
+            </p>
+            <h3 class="font-semibold mb-1">
+              GhostOps Studio Scénarios
+            </h3>
+            <p class="text-gray-300 mb-3">
+              Construction de <span class="font-semibold">2 à 3 scénarios tactiques comparables</span> à partir d’un diagnostic consolidé&nbsp;:
+              matrices risques / gains / exposition, conditions de faisabilité et horizons temporels.
+            </p>
+            <p class="text-gray-200 text-sm font-semibold mb-3">
+              Forfait&nbsp;: 1&nbsp;490&nbsp;€ TTC
+            </p>
+            <a href="/studio-scenarios.html"
+               class="mt-auto inline-block text-xs md:text-sm px-4 py-2 border border-white rounded-md hover:bg-white hover:text-black transition text-center">
+              Explorer le Studio Scénarios
+            </a>
+          </article>
+
+          <!-- Niveau 3 -->
+          <article class="bg-gray-800/80 rounded-2xl p-5 flex flex-col h-full">
+            <p class="text-xs uppercase tracking-[.18em] text-gray-400 mb-1">
+              Niveau&nbsp;3
+            </p>
+            <h3 class="font-semibold mb-1">
+              GhostOps Pré-brief Board
+            </h3>
+            <p class="text-gray-300 mb-3">
+              Co-production d’une <span class="font-semibold">note de gouvernance “board-ready”</span> pour un
+              conseil d’administration ou un comité d’audit&nbsp;: options, risques et arbitrages présentés de façon assumable.
+            </p>
+            <p class="text-gray-200 text-sm font-semibold mb-3">
+              Forfait&nbsp;: 2&nbsp;990&nbsp;€ TTC
+            </p>
+            <a href="/pre-brief-board.html"
+               class="mt-auto inline-block text-xs md:text-sm px-4 py-2 border border-white rounded-md hover:bg-white hover:text-black transition text-center">
+              Accéder au Pré-brief Board
+            </a>
+          </article>
+        </div>
+
+        <p class="mt-4 text-[11px] md:text-xs text-gray-400 max-w-4xl">
+          Le parcours complet – Diagnostic IA → Studio Scénarios → Pré-brief Board – est recommandé pour les dossiers
+          à très forte exposition (board, actionnaires, autorités). Chaque niveau dispose de sa page dédiée pour
+          consulter le détail du déroulé et des conditions.
+        </p>
+      </div>
+    </section>
+
     <!-- SITUATIONS TRAITÉES – PREUVE SOCIALE -->
     <section id="situations" class="max-w-6xl mx-auto py-16">
       <h2 class="text-2xl md:text-3xl font-bold mb-4 text-shadow">
@@ -400,7 +490,7 @@
       </div>
     </section>
 
-       <!-- CHRONIQUES GHOSTOPS -->
+    <!-- CHRONIQUES GHOSTOPS -->
     <section id="chroniques" class="px-6 md:px-24 pb-16">
       <div class="max-w-5xl mx-auto">
         <h2 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
@@ -486,8 +576,6 @@
         </div>
       </div>
     </section>
-
-
 
     <!-- A PROPOS (SEO / CARTE DE VISITE) -->
     <section id="apropos" class="pb-20 px-6 md:px-24">
@@ -581,21 +669,20 @@
       </div>
     </section>
 
-<footer class="w-full px-6 md:px-24 pb-8 text-xs text-gray-400">
-  <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
-    <p>© GhostOps – Tous droits réservés.</p>
-    <nav class="flex flex-wrap items-center gap-3">
-      <a href="/" class="hover:underline">Accueil</a>
-      <a href="/expertise.html" class="hover:underline">Expertise</a>
-      <a href="/qui-sommes-nous.html" class="hover:underline">Qui sommes-nous&nbsp;?</a>
-      <a href="/contact.html" class="hover:underline">Contact</a>
-      <a href="/mentions-legales.html" class="hover:underline">
-        Mentions légales &amp; confidentialité
-      </a>
-    </nav>
-  </div>
-</footer>
-
+    <footer class="w-full px-6 md:px-24 pb-8 text-xs text-gray-400">
+      <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <p>© GhostOps – Tous droits réservés.</p>
+        <nav class="flex flex-wrap items-center gap-3">
+          <a href="/" class="hover:underline">Accueil</a>
+          <a href="/expertise.html" class="hover:underline">Expertise</a>
+          <a href="/qui-sommes-nous.html" class="hover:underline">Qui sommes-nous&nbsp;?</a>
+          <a href="/contact.html" class="hover:underline">Contact</a>
+          <a href="/mentions-legales.html" class="hover:underline">
+            Mentions légales &amp; confidentialité
+          </a>
+        </nav>
+      </div>
+    </footer>
 
     <!-- Widget GhostOps Chat -->
     <div id="ghostops-chat-root">
