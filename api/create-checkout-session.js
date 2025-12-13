@@ -1,12 +1,11 @@
-// /api/create-checkout-session.js
+// /api/create-checkout-session-diagnostic-ia.js
 const Stripe = require('stripe');
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const priceId = process.env.STRIPE_PRICE_ID_DIAGNOSTIC_IA || '';
-
-const stripe = stripeSecretKey ? new Stripe(stripeSecretKey) : null;
+const priceId = process.env.STRIPE_PRICE_ID_DIAGNOSTIC_IA || ''; // ID du prix Stripe pour le Diagnostic IA
 
 module.exports = async function handler(req, res) {
+  // Sécurité : uniquement POST
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res
@@ -14,17 +13,19 @@ module.exports = async function handler(req, res) {
       .json({ error: 'Méthode non autorisée. Utilisez POST.' });
   }
 
-  if (!stripeSecretKey || !stripe) {
+  // Vérification configuration Stripe
+  if (!stripeSecretKey) {
     return res.status(500).json({
       error: 'STRIPE_SECRET_KEY non configurée dans les variables d’environnement.'
     });
   }
-
   if (!priceId) {
     return res.status(500).json({
       error: 'STRIPE_PRICE_ID_DIAGNOSTIC_IA non configuré dans les variables d’environnement.'
     });
   }
+
+  const stripe = new Stripe(stripeSecretKey);
 
   try {
     const origin =
@@ -36,22 +37,24 @@ module.exports = async function handler(req, res) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: priceId,
+          price: priceId,  // prix géré côté Stripe (Diagnostic IA – 790 € TTC)
           quantity: 1,
         },
       ],
-      success_url: `${origin}/diagnostic-ia.html?paid=1#ghostops-diagnostic-ia-widget`,
+      // 🔁 Après paiement OK → redirection vers l’espace IA
+      success_url: `${origin}/diagnostic-ia-session.html?paid=1`,
+      // ❌ Si l’utilisateur annule → retour à la page de paiement
       cancel_url: `${origin}/paiement-diagnostic-ia.html?canceled=1`,
       metadata: {
-        product: 'ghostops_diagnostic_ia_90min',
+        product: 'ghostops_diagnostic_ia',
       },
     });
 
     return res.status(200).json({ url: session.url });
   } catch (err) {
-    console.error('Erreur Stripe create-checkout-session :', err);
+    console.error('Erreur Stripe create-checkout-session-diagnostic-ia :', err);
     return res.status(500).json({
-      error: 'Erreur lors de la création de la session de paiement Stripe.',
+      error: 'Erreur lors de la création de la session de paiement Stripe (Diagnostic IA).',
       details: err && err.message ? err.message : String(err),
     });
   }
