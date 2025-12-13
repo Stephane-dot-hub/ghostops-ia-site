@@ -41,8 +41,8 @@ module.exports = async function handler(req, res) {
           quantity: 1,
         },
       ],
-      // Après paiement OK → on renverra ensuite vers studio-scenarios.html?paid=1
-      success_url: `${origin}/studio-scenarios.html?paid=1`,
+      // Après paiement OK → redirection vers l’espace IA du Niveau 2
+      success_url: `${origin}/studio-scenarios-session.html?paid=1`,
       // Si l’utilisateur annule → retour page de paiement Studio Scénarios
       cancel_url: `${origin}/paiement-studio-scenarios.html?canceled=1`,
       metadata: {
