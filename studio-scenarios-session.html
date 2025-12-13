@@ -1,1 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <title>GhostOps Studio Scénarios – Espace IA Niveau 2</title>
+    <meta name="description" content="Espace IA sécurisé du GhostOps Studio Scénarios : construction de 2 à 3 scénarios tactiques comparables à partir de votre Diagnostic IA ou de votre dossier consolidé." />
+    <meta name="robots" content="noindex, nofollow" />
+
+    <link rel="canonical" href="https://www.ghostops.tech/studio-scenarios-session.html" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="GhostOps Studio Scénarios – Espace IA Niveau 2" />
+    <meta property="og:description" content="Module IA dédié au GhostOps Studio Scénarios : scénarios tactiques, matrices risques/gains/exposition et conditions de faisabilité." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.ghostops.tech/studio-scenarios-session.html" />
+    <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
+
+    <!-- Fonts & Tailwind -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } }
+      };
+    </script>
+
+    <style>
+      body::before {
+        content: "";
+        background: url('/assets/background-ghostops.jpg') no-repeat center center fixed;
+        background-color: #0f172a;
+        background-size: cover;
+        animation: bgPulse 10s ease-in-out infinite alternate;
+        position: fixed; inset: 0; opacity: 0.25; z-index: -1;
+        transition: opacity .4s ease;
+      }
+      @keyframes bgPulse {
+        0% { filter: brightness(1) contrast(1); }
+        100% { filter: brightness(1.05) contrast(1.05); }
+      }
+      .text-shadow { text-shadow: 1px 1px 4px rgba(0,0,0,.6); }
+      html { scroll-behavior: smooth; }
+      header, main, section, footer { position: relative; z-index: 1; }
+    </style>
+  </head>
+
+  <body class="bg-gray-900 text-white font-sans leading-relaxed">
+    <!-- HEADER -->
+    <header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
+      <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
+        GHOST<span class="text-gray-400">OPS</span>
+      </a>
+      <nav class="flex items-center gap-4 text-xs md:text-sm">
+        <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
+        <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
+        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
+        <a href="/contact.html"
+           class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition">
+          Contact confidentiel
+        </a>
+      </nav>
+    </header>
+
+    <main class="px-6 md:px-24 pb-20">
+      <!-- Bandeau paiement validé -->
+      <section class="max-w-4xl mx-auto mt-6">
+        <div id="ghostops-studio-paid-banner"
+             class="hidden mb-4 rounded-xl border border-emerald-500/70 bg-emerald-900/40 px-4 py-3 text-xs md:text-sm text-emerald-100">
+          <p class="font-semibold mb-1">Paiement GhostOps Studio Scénarios confirmé.</p>
+          <p>
+            Vous êtes dans l’espace IA dédié au <span class="font-semibold">Niveau&nbsp;2 – GhostOps Studio Scénarios</span>.
+            Les échanges qui suivent servent à préparer vos <span class="font-semibold">2 à 3 scénarios tactiques</span>.
+          </p>
+        </div>
+      </section>
+
+      <!-- CONTEXTE NIVEAU 2 -->
+      <section class="max-w-4xl mx-auto mt-4 mb-6">
+        <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">
+          GhostOps IA – Niveau&nbsp;2 · Studio Scénarios
+        </p>
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
+          Espace IA – GhostOps Studio Scénarios
+        </h1>
+        <p class="text-gray-200 text-sm md:text-base mb-3">
+          Cet espace est réservé au <span class="font-semibold">Niveau&nbsp;2 de la suite GhostOps IA</span>.
+          Il a pour objectif de transformer votre <span class="font-semibold">Diagnostic IA</span> ou votre
+          dossier consolidé en <span class="font-semibold">2 à 3 scénarios tactiques comparables</span>.
+        </p>
+        <p class="text-gray-300 text-xs md:text-sm mb-3">
+          L’IA GhostOps ne remplace pas l’intervention humaine ni les arbitrages de gouvernance.
+          Elle sert ici à <span class="font-semibold">structurer les options</span>, clarifier les
+          <span class="font-semibold">risques / gains / expositions</span> et tester différentes lignes d’action.
+        </p>
+        <p class="text-gray-400 text-[11px] md:text-xs">
+          Évitez de saisir des noms complets ou des données directement identifiantes. Restez centré sur
+          les fonctions, les comportements, les rapports de force et les enjeux (humains, politiques, réputationnels).
+        </p>
+      </section>
+
+      <!-- CARTOUCHE DE TRAVAIL IA -->
+      <section class="max-w-4xl mx-auto">
+        <div class="bg-gray-900/80 border border-gray-700 rounded-2xl p-5 md:p-6">
+          <h2 class="text-lg md:text-xl font-semibold mb-3 text-white text-shadow">
+            Atelier IA – Construction de scénarios tactiques
+          </h2>
+          <p class="text-gray-300 text-xs md:text-sm mb-4">
+            Pour tirer pleinement parti de cet espace, commencez par rappeler en quelques lignes&nbsp;:
+          </p>
+          <ul class="list-disc list-inside text-gray-300 text-xs md:text-sm mb-4 space-y-1">
+            <li>le <span class="font-semibold">contexte</span> (périmètre, fonction, situation actuelle) ;</li>
+            <li>les <span class="font-semibold">acteurs clés</span> et leurs comportements visibles ;</li>
+            <li>ce que vous cherchez surtout à <span class="font-semibold">éviter</span> et à <span class="font-semibold">sécuriser</span> ;</li>
+            <li>les <span class="font-semibold">contraintes</span> non négociables (délai, confidentialité, gouvernance, droit, etc.).</li>
+          </ul>
+          <p class="text-gray-400 text-[11px] md:text-xs mb-4">
+            L’IA GhostOps pourra alors vous proposer plusieurs <span class="font-semibold">axes de scénarios</span>,
+            les décliner, comparer leurs implications et préparer une base exploitable pour la suite de l’intervention GhostOps.
+          </p>
+
+          <!-- Zone de chat IA Niveau 2 -->
+          <div class="mt-5">
+            <div id="ghostops-studio-messages"
+                 class="bg-gray-950/80 border border-gray-800 rounded-xl px-3 py-3 h-64 md:h-80 overflow-y-auto text-xs md:text-sm space-y-2">
+              <div class="text-gray-200 text-xs md:text-[13px]">
+                <span class="font-semibold">GhostOps IA – Studio Scénarios&nbsp;:</span>
+                <span>
+                  Pour commencer, décrivez votre situation en précisant&nbsp;:
+                  (1) le contexte, (2) les acteurs et leurs positions, (3) ce que vous cherchez surtout à éviter,
+                  (4) ce qui serait considéré comme une issue acceptable.<br /><br />
+                  Je vous répondrai avec une première <span class="font-semibold">lecture tactique</span> et
+                  2 à 3 pistes de scénarios à approfondir.
+                </span>
+              </div>
+            </div>
+
+            <form id="ghostops-studio-form"
+                  class="mt-3 flex flex-col gap-2 md:flex-row md:items-end">
+              <textarea id="ghostops-studio-input"
+                        class="flex-1 text-xs md:text-sm bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-2 resize-none focus:outline-none focus:border-gray-400"
+                        rows="3"
+                        placeholder="Décrivez votre situation (contexte, acteurs, risques, ce que vous cherchez à sécuriser)…"></textarea>
+              <button type="submit"
+                      class="mt-1 md:mt-0 md:ml-2 text-xs md:text-sm px-4 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
+                Envoyer
+              </button>
+            </form>
+
+            <p class="mt-3 text-[11px] md:text-xs text-gray-500">
+              Cet espace IA prépare les scénarios. La validation finale, le cadrage des décisions et les
+              communications sensibles sont toujours assumés par des humains (dirigeants, board, GhostOps).
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="w-full px-6 md:px-24 pb-8 mt-10 text-xs text-gray-400">
+      <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+        <p>© GhostOps – Tous droits réservés.</p>
+        <nav class="flex flex-wrap items-center gap-3">
+          <a href="/" class="hover:underline">Accueil</a>
+          <a href="/expertise.html" class="hover:underline">Expertise</a>
+          <a href="/qui-sommes-nous.html" class="hover:underline">Qui sommes-nous&nbsp;?</a>
+          <a href="/contact.html" class="hover:underline">Contact</a>
+          <a href="/mentions-legales.html" class="hover:underline">
+            Mentions légales &amp; confidentialité
+          </a>
+        </nav>
+      </div>
+    </footer>
+
+    <!-- Script : affichage bandeau + chat IA Niveau 2 -->
+    <script>
+      (function () {
+        // Bandeau "paid=1"
+        const params = new URLSearchParams(window.location.search);
+        const paid = params.get('paid');
+        const paidBanner = document.getElementById('ghostops-studio-paid-banner');
+        if (paid === '1' && paidBanner) {
+          paidBanner.classList.remove('hidden');
+        }
+
+        const form = document.getElementById('ghostops-studio-form');
+        const input = document.getElementById('ghostops-studio-input');
+        const messages = document.getElementById('ghostops-studio-messages');
+
+        if (!form || !input || !messages) return;
+
+        function scrollToBottom() {
+          messages.scrollTop = messages.scrollHeight;
+        }
+
+        function addMessage(sender, text) {
+          const wrapper = document.createElement('div');
+          wrapper.className = sender === 'user'
+            ? 'text-right'
+            : 'text-left';
+
+          const bubble = document.createElement('div');
+          bubble.className = sender === 'user'
+            ? 'inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg mb-1'
+            : 'inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg mb-1';
+
+          bubble.textContent = text;
+          wrapper.appendChild(bubble);
+          messages.appendChild(wrapper);
+          scrollToBottom();
+          return wrapper;
+        }
+
+        async function sendMessage() {
+          const userText = (input.value || '').trim();
+          if (!userText) return;
+
+          addMessage('user', userText);
+          input.value = '';
+
+          const waiting = addMessage('bot', 'Lecture scénarios en cours…');
+
+          try {
+            const response = await fetch('/api/ghostops-studio-scenarios', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ message: userText })
+            });
+
+            let data = {};
+            try {
+              data = await response.json();
+            } catch (_) {}
+
+            if (waiting && waiting.parentNode) {
+              waiting.parentNode.removeChild(waiting);
+            }
+
+            if (!response.ok || !data.reply) {
+              const errText = data.error || 'Une erreur est survenue lors de l’analyse IA (Studio Scénarios). Veuillez réessayer.';
+              addMessage('bot', errText);
+              return;
+            }
+
+            addMessage('bot', data.reply);
+          } catch (err) {
+            console.error('Erreur /api/ghostops-studio-scenarios :', err);
+            if (waiting && waiting.parentNode) {
+              waiting.parentNode.removeChild(waiting);
+            }
+            addMessage('bot', 'Erreur de connexion à GhostOps IA. Veuillez réessayer plus tard ou utiliser la page contact.');
+          }
+        }
+
+        form.addEventListener('submit', function (e) {
+          e.preventDefault();
+          sendMessage();
+        });
+
+        input.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
