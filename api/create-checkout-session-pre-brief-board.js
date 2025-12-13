@@ -37,7 +37,7 @@ module.exports = async function handler(req, res) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: priceId, // géré côté Stripe (prix Pré-brief Board)
+          price: priceId,          // géré côté Stripe (prix 2 990 € TTC)
           quantity: 1,
         },
       ],
