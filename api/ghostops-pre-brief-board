@@ -1,1 +1,104 @@
+// /api/ghostops-pre-brief-board.js
+// Module IA dédié au Pré-brief Board : lecture structurée et cadrage,
+// sans produire une stratégie complète ni une note board-ready finale.
 
+const OpenAI = require('openai');
+
+const apiKey = process.env.OPENAI_API_KEY;
+const defaultModel = process.env.OPENAI_MODEL_PRE_BRIEF_BOARD || 'gpt-4.1-mini';
+
+module.exports = async function handler(req, res) {
+  // Sécurité : uniquement POST
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', ['POST']);
+    return res
+      .status(405)
+      .json({ error: 'Méthode non autorisée. Utilisez POST.' });
+  }
+
+  // Vérification configuration OpenAI
+  if (!apiKey) {
+    return res.status(500).json({
+      error: 'OPENAI_API_KEY non configurée dans les variables d’environnement.'
+    });
+  }
+
+  let body = {};
+  try {
+    body = req.body || {};
+  } catch (e) {
+    // Au cas où le body ne serait pas parsé automatiquement
+  }
+
+  const { message } = body;
+
+  if (!message || typeof message !== 'string') {
+    return res.status(400).json({
+      error: 'Aucun message valide fourni. Envoyez un champ "message" de type string en JSON.'
+    });
+  }
+
+  const client = new OpenAI({ apiKey });
+
+  try {
+    const completion = await client.chat.completions.create({
+      model: defaultModel,
+      temperature: 0.4,
+      max_tokens: 900,
+      messages: [
+        {
+          role: 'system',
+          content: [
+            'Tu es GhostOps IA – Pré-brief Board.',
+            'Ton rôle : produire une lecture structurée d’une situation à fort enjeu humain / politique / de gouvernance,',
+            'afin d’aider à préparer une note “board-ready” pour un conseil d’administration ou un comité d’audit.',
+            '',
+            'Contraintes :',
+            '- Tu ne rédiges PAS la note board-ready finale.',
+            '- Tu ne fournis PAS une stratégie opérationnelle complète ni un plan d’actions détaillé.',
+            '- Tu ne donnes pas de conseils juridiques ou de conformité présentés comme définitifs.',
+            '- Tu restes sur une lecture, une structuration et des options de cadrage.',
+            '',
+            'Attendus de chaque réponse :',
+            '1) Clarification du contexte et des lignes de force (enjeu central, périmètre, acteurs, tensions).',
+            '2) Cartographie synthétique des risques : humains, narratifs, de gouvernance, réputationnels.',
+            '3) Pistes de cadrage pour la future note Pré-brief Board :',
+            '   - axes possibles de structuration,',
+            '   - points à documenter,',
+            '   - questions auxquelles il faudra répondre pour un board / comité d’audit.',
+            '4) 2 à 4 questions d’affinement à poser au décideur pour la suite.',
+            '',
+            'Style :',
+            '- Ton neutre, analytique, sans dramatisation.',
+            '- Pas de jargon inutile, mais un niveau de lecture compatible avec un board ou un comité d’audit.',
+            '- Tu peux utiliser des listes à puces et des sous-titres courts.',
+            '',
+            'Confidentialité :',
+            'Si l’utilisateur mentionne des noms ou détails très identifiants, tu peux proposer de les anonymiser ou de rester sur les rôles (PDG, DRH, board, etc.).'
+          ].join('\n')
+        },
+        {
+          role: 'user',
+          content: message
+        }
+      ]
+    });
+
+    const reply =
+      completion &&
+      completion.choices &&
+      completion.choices[0] &&
+      completion.choices[0].message &&
+      completion.choices[0].message.content
+        ? completion.choices[0].message.content.trim()
+        : "Je n’ai pas pu générer d’analyse exploitable. Pouvez-vous reformuler votre situation en quelques lignes (contexte, acteurs, risques, échéances) ?";
+
+    return res.status(200).json({ reply });
+  } catch (err) {
+    console.error('Erreur OpenAI ghostops-pre-brief-board :', err);
+    return res.status(500).json({
+      error: 'Erreur lors de l’analyse IA pour le Pré-brief Board.',
+      details: err && err.message ? err.message : String(err),
+    });
+  }
+};
