@@ -42,8 +42,8 @@ module.exports = async function handler(req, res) {
           quantity: 1,
         },
       ],
-      // Après paiement OK → retour vers pre-brief-board.html?paid=1
-      success_url: `${origin}/pre-brief-board.html?paid=1`,
+      // Après paiement OK → retour vers pre-brief-board-session.html?paid=1
+      success_url: `${origin}/pre-brief-board-session.html?paid=1`,
       // Si annulation → retour page de paiement Pré-brief Board
       cancel_url: `${origin}/paiement-pre-brief-board.html?canceled=1`,
       metadata: {
