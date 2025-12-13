@@ -697,8 +697,12 @@
            class="hidden fixed bottom-20 right-6 z-40 w-80 max-h-[70vh] bg-gray-900 border border-gray-700 rounded-2xl shadow-2xl flex flex-col">
         <div class="px-4 py-3 border-b border-gray-700 flex items-center justify-between">
           <div>
-            <p class="text-[10px] uppercase tracking-[.25em] text-gray-400 mb-0.5">Assistant IA</p>
-            <p class="text-sm font-semibold text-white">GhostOps IA – Lecture tactique</p>
+            <p class="text-[10px] uppercase tracking-[.25em] text-gray-400 mb-0.5">
+              Assistant IA – Orientation
+            </p>
+            <p class="text-sm font-semibold text-white">
+              GhostOps IA · Orientation des dispositifs
+            </p>
           </div>
           <button id="ghostops-chat-close" class="text-gray-400 hover:text-white text-lg leading-none">&times;</button>
         </div>
@@ -709,16 +713,23 @@
           <div class="text-gray-300 text-xs md:text-[13px]">
             <span class="font-semibold">GhostOps IA&nbsp;:</span>
             <span>
-              Bonjour, ici GhostOps IA.<br /><br />
-              Vous pouvez me décrire, de manière factuelle, une situation réelle que vous vivez&nbsp;:
-              crise RH ou sociale, dirigeant fragilisé ou contesté, jeux de pouvoir internes, blocage de gouvernance,
-              repositionnement d’un profil clé.<br /><br />
-              J’analyse votre description pour&nbsp;:
-              (1) clarifier les enjeux et les acteurs en présence,
-              (2) mettre en lumière les risques (RH, gouvernance, image),
-              (3) proposer quelques angles de travail possibles pour une intervention GhostOps.<br /><br />
-              Ne mentionnez pas de noms complets si ce n’est pas nécessaire. Restez centré sur les faits,
-              la structure et les comportements.
+              Bonjour, ici GhostOps IA – Orientation.<br /><br />
+              Mon rôle n’est pas de vous fournir une stratégie opérationnelle détaillée, mais de
+              <span class="font-semibold">comprendre votre situation</span> (crise RH, dirigeant contesté ou isolé,
+              jeux de pouvoir internes, gouvernance floue…) et de vous <span class="font-semibold">orienter vers le bon dispositif GhostOps</span> :<br />
+              – <span class="font-semibold">Niveau&nbsp;1&nbsp;:</span> Diagnostic IA – 90&nbsp;minutes<br />
+              – <span class="font-semibold">Niveau&nbsp;2&nbsp;:</span> GhostOps Studio Scénarios<br />
+              – <span class="font-semibold">Niveau&nbsp;3&nbsp;:</span> GhostOps Pré-brief Board<br />
+              – ou une <span class="font-semibold">prise en charge confidentielle GhostOps</span> hors parcours IA classique.<br /><br />
+              Décrivez en quelques lignes&nbsp;:<br />
+              – le contexte (entreprise / périmètre, sans noms complets),<br />
+              – les acteurs clés,<br />
+              – ce que vous cherchez surtout à éviter ou à sécuriser.<br /><br />
+              Je vous répondrai avec&nbsp;:<br />
+              (1) une lecture rapide de la situation,<br />
+              (2) une orientation parmi les dispositifs GhostOps,<br />
+              (3) un prochain pas concret (lien vers la bonne page ou vers un contact confidentiel).<br /><br />
+              Merci d’éviter les noms complets, informations trop identifiantes ou données sensibles.
             </span>
           </div>
         </div>
@@ -795,7 +806,7 @@
           input.value = '';
 
           // Message temporaire d’attente
-          const waitingElem = addMessage('bot', 'Lecture tactique en cours…');
+          const waitingElem = addMessage('bot', 'Lecture d’orientation en cours…');
 
           try {
             const response = await fetch('/api/ghostops-chat', {
@@ -811,7 +822,7 @@
               // réponse non-JSON
             }
 
-            // Retirer le message "Lecture tactique en cours…"
+            // Retirer le message "Lecture d’orientation en cours…"
             if (waitingElem && waitingElem.parentNode) {
               waitingElem.parentNode.removeChild(waitingElem);
             }
