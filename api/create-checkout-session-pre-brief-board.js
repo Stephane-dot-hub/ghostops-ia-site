@@ -2,7 +2,6 @@
 const Stripe = require('stripe');
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
-const priceId = process.env.STRIPE_PRICE_ID_PRE_BRIEF_BOARD || ''; // ID du prix Stripe (one-shot)
 
 module.exports = async function handler(req, res) {
   // Sécurité : uniquement POST
@@ -19,11 +18,6 @@ module.exports = async function handler(req, res) {
       error: 'STRIPE_SECRET_KEY non configurée dans les variables d’environnement.'
     });
   }
-  if (!priceId) {
-    return res.status(500).json({
-      error: 'STRIPE_PRICE_ID_PRE_BRIEF_BOARD non configuré dans les variables d’environnement.'
-    });
-  }
 
   const stripe = new Stripe(stripeSecretKey);
 
@@ -37,7 +31,14 @@ module.exports = async function handler(req, res) {
       payment_method_types: ['card'],
       line_items: [
         {
-          price: priceId,          // géré côté Stripe (prix 2 990 € TTC)
+          price_data: {
+            currency: 'eur',
+            product_data: {
+              name: 'GhostOps Pré-brief Board – Note de gouvernance board-ready',
+            },
+            // 2 990 € TTC = 299 000 centimes
+            unit_amount: 299000,
+          },
           quantity: 1,
         },
       ],
