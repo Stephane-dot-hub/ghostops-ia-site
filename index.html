@@ -793,11 +793,16 @@
         }
 
         // Transformation des URLs en liens cliquables
+        // Correction : exclusion des ponctuations finales (], ), ., , ; :) du href
         function linkify(text) {
           const urlRegex = /(https?:\/\/[^\s]+)/g;
           return text.replace(urlRegex, (url) => {
-            const safeUrl = url.replace(/"/g, '&quot;');
-            return `<a href="${safeUrl}" target="_blank" rel="noopener" class="underline text-blue-400">${safeUrl}</a>`;
+            // Séparer l’URL « propre » de la ponctuation finale éventuelle
+            const match = url.match(/^(.*?)([)\].,;:]*)$/);
+            const cleanUrl = match && match[1] ? match[1] : url;
+            const trailing = match && match[2] ? match[2] : '';
+            const safeUrl = cleanUrl.replace(/"/g, '&quot;');
+            return `<a href="${safeUrl}" target="_blank" rel="noopener" class="underline text-blue-400">${cleanUrl}</a>${trailing}`;
           });
         }
 
@@ -808,7 +813,7 @@
           return withLinks.replace(/\n/g, '<br>');
         }
 
-        // Ajout d’un message dans la fenêtre
+        // Ajout d’un message générique (sans effet machine à écrire)
         function addMessage(sender, text) {
           const wrapper = document.createElement('div');
           wrapper.className = sender === 'user'
@@ -821,7 +826,7 @@
             : 'inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg';
 
           if (sender === 'user') {
-            // Texte utilisateur en brut (sécurisé)
+            // Texte utilisateur en brut (sécurisé par textContent)
             bubble.textContent = text;
           } else {
             // Texte bot : formatage avec liens + sauts de ligne
@@ -831,6 +836,39 @@
           wrapper.appendChild(bubble);
           messages.appendChild(wrapper);
           scrollToBottom();
+          return wrapper;
+        }
+
+        // Ajout d’un message bot avec effet "machine à écrire"
+        function addBotMessageWithTyping(text) {
+          const wrapper = document.createElement('div');
+          wrapper.className = 'mb-2 text-left';
+
+          const bubble = document.createElement('div');
+          bubble.className = 'inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg';
+
+          wrapper.appendChild(bubble);
+          messages.appendChild(wrapper);
+          scrollToBottom();
+
+          const fullText = text || '';
+          let index = 0;
+          const typingSpeed = 20; // ms par caractère (à ajuster si besoin)
+
+          const intervalId = setInterval(() => {
+            if (index >= fullText.length) {
+              clearInterval(intervalId);
+              // Une fois le texte entièrement affiché, activer le formatage (liens, retours à la ligne)
+              bubble.innerHTML = formatBotText(fullText);
+              scrollToBottom();
+              return;
+            }
+            // textContent protège contre l'interprétation HTML pendant la frappe
+            bubble.textContent += fullText.charAt(index);
+            index += 1;
+            scrollToBottom();
+          }, typingSpeed);
+
           return wrapper;
         }
 
@@ -867,7 +905,7 @@
           addMessage('user', userMessage);
           input.value = '';
 
-          // Message temporaire d’attente
+          // Message temporaire d’attente (sans effet machine à écrire)
           const waitingElem = addMessage('bot', 'Lecture d’orientation en cours…');
 
           try {
@@ -895,8 +933,8 @@
               return;
             }
 
-            // Afficher la réponse du backend
-            addMessage('bot', data.reply);
+            // Afficher la réponse du backend avec effet "machine à écrire"
+            addBotMessageWithTyping(data.reply);
           } catch (err) {
             console.error('Erreur lors de l’appel /api/ghostops-chat :', err);
             if (waitingElem && waitingElem.parentNode) {
