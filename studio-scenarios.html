@@ -401,5 +401,90 @@
         </nav>
       </div>
     </footer>
+
+    <!-- Script chat d’orientation GhostOps IA (URLs cliquables) -->
+    <script>
+      (function () {
+        const form = document.getElementById('ghostops-orientation-form');
+        if (!form) return;
+
+        const textarea = document.getElementById('ghostops-orientation-message');
+        const statusEl = document.getElementById('ghostops-orientation-status');
+        const answerEl = document.getElementById('ghostops-orientation-answer');
+
+        // Transforme toute URL en lien cliquable, en restant sécurisé
+        function ghostOpsLinkify(text) {
+          if (!text) return '';
+
+          // Échapper le texte pour éviter toute injection HTML
+          const escaped = text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;');
+
+          // Détection des URLs
+          const urlRegex = /(https?:\/\/[^\s]+)/g;
+
+          return escaped.replace(urlRegex, function (url) {
+            // On remet les & normaux dans le href
+            const cleanUrl = url.replace(/&amp;/g, '&');
+
+            return `<a href="${cleanUrl}"
+                      class="underline decoration-dotted"
+                      target="_blank"
+                      rel="noopener">
+                      ${url}
+                    </a>`;
+          });
+        }
+
+        form.addEventListener('submit', async function (e) {
+          e.preventDefault();
+
+          const message = (textarea.value || '').trim();
+          if (!message) {
+            statusEl.textContent = 'Merci de décrire brièvement votre situation avant de lancer le chat GhostOps IA.';
+            statusEl.className = 'mt-3 text-xs text-red-400';
+            return;
+          }
+
+          statusEl.textContent = 'Analyse GhostOps IA en cours…';
+          statusEl.className = 'mt-3 text-xs text-gray-300';
+          answerEl.classList.add('hidden');
+          answerEl.innerHTML = '';
+
+          try {
+            const response = await fetch('/api/ghostops-chat', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                message,
+                source: 'studio-scenarios'
+              })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.reply) {
+              const errText = data.error || 'Une erreur est survenue côté moteur GhostOps IA – Orientation.';
+              statusEl.textContent = errText;
+              statusEl.className = 'mt-3 text-xs text-red-400';
+              return;
+            }
+
+            statusEl.textContent = 'Orientation proposée ci-dessous.';
+            statusEl.className = 'mt-3 text-xs text-green-400';
+
+            // Injection du texte avec URLs cliquables
+            answerEl.innerHTML = ghostOpsLinkify(data.reply);
+            answerEl.classList.remove('hidden');
+          } catch (err) {
+            console.error('Erreur lors de l’appel /api/ghostops-chat :', err);
+            statusEl.textContent = 'Erreur de connexion au moteur GhostOps. Veuillez réessayer ultérieurement.';
+            statusEl.className = 'mt-3 text-xs text-red-400';
+          }
+        });
+      })();
+    </script>
   </body>
 </html>
