@@ -18,12 +18,43 @@ export default async function handler(req, res) {
   }
 
   // ------------------------------------------------------------------
-  // On fait confiance au parsing JSON intégré (comme sur vos autres API)
+  // LECTURE EXPLICITE DU CORPS DE REQUÊTE (même logique que le chatbot d’orientation)
   // ------------------------------------------------------------------
-  const body = req.body || {};
-  const { description, contexte, enjeu, message, mode } = body;
+  let rawBody = '';
+  try {
+    rawBody = await new Promise((resolve, reject) => {
+      let data = '';
+      req.on('data', (chunk) => {
+        data += chunk;
+      });
+      req.on('end', () => resolve(data));
+      req.on('error', (err) => reject(err));
+    });
+  } catch (e) {
+    console.error('Erreur lors de la lecture du body (Diagnostic IA) :', e);
+    return res.status(400).json({
+      error: 'Corps de requête illisible pour le Diagnostic IA.',
+    });
+  }
 
-  // On prend d’abord "description", sinon "message"
+  let payload = {};
+  try {
+    payload = rawBody ? JSON.parse(rawBody) : {};
+  } catch (e) {
+    console.error('JSON invalide pour Diagnostic IA :', e, rawBody);
+    return res.status(400).json({
+      error: 'Format JSON invalide pour la requête Diagnostic IA.',
+    });
+  }
+
+  console.log('Payload Diagnostic IA reçu :', payload);
+
+  // On accepte :
+  // - { description, contexte, enjeu }
+  // - { message, mode: "diagnostic-ia-session-v1" }
+  const { description, contexte, enjeu, message } = payload || {};
+
+  // Priorité à "description", sinon "message"
   let effectiveDescription = '';
   if (typeof description === 'string' && description.trim().length > 0) {
     effectiveDescription = description.trim();
@@ -32,22 +63,16 @@ export default async function handler(req, res) {
   }
 
   if (!effectiveDescription) {
-    return res.status(400).json({
-      error: 'Le champ "description" est obligatoire pour le diagnostic.',
-      debug: {
-        bodyType: typeof body,
-        body,
-      },
-    });
+    return res
+      .status(400)
+      .json({ error: 'Le champ "description" est obligatoire pour le diagnostic.' });
   }
 
-  const safeContexte =
-    typeof contexte === 'string' ? contexte : '';
-  const safeEnjeu =
-    typeof enjeu === 'string' ? enjeu : '';
+  const safeContexte = typeof contexte === 'string' ? contexte : '';
+  const safeEnjeu = typeof enjeu === 'string' ? enjeu : '';
 
   // ------------------------------------------------------------------
-  // Prompt système GhostOps Diagnostic IA (gpt-5.1-mini)
+  // PROMPT SYSTÈME – GhostOps Diagnostic IA (gpt-5.1-mini)
   // ------------------------------------------------------------------
   const systemPrompt = `
 Tu es "GhostOps IA – Diagnostic", IA utilisée en back-office dans le produit payant
@@ -74,10 +99,10 @@ Règles :
 - Termine toujours par une phrase de prudence du type :
   "Ce pré-diagnostic ne remplace ni un avis juridique, ni un conseil RH individualisé,
    ni une mission GhostOps complète."
-`.trim();
+  `.trim();
 
   // ------------------------------------------------------------------
-  // Prompt utilisateur : structure attendue + données envoyées
+  // PROMPT UTILISATEUR – structure de la note
   // ------------------------------------------------------------------
   const userPrompt = `
 Tu vas produire un **pré-diagnostic structuré** à partir des éléments suivants.
@@ -101,7 +126,7 @@ Ta réponse doit suivre **strictement** la structure ci-dessous, avec les titres
 
 2) Points de tension majeurs
    - 3 à 6 puces.
-   - Mets en avant les tensions clés : humaines, organisationnelles, de gouvernance, narratifs.
+   - Mets en avant les tensions clés : humaines, organisationnelles, de gouvernance, narratives.
    - Chaque puce = une phrase claire.
 
 3) Questions à clarifier en priorité lors du Diagnostic IA (90 min)
@@ -137,7 +162,7 @@ Contraintes supplémentaires :
 - Pas de scénario d'exécution détaillé : tu restes sur le "quoi voir" et le "quoi clarifier",
   pas sur "comment manœuvrer".
 - Ne modifie pas les titres des sections.
-`.trim();
+  `.trim();
 
   try {
     const openaiResponse = await fetch('https://api.openai.com/v1/responses', {
