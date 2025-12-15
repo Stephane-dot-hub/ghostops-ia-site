@@ -17,12 +17,35 @@ export default async function handler(req, res) {
     });
   }
 
+  // -----------------------------
+  // Normalisation du body
+  // -----------------------------
+  let payload = {};
+
+  try {
+    if (typeof req.body === 'string') {
+      // Certains environnements passent le body brut en string
+      payload = JSON.parse(req.body || '{}');
+    } else if (req.body && typeof req.body === 'object') {
+      // Next.js (ou similaire) le fournit déjà parsé
+      payload = req.body;
+    } else {
+      payload = {};
+    }
+  } catch (e) {
+    console.error('Erreur lors du parse du body Diagnostic IA :', e, req.body);
+    payload = {};
+  }
+
+  // Log de debug à vérifier dans les logs Vercel
+  console.log('Payload Diagnostic IA reçu :', payload);
+
   // On accepte deux formats :
   // - { description, contexte, enjeu }  -> pré-diagnostic (diagnostic-ia.html)
   // - { message }                      -> session complète (diagnostic-ia-session.html)
-  const { description, contexte, enjeu, message } = req.body || {};
+  const { description, contexte, enjeu, message } = payload;
 
-  // Priorité au champ "description" ; sinon on tombe sur "message"
+  // Priorité au champ "description" ; sinon on utilise "message"
   let effectiveDescription = '';
   if (typeof description === 'string' && description.trim().length > 0) {
     effectiveDescription = description.trim();
