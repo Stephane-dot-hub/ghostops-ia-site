@@ -21,40 +21,49 @@ export default async function handler(req, res) {
   // Normalisation du body
   // -----------------------------
   let payload = {};
+  let rawBody = '';
 
   try {
-    let rawBody = null;
-
-    // Vercel / Node : body peut être string, Buffer ou objet déjà parsé
+    // Cas 1 : body déjà fourni sous forme de chaîne
     if (typeof req.body === 'string') {
       rawBody = req.body;
-    } else if (typeof Buffer !== 'undefined' && Buffer.isBuffer(req.body)) {
+    }
+    // Cas 2 : body fourni sous forme de Buffer
+    else if (typeof Buffer !== 'undefined' && Buffer.isBuffer(req.body)) {
       rawBody = req.body.toString('utf8');
     }
 
-    if (rawBody !== null) {
-      // On essaie de parser le JSON brut
-      payload = rawBody ? JSON.parse(rawBody) : {};
-    } else if (req.body && typeof req.body === 'object') {
-      // JSON déjà parsé par le runtime
+    // Si nous avons une chaîne brute, on essaie de parser le JSON
+    if (rawBody && rawBody.length > 0) {
+      try {
+        payload = JSON.parse(rawBody);
+      } catch (e) {
+        console.error('Échec JSON.parse sur rawBody Diagnostic IA :', e, rawBody);
+        payload = {};
+      }
+    }
+    // Sinon, si le runtime a déjà parsé le body en objet
+    else if (req.body && typeof req.body === 'object') {
       payload = req.body;
     } else {
       payload = {};
     }
   } catch (e) {
-    console.error('Erreur lors du parse du body Diagnostic IA :', e, req.body);
+    console.error('Erreur lors de la normalisation du body Diagnostic IA :', e, req.body);
     payload = {};
   }
 
-  // Log de debug (à vérifier dans les logs Vercel)
-  console.log('Payload Diagnostic IA reçu (type req.body =', typeof req.body, '):', payload);
+  // Logs serveur (dans les logs Vercel)
+  console.log('Diagnostic IA – type de req.body =', typeof req.body);
+  console.log('Diagnostic IA – valeur brute de req.body =', req.body);
+  console.log('Diagnostic IA – payload normalisé =', payload);
 
-  // On accepte plusieurs formats possibles :
+  // On accepte plusieurs formats :
   // - { description, contexte, enjeu }  -> pré-diagnostic (diagnostic-ia.html)
   // - { message }                      -> session complète (diagnostic-ia-session.html)
   const { description, contexte, enjeu, message } = payload || {};
 
-  // Priorité au champ "description" ; sinon "message" ; sinon 1er champ texte non vide
+  // Priorité au champ "description", sinon "message", sinon premier champ texte non vide
   let effectiveDescription = '';
 
   if (typeof description === 'string' && description.trim().length > 0) {
@@ -62,7 +71,6 @@ export default async function handler(req, res) {
   } else if (typeof message === 'string' && message.trim().length > 0) {
     effectiveDescription = message.trim();
   } else if (payload && typeof payload === 'object') {
-    // Fallback de sécurité : on prend le premier champ texte non vide
     for (const [key, value] of Object.entries(payload)) {
       if (typeof value === 'string' && value.trim().length > 0) {
         effectiveDescription = value.trim();
@@ -75,9 +83,15 @@ export default async function handler(req, res) {
   }
 
   if (!effectiveDescription) {
-    return res
-      .status(400)
-      .json({ error: 'Le champ "description" est obligatoire pour le diagnostic.' });
+    // On renvoie aussi le payload pour debug côté navigateur
+    return res.status(400).json({
+      error: 'Le champ "description" est obligatoire pour le diagnostic.',
+      debug: {
+        bodyType: typeof req.body,
+        rawBody: rawBody || null,
+        payload,
+      },
+    });
   }
 
   const safeContexte = typeof contexte === 'string' ? contexte : '';
