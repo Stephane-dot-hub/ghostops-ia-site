@@ -1,7 +1,7 @@
 // /api/ghostops-diagnostic-ia.js
 
 export default async function handler(req, res) {
-  // Autoriser uniquement le POST
+  // 1) Méthode autorisée
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res
@@ -9,6 +9,7 @@ export default async function handler(req, res) {
       .json({ error: 'Méthode non autorisée. Utilisez POST.' });
   }
 
+  // 2) Clé OpenAI
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({
@@ -17,55 +18,67 @@ export default async function handler(req, res) {
     });
   }
 
-  // ------------------------------------------------------------------
-  // LECTURE EXPLICITE DU CORPS DE REQUÊTE (même logique que le chatbot d’orientation)
-  // ------------------------------------------------------------------
-  let rawBody = '';
-  try {
-    rawBody = await new Promise((resolve, reject) => {
-      let data = '';
-      req.on('data', (chunk) => {
-        data += chunk;
-      });
-      req.on('end', () => resolve(data));
-      req.on('error', (err) => reject(err));
-    });
-  } catch (e) {
-    console.error('Erreur lors de la lecture du body (Diagnostic IA) :', e);
-    return res.status(400).json({
-      error: 'Corps de requête illisible pour le Diagnostic IA.',
-    });
-  }
-
+  // 3) Récupération robuste du body (on gère plusieurs cas possibles)
   let payload = {};
+
   try {
-    payload = rawBody ? JSON.parse(rawBody) : {};
+    if (req.body && typeof req.body === 'object') {
+      // Cas standard Next.js : body déjà parsé
+      payload = req.body;
+    } else if (typeof req.body === 'string') {
+      // Cas où le body est une string JSON
+      payload = req.body ? JSON.parse(req.body) : {};
+    } else {
+      // Fallback : lecture brute du flux si jamais req.body est vide
+      payload = await new Promise((resolve) => {
+        let data = '';
+        req.on('data', (chunk) => {
+          data += chunk;
+        });
+        req.on('end', () => {
+          if (!data) {
+            return resolve({});
+          }
+          try {
+            resolve(JSON.parse(data));
+          } catch (e) {
+            // Si ce n’est pas du JSON valide, on garde la string brute
+            resolve({ _raw: data });
+          }
+        });
+        req.on('error', () => resolve({}));
+      });
+    }
   } catch (e) {
-    console.error('JSON invalide pour Diagnostic IA :', e, rawBody);
-    return res.status(400).json({
-      error: 'Format JSON invalide pour la requête Diagnostic IA.',
-    });
+    console.error('Erreur de parsing du body Diagnostic IA :', e, req.body);
+    payload = {};
   }
 
   console.log('Payload Diagnostic IA reçu :', payload);
 
-  // On accepte :
-  // - { description, contexte, enjeu }
-  // - { message, mode: "diagnostic-ia-session-v1" }
+  // 4) Normalisation : on accepte description OU message
   const { description, contexte, enjeu, message } = payload || {};
 
-  // Priorité à "description", sinon "message"
   let effectiveDescription = '';
+
   if (typeof description === 'string' && description.trim().length > 0) {
     effectiveDescription = description.trim();
   } else if (typeof message === 'string' && message.trim().length > 0) {
     effectiveDescription = message.trim();
+  } else if (payload && Object.keys(payload).length > 0) {
+    // ⚠️ Fallback : on utilise le JSON brut comme base de texte
+    // pour éviter l’erreur 400 et voir ce qui arrive réellement.
+    effectiveDescription =
+      'Contenu brut reçu par le serveur (format non standard) : ' +
+      JSON.stringify(payload);
   }
 
   if (!effectiveDescription) {
-    return res
-      .status(400)
-      .json({ error: 'Le champ "description" est obligatoire pour le diagnostic.' });
+    // Ici on ne renvoie 400 que s’il n’y a VRAIMENT rien dans la requête
+    return res.status(400).json({
+      error:
+        'Le serveur ne reçoit aucun contenu exploitable pour le diagnostic (body vide).',
+    });
   }
 
   const safeContexte = typeof contexte === 'string' ? contexte : '';
@@ -164,6 +177,7 @@ Contraintes supplémentaires :
 - Ne modifie pas les titres des sections.
   `.trim();
 
+  // 5) Appel OpenAI – gpt-5.1-mini
   try {
     const openaiResponse = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST',
