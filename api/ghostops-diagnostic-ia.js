@@ -17,87 +17,38 @@ export default async function handler(req, res) {
     });
   }
 
-  // -----------------------------
-  // Normalisation du body
-  // -----------------------------
-  let payload = {};
-  let rawBody = '';
+  // ------------------------------------------------------------------
+  // On fait confiance au parsing JSON intégré (comme sur vos autres API)
+  // ------------------------------------------------------------------
+  const body = req.body || {};
+  const { description, contexte, enjeu, message, mode } = body;
 
-  try {
-    // Cas 1 : body déjà fourni sous forme de chaîne
-    if (typeof req.body === 'string') {
-      rawBody = req.body;
-    }
-    // Cas 2 : body fourni sous forme de Buffer
-    else if (typeof Buffer !== 'undefined' && Buffer.isBuffer(req.body)) {
-      rawBody = req.body.toString('utf8');
-    }
-
-    // Si nous avons une chaîne brute, on essaie de parser le JSON
-    if (rawBody && rawBody.length > 0) {
-      try {
-        payload = JSON.parse(rawBody);
-      } catch (e) {
-        console.error('Échec JSON.parse sur rawBody Diagnostic IA :', e, rawBody);
-        payload = {};
-      }
-    }
-    // Sinon, si le runtime a déjà parsé le body en objet
-    else if (req.body && typeof req.body === 'object') {
-      payload = req.body;
-    } else {
-      payload = {};
-    }
-  } catch (e) {
-    console.error('Erreur lors de la normalisation du body Diagnostic IA :', e, req.body);
-    payload = {};
-  }
-
-  // Logs serveur (dans les logs Vercel)
-  console.log('Diagnostic IA – type de req.body =', typeof req.body);
-  console.log('Diagnostic IA – valeur brute de req.body =', req.body);
-  console.log('Diagnostic IA – payload normalisé =', payload);
-
-  // On accepte plusieurs formats :
-  // - { description, contexte, enjeu }  -> pré-diagnostic (diagnostic-ia.html)
-  // - { message }                      -> session complète (diagnostic-ia-session.html)
-  const { description, contexte, enjeu, message } = payload || {};
-
-  // Priorité au champ "description", sinon "message", sinon premier champ texte non vide
+  // On prend d’abord "description", sinon "message"
   let effectiveDescription = '';
-
   if (typeof description === 'string' && description.trim().length > 0) {
     effectiveDescription = description.trim();
   } else if (typeof message === 'string' && message.trim().length > 0) {
     effectiveDescription = message.trim();
-  } else if (payload && typeof payload === 'object') {
-    for (const [key, value] of Object.entries(payload)) {
-      if (typeof value === 'string' && value.trim().length > 0) {
-        effectiveDescription = value.trim();
-        console.log(
-          `Fallback description sur le champ "${key}" (valeur utilisée pour le diagnostic).`
-        );
-        break;
-      }
-    }
   }
 
   if (!effectiveDescription) {
-    // On renvoie aussi le payload pour debug côté navigateur
     return res.status(400).json({
       error: 'Le champ "description" est obligatoire pour le diagnostic.',
       debug: {
-        bodyType: typeof req.body,
-        rawBody: rawBody || null,
-        payload,
+        bodyType: typeof body,
+        body,
       },
     });
   }
 
-  const safeContexte = typeof contexte === 'string' ? contexte : '';
-  const safeEnjeu = typeof enjeu === 'string' ? enjeu : '';
+  const safeContexte =
+    typeof contexte === 'string' ? contexte : '';
+  const safeEnjeu =
+    typeof enjeu === 'string' ? enjeu : '';
 
-  // Prompt système (rôle et règles GhostOps Diagnostic IA)
+  // ------------------------------------------------------------------
+  // Prompt système GhostOps Diagnostic IA (gpt-5.1-mini)
+  // ------------------------------------------------------------------
   const systemPrompt = `
 Tu es "GhostOps IA – Diagnostic", IA utilisée en back-office dans le produit payant
 "GhostOps Diagnostic IA – 90 minutes".
@@ -125,7 +76,9 @@ Règles :
    ni une mission GhostOps complète."
 `.trim();
 
+  // ------------------------------------------------------------------
   // Prompt utilisateur : structure attendue + données envoyées
+  // ------------------------------------------------------------------
   const userPrompt = `
 Tu vas produire un **pré-diagnostic structuré** à partir des éléments suivants.
 
