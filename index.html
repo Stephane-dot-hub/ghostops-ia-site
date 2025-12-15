@@ -782,6 +782,32 @@
           messages.scrollTop = messages.scrollHeight;
         }
 
+        // Sécurisation du texte (éviter toute injection HTML)
+        function escapeHtml(str) {
+          return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+        }
+
+        // Transformation des URLs en liens cliquables
+        function linkify(text) {
+          const urlRegex = /(https?:\/\/[^\s]+)/g;
+          return text.replace(urlRegex, (url) => {
+            const safeUrl = url.replace(/"/g, '&quot;');
+            return `<a href="${safeUrl}" target="_blank" rel="noopener" class="underline text-blue-400">${safeUrl}</a>`;
+          });
+        }
+
+        // Formatage des réponses du bot (HTML sécurisé + liens + retours à la ligne)
+        function formatBotText(text) {
+          const escaped = escapeHtml(text);
+          const withLinks = linkify(escaped);
+          return withLinks.replace(/\n/g, '<br>');
+        }
+
         // Ajout d’un message dans la fenêtre
         function addMessage(sender, text) {
           const wrapper = document.createElement('div');
@@ -794,7 +820,14 @@
             ? 'inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg'
             : 'inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg';
 
-          bubble.textContent = text;
+          if (sender === 'user') {
+            // Texte utilisateur en brut (sécurisé)
+            bubble.textContent = text;
+          } else {
+            // Texte bot : formatage avec liens + sauts de ligne
+            bubble.innerHTML = formatBotText(text);
+          }
+
           wrapper.appendChild(bubble);
           messages.appendChild(wrapper);
           scrollToBottom();
