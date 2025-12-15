@@ -37,20 +37,32 @@ export default async function handler(req, res) {
     payload = {};
   }
 
-  // Log de debug à vérifier dans les logs Vercel
+  // Log de debug (visible dans les logs Vercel)
   console.log('Payload Diagnostic IA reçu :', payload);
 
-  // On accepte deux formats :
+  // On accepte plusieurs formats possibles :
   // - { description, contexte, enjeu }  -> pré-diagnostic (diagnostic-ia.html)
   // - { message }                      -> session complète (diagnostic-ia-session.html)
   const { description, contexte, enjeu, message } = payload;
 
-  // Priorité au champ "description" ; sinon on utilise "message"
+  // Priorité au champ "description" ; sinon "message" ; sinon 1er champ texte non vide
   let effectiveDescription = '';
+
   if (typeof description === 'string' && description.trim().length > 0) {
     effectiveDescription = description.trim();
   } else if (typeof message === 'string' && message.trim().length > 0) {
     effectiveDescription = message.trim();
+  } else if (payload && typeof payload === 'object') {
+    // Fallback de sécurité : on prend le premier champ texte non vide
+    for (const [key, value] of Object.entries(payload)) {
+      if (typeof value === 'string' && value.trim().length > 0) {
+        effectiveDescription = value.trim();
+        console.log(
+          `Fallback description sur le champ "${key}" (valeur utilisée pour le diagnostic).`
+        );
+        break;
+      }
+    }
   }
 
   if (!effectiveDescription) {
