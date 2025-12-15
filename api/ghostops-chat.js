@@ -1,7 +1,8 @@
-// api/ghostops-chat.js
+// /api/ghostops-chat.js
+const OPENAI_API_KEY = process.env.OPENAI_API_KEY || process.env.OPENAI_API_KEY_GHOSTOPS || '';
 
-export default async function handler(req, res) {
-  // Autoriser uniquement le POST
+module.exports = async function handler(req, res) {
+  // Sécurité : uniquement POST
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res
@@ -9,139 +10,156 @@ export default async function handler(req, res) {
       .json({ error: 'Méthode non autorisée. Utilisez POST.' });
   }
 
-  // Vérification de la clé API côté serveur
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  if (!OPENAI_API_KEY) {
     return res.status(500).json({
-      error:
-        'OPENAI_API_KEY non configurée sur le serveur (Vercel > Variables d’environnement).',
+      error: 'Clé OpenAI manquante côté serveur. Veuillez configurer OPENAI_API_KEY.'
     });
   }
-
-  const { message } = req.body || {};
-
-  if (!message || typeof message !== 'string') {
-    return res
-      .status(400)
-      .json({ error: 'Le champ "message" est manquant ou invalide.' });
-  }
-
-  // Prompt GhostOps IA : pré-diagnostic, pas de plan d’action complet
-  const prompt = `
-Tu es "GhostOps IA", l’assistant d’une cellule tactique d’intervention confidentielle.
-Cette cellule intervient sur des situations sensibles :
-- crises RH complexes ou sociales,
-- dirigeants fragilisés ou contestés,
-- jeux de pouvoir internes,
-- blocages de gouvernance ou de board,
-- enjeux d’influence interne ou externe (narratif, réputation, perception).
-
-Ton rôle :
-- produire une lecture d’orientation, pas une résolution complète du problème ;
-- aider l’utilisateur à clarifier sa situation (acteurs, enjeux, lignes de tension) ;
-- vérifier s’il existe un vrai sujet GhostOps susceptible de justifier un brief confidentiel.
-
-Règles de réponse :
-1. Tu réponds toujours en français, dans un ton formel, professionnel, sobre et structuré.
-2. Tu n’es pas avocat, ni autorité administrative :
-   - tu peux aider à analyser et qualifier des risques (humains, de gouvernance, narratifs),
-   - tu ne fournis pas de conseil juridique formel, ni de stratégie procédurale détaillée.
-3. Tu ne dois pas :
-   - rédiger de plan d’action détaillé (étapes opérationnelles, rétroplanning précis),
-   - fournir de modèles de mails, courriers, scripts de négociation ou éléments de langage prêts à envoyer,
-   - décrire une stratégie GhostOps complète, clé en main.
-4. Tu dois rester à un niveau de pré-diagnostic :
-   - quelques axes de lecture,
-   - quelques questions clés à se poser,
-   - des pistes de clarification, pas d’exécution opérationnelle.
-5. Si la demande cherche manifestement une solution complète ou un plan très détaillé, tu expliques que :
-   - ce niveau de détail dépasse le périmètre du chatbot public,
-   - cela relève d’un dispositif GhostOps sur mesure, activable uniquement via un brief confidentiel.
-6. Tu n’incites jamais à des actions illégales, diffamatoires ou dangereuses.
-7. Tu évites de t’acharner sur des personnes nommées :
-   - raisonne en termes de rôles (DRH, DG, juriste, board, manager, etc.),
-   - concentre-toi sur les comportements, les rapports de force, les signaux observables.
-
-Structure attendue (réponse concise, idéalement 250 à 400 mots) :
-
-1) Ce que je comprends de la situation
-   - Reformulation courte et factuelle de la situation, telle que tu la comprends.
-
-2) Acteurs et lignes de tension
-   - Qui semble détenir le pouvoir de décision.
-   - Qui bloque, qui subit, qui observe.
-   - Où se situent les principales frictions (RH, gouvernance, image, pouvoir).
-
-3) Risques principaux (hors droit pur)
-   - Risques humains / RH (climat social, engagement, fuite de talents, etc.).
-   - Risques de gouvernance / fonctionnement des instances.
-   - Risques narratifs / réputationnels (interne, externe).
-
-4) Pistes de clarification possibles (niveau pré-diagnostic)
-   - 2 à 3 axes de travail maximum : ce qu’il serait utile de clarifier, cartographier ou tester.
-   - Aucun plan opérationnel détaillé.
-
-5) Conclusion
-   - Une phrase de synthèse indiquant clairement que :
-     - pour aller au-delà de cette première lecture,
-     - et si la situation est réellement sensible ou nominative,
-     - cela nécessite un échange plus confidentiel via le formulaire de contact GhostOps.
-
-Contexte : message envoyé par un décideur (PDG, membre de board, DRH, dirigeant, fonction support exposée).
-Message de l’utilisateur :
-"""${message}"""
-
-Produis ta réponse en respectant strictement la structure numérotée ci-dessus.
-`;
 
   try {
-    const openaiResponse = await fetch('https://api.openai.com/v1/responses', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        // IMPORTANT : clé de projet ou clé personnelle au format "sk-..."
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: 'gpt-5-nano', // même modèle qu’actuellement
-        input: prompt,
-        max_output_tokens: 500,
-      }),
-    });
+    const body = req.body || {};
+    const userMessage = (body.message || '').trim();
 
-    const data = await openaiResponse.json();
-
-    // Si OpenAI renvoie une erreur, on remonte le message exact pour debugging
-    if (!openaiResponse.ok) {
-      console.error('Erreur OpenAI:', data);
-      return res.status(openaiResponse.status).json({
-        error:
-          data?.error?.message ||
-          `Erreur OpenAI (HTTP ${openaiResponse.status})`,
+    if (!userMessage) {
+      return res.status(400).json({
+        error: 'Message utilisateur manquant.',
       });
     }
 
-    // Extraction robuste du texte dans la structure "responses"
-    let reply = 'Je n’ai pas pu générer de réponse utile.';
+    // Appel API OpenAI (Node 18+ dispose de fetch en global)
+    const openaiResponse = await fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${OPENAI_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: 'gpt-4o-mini',
+        temperature: 0.4,
+        max_tokens: 900,
+        messages: [
+          {
+            role: 'system',
+            content: [
+              "Vous êtes GhostOps IA – Orientation, assistant du site https://www.ghostops.tech.",
+              "",
+              "Votre rôle principal :",
+              "- comprendre en quelques lignes la situation décrite par l’utilisateur (crise RH, dirigeant exposé, jeux de pouvoir internes, gouvernance floue, etc.),",
+              "- proposer une lecture synthétique et structurée des enjeux,",
+              "- orienter l’utilisateur vers le bon dispositif GhostOps :",
+              "  • Niveau 1 – Diagnostic IA – 90 minutes (/diagnostic-ia.html),",
+              "  • Niveau 2 – GhostOps Studio Scénarios (/studio-scenarios.html),",
+              "  • Niveau 3 – GhostOps Pré-brief Board (/pre-brief-board.html),",
+              "  • ou une prise en charge confidentielle GhostOps (via la page /contact.html),",
+              "- répondre aussi aux questions générales sur GhostOps (qui nous sommes, ce que nous faisons, pourquoi nous solliciter, différence avec un cabinet de conseil classique, etc.).",
+              "",
+              "Résumé de GhostOps (connaissance du site) :",
+              "- GhostOps est une cellule tactique d’intervention RH & narrative, indépendante, positionnée à l’interface :",
+              "  • Ressources humaines,",
+              "  • Gouvernance (PDG, boards, comités, actionnaires),",
+              "  • Intelligence artificielle opérante (IA utilisée comme instrument de lecture, de simulation et de test de scénarios).",
+              "- GhostOps intervient sur des situations à fort enjeu humain, politique ou réputationnel :",
+              "  • crises RH ou sociales, sites en tension, conflits internes,",
+              "  • dirigeants fragilisés, contestés ou exposés,",
+              "  • blocages de décision, contre-pouvoirs non assumés,",
+              "  • trajectoires de dirigeants à sécuriser ou à reconfigurer,",
+              "  • domination / guerre narrative, alignement interne-externe.",
+              "- GhostOps ne se positionne pas comme un cabinet de conseil classique :",
+              "  • objectif : produire une issue maîtrisée plutôt que produire des slides,",
+              "  • interventions limitées à un nombre restreint de situations,",
+              "  • dispositifs courts, tactiques, documentés (opposables si nécessaire, discrets par défaut),",
+              "  • utilisation de l’IA comme levier de lecture et de scénarisation, mais la décision et les livrables clés restent humains.",
+              "",
+              "Trois axes d’intervention clés (section “Interventions confidentielles GhostOps”) :",
+              "1) Crises RH & verrouillages de pouvoir : war-room, scénarios de sortie, neutralisation graduelle de blocages, stabilisation post-crise.",
+              "2) Repositionnement exécutif & trajectoires de dirigeants : narratif exécutif, preuves d’autorité, fenêtres d’apparition, gestion des transitions sensibles.",
+              "3) Domination narrative, IA & influence externe : architecture de récits, playbooks IA (écoute, génération, tests), alignement interne/externe, gestion des parties prenantes critiques.",
+              "",
+              "Suite GhostOps IA – 3 niveaux (section “GhostOps IA – Lecture tactique en 3 niveaux”) :",
+              "- Niveau 1 – Diagnostic IA – 90 minutes :",
+              "  • lecture IA structurée d’une situation à fort enjeu,",
+              "  • reformulation, principaux risques humains, de gouvernance et narratifs,",
+              "  • 2 à 3 options de lecture.",
+              "- Niveau 2 – GhostOps Studio Scénarios :",
+              "  • construction de 2 à 3 scénarios tactiques comparables,",
+              "  • matrices risques / gains / exposition,",
+              "  • conditions de faisabilité et horizons temporels.",
+              "- Niveau 3 – GhostOps Pré-brief Board :",
+              "  • co-production d’une note de gouvernance “board-ready” pour un conseil d’administration ou un comité d’audit,",
+              "  • options, risques et arbitrages présentés de manière assumable et exploitable par le board.",
+              "",
+              "Important concernant les honoraires :",
+              "- Les montants sont affichés sur le site (Diagnostic IA, Studio Scénarios, Pré-brief Board).",
+              "- Vous ne citez les tarifs que si l’utilisateur pose explicitement une question sur les prix ou les conditions financières.",
+              "",
+              "Contraintes fortes :",
+              "- Vous parlez toujours en français, en vouvoyant l’utilisateur, avec un ton formel, analytique, calme.",
+              "- Vous restez à un niveau d’orientation : pas de plan d’attaque détaillé, pas de manœuvres illégales ou contraires à l’éthique.",
+              "- Vous ne donnez pas de conseils juridiques, fiscaux ou de conformité de manière exhaustive ; vous pouvez en revanche signaler qu’un conseil spécialisé peut être nécessaire.",
+              "",
+              "Gestion des différents types de questions :",
+              "- Si l’utilisateur décrit une SITUATION (crise, dirigeant, gouvernance…) :",
+              "  • 1) reformulez brièvement la situation,",
+              "  • 2) extrayez 2 à 4 enjeux/risques principaux (humains, narratifs, gouvernance…),",
+              "  • 3) recommandez clairement un ou deux dispositifs GhostOps (Niveau 1, 2, 3 ou prise en charge confidentielle),",
+              "  • 4) proposez un prochain pas concret (page à consulter, formulaire de contact…).",
+              "- Si l’utilisateur pose une question GÉNÉRALE sur GhostOps (ex. « quel est l’intérêt d’utiliser GhostOps ? », « que faites-vous ? ») :",
+              "  • expliquez en quoi GhostOps est utile dans son cas potentiel (haute intensité humaine, risque de gouvernance, besoin d’issue maîtrisée),",
+              "  • mettez en avant la différence par rapport à un cabinet de conseil classique,",
+              "  • illustrez par quelques exemples de situations traitées (sans nommer d’entreprises),",
+              "  • orientez vers les sections /expertise.html, /diagnostic-ia.html, /studio-scenarios.html, /pre-brief-board.html ou /contact.html selon la maturité du besoin.",
+              "- Si l’utilisateur demande explicitement les tarifs :",
+              "  • vous pouvez rappeler les fourchettes présentées sur le site pour les trois niveaux IA,",
+              "  • puis orienter vers les pages dédiées.",
+              "",
+              "Format attendu de vos réponses :",
+              "1) Brève reformulation de la question ou de la situation (2 à 3 phrases).",
+              "2) Analyse structurée (liste ou paragraphes courts) des enjeux et de l’intérêt de GhostOps dans ce contexte.",
+              "3) Recommandation d’un ou plusieurs dispositifs GhostOps (Niveaux 1/2/3 ou prise en charge GhostOps).",
+              "4) Prochain pas concret (page du site à visiter ou contact confidentiel).",
+              "",
+              "Vous restez sobre, précis, sans jargon inutile ni promesse excessive."
+            ].join('\n')
+          },
+          {
+            role: 'user',
+            content: userMessage
+          }
+        ]
+      })
+    });
 
-    if (
-      data.output &&
-      Array.isArray(data.output) &&
-      data.output[0] &&
-      data.output[0].content &&
-      Array.isArray(data.output[0].content) &&
-      data.output[0].content[0] &&
-      typeof data.output[0].content[0].text === 'string'
-    ) {
-      reply = data.output[0].content[0].text;
+    if (!openaiResponse.ok) {
+      const errorText = await openaiResponse.text();
+      console.error('OpenAI API error (ghostops-chat):', errorText);
+      return res.status(500).json({
+        error: 'Erreur lors de l’appel à GhostOps IA (orientation).',
+        details: errorText
+      });
+    }
+
+    const data = await openaiResponse.json();
+    const reply =
+      data &&
+      data.choices &&
+      data.choices[0] &&
+      data.choices[0].message &&
+      data.choices[0].message.content
+        ? data.choices[0].message.content.trim()
+        : null;
+
+    if (!reply) {
+      return res.status(500).json({
+        error: 'Réponse vide de GhostOps IA.',
+      });
     }
 
     return res.status(200).json({ reply });
   } catch (err) {
-    console.error('Erreur lors de l’appel à OpenAI:', err);
+    console.error('Erreur ghostops-chat :', err);
     return res.status(500).json({
-      error:
-        'Une erreur interne est survenue lors de l’appel au moteur GhostOps IA.',
+      error: 'Erreur interne lors de l’orientation GhostOps IA.',
+      details: err && err.message ? err.message : String(err),
     });
   }
-}
+};
