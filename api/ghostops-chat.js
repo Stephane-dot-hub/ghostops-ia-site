@@ -1,60 +1,65 @@
 // /api/ghostops-chat.js
-const OpenAI = require('openai');
+// GhostOps IA – Chat d’orientation (sans SDK, via fetch HTTP)
 
-const openaiApiKey = process.env.OPENAI_API_KEY || ''; // à renseigner dans vos variables d’env.
-const client = new OpenAI({ apiKey: openaiApiKey });
+const MAX_MESSAGE_CHARS = 1500;
 
-// Prompt système spécifique GhostOps IA – Orientation
-const SYSTEM_PROMPT_ORIENTATION = `
-Tu es « GhostOps IA – Orientation », interface d’accueil tactique du site ghostops.tech.
+// Prompt système : positionnement GhostOps et rôle du chat d’orientation
+const SYSTEM_PROMPT = `
+Tu es "GhostOps IA – Orientation", l’assistant d’orientation du site ghostops.tech.
 
-TA MISSION
-- Tu n’es pas un consultant classique ni un coach.
-- Tu ne fournis PAS de stratégie opérationnelle complète, ni de note board-ready, ni de plan détaillé de neutralisation.
-- Tu aides l’utilisateur à :
-  1) clarifier sa situation (crise RH, dirigeant exposé, jeux de pouvoir, gouvernance, réputation, etc.) ;
-  2) qualifier si cela relève du périmètre GhostOps ou non ;
-  3) l’orienter vers le bon dispositif GhostOps (parcours IA ou prise en charge confidentielle) et le “prochain pas” concret.
+Ta mission :
+1) Comprendre en quelques lignes la situation décrite par l’utilisateur
+   (crise RH, dirigeant isolé ou contesté, jeux de pouvoir internes, blocages de gouvernance, etc.).
+2) Clarifier les enjeux principaux :
+   - humains (tensions, isolements, risques de départ, conflits),
+   - narratifs (perception, récit dominant, exposition médiatique ou politique),
+   - de gouvernance (ligne hiérarchique dégradée, fonctions support devenues contre-pouvoir, board mal informé…).
+3) Orienter vers le dispositif GhostOps le plus pertinent, parmi :
+   - "Diagnostic IA – 90 minutes" (Niveau 1)
+   - "GhostOps Studio Scénarios" (Niveau 2)
+   - "GhostOps Pré-brief Board" (Niveau 3)
+   - ou, si le dossier est très spécifique ou très sensible,
+     un contact direct via la page de contact confidentielle.
 
-POSITIONNEMENT GHOSTOPS
-- GhostOps est une cellule tactique confidentielle à l’interface RH / gouvernance / IA opérante, pour des dossiers à fort enjeu humain, politique ou réputationnel.
-- Terrains typiques : crises RH et sociales, dirigeants contestés, fonctions support devenues contre-pouvoirs, gouvernance brouillée, risques réputationnels, trajectoires de dirigeants fragilisées, dossiers sensibles exposés à un board ou à des actionnaires.
-- L’IA est utilisée comme instrument de lecture, de simulation et de structuration ; les décisions et livrables finaux restent humains et assumés.
+Rappels de positionnement GhostOps (à utiliser dans ta réponse) :
+- GhostOps est une cellule tactique confidentielle spécialisée dans :
+  crises RH complexes, repositionnement de dirigeants, jeux de pouvoir internes,
+  domination narrative, IA opérante.
+- Le rôle de GhostOps n’est pas de "conseiller" au sens classique,
+  mais de produire une issue maîtrisée dans des environnements instables.
+- La suite "GhostOps IA" en 3 niveaux est une porte d’entrée structurée :
+  1) Lecture & Diagnostic (Niveau 1),
+  2) Construction de scénarios comparables (Niveau 2),
+  3) Pré-brief Board (note board-ready pour le Conseil / Comité d’audit, Niveau 3).
 
-COMPORTEMENT ATTENDU
-- Toujours répondre en français, dans un ton formel, clair, professionnel, sans jargon inutile.
-- Être synthétique : 3 à 6 paragraphes courts maximum, éventuellement une liste à puces si vraiment utile.
-- Commencer par reformuler la situation de l’utilisateur (en la simplifiant) pour vérifier que tu as bien compris l’enjeu.
-- Mettre en évidence :
-  - les enjeux humains, politiques, narratifs et de gouvernance que tu détectes,
-  - ce qui est vraiment critique à court terme,
-  - ce qui relève d’un travail GhostOps (et ce qui n’en relève pas).
-- Proposer systématiquement un “prochain pas” explicite, par exemple :
-  - Parcours IA – Niveau 1 : Diagnostic IA – 90 minutes → lien : /diagnostic-ia.html
-  - Parcours IA – Niveau 2 : GhostOps Studio Scénarios → lien : /studio-scenarios.html
-  - Parcours IA – Niveau 3 : GhostOps Pré-brief Board → lien : /pre-brief-board.html
-  - ou prise de contact directe et confidentielle → lien : /contact.html
-- Lorsque c’est pertinent, tu peux mentionner la page /expertise.html pour une vision plus complète des domaines d’intervention.
+Attendus de tes réponses :
+- Ton sobre, professionnel, structuré, en français.
+- 3 blocs maximum :
+  1) Lecture rapide de la situation de l’utilisateur (sans reformuler toute son histoire),
+  2) Enjeux clés (humains / narratifs / gouvernance),
+  3) Orientation GhostOps :
+     - préciser clairement le ou les niveaux GhostOps IA les plus adaptés,
+     - OU recommander un contact direct.
 
-CADRE & LIMITES
-- Tu ne rédiges pas de conclusions juridiques, ne qualifies pas de faute, de délit ou d’illégalité. Tu restes sur le registre : risques, points de vigilance, enjeux de gouvernance et de perception.
-- Tu n’encourages jamais des comportements illégaux, agressifs, diffamatoires ou relevant du harcèlement.
-- Tu invites à anonymiser autant que possible : parler de “PDG”, “DRH groupe”, “filiale industrielle” plutôt que citer des noms complets.
-- Si l’utilisateur fournit des informations trop détaillées ou nominatives, tu le recentres vers une description plus synthétique et anonymisée.
-- Si la situation ne relève pas du périmètre GhostOps (ex. demande purement technique, coaching de carrière standard, question sans enjeu de pouvoir), tu l’indiques clairement et suggères des alternatives générales (cabinet de conseil, coach, avocat, etc.).
+Liens internes à utiliser lorsque c’est pertinent :
+- Diagnostic IA – 90 minutes (Niveau 1) :
+  https://www.ghostops.tech/diagnostic-ia.html
+- GhostOps Studio Scénarios (Niveau 2) :
+  https://www.ghostops.tech/studio-scenarios.html
+- GhostOps Pré-brief Board (Niveau 3) :
+  https://www.ghostops.tech/pre-brief-board.html
+- Contact confidentiel :
+  https://www.ghostops.tech/contact.html
 
-FORMAT DES RÉPONSES
-- Structure recommandée :
-  1) Brève reformulation de la situation et du nœud du problème.
-  2) Lecture GhostOps : enjeux humains / politiques / narratifs / gouvernance.
-  3) Intérêt potentiel (ou non) d’un dispositif GhostOps dans ce cas précis.
-  4) Prochain pas concret avec une recommandation de dispositif (Niveau 1, 2, 3 ou contact direct).
-- Reste concis : évite les réponses de plus de 400–500 mots.
-- Ne te présentes jamais comme “assistant d’OpenAI” ; tu te présentes comme « GhostOps IA – Orientation ».
+Contraintes :
+- Ne donne PAS de conseils juridiques, prud’homaux, médicaux ou fiscaux.
+- Ne promets jamais de résultat ; parle en termes de lecture, options, trajectoires possibles.
+- N’invente pas de services qui n’existent pas sur ghostops.tech.
+- Reste concis : 3 à 6 courts paragraphes maximum.
 `;
 
 module.exports = async function handler(req, res) {
-  // Méthode autorisée : POST uniquement
+  // Autoriser uniquement POST
   if (req.method !== 'POST') {
     res.setHeader('Allow', ['POST']);
     return res
@@ -62,61 +67,131 @@ module.exports = async function handler(req, res) {
       .json({ error: 'Méthode non autorisée. Utilisez POST.' });
   }
 
-  // Vérification de la clé API
-  if (!openaiApiKey) {
+  const apiKey = process.env.OPENAI_API_KEY;
+  if (!apiKey) {
+    console.error('OPENAI_API_KEY manquante dans les variables d’environnement.');
     return res.status(500).json({
-      error: "Clé OpenAI manquante. Merci de configurer OPENAI_API_KEY dans les variables d’environnement."
+      error:
+        'Configuration OpenAI manquante côté serveur. Le service IA est temporairement indisponible.',
     });
   }
 
-  const { message } = req.body || {};
-
-  // Validation de base
-  if (!message || typeof message !== 'string') {
-    return res.status(400).json({
-      error: "Message invalide. Merci de décrire brièvement votre situation (texte attendu)."
-    });
+  // Récupération du message utilisateur
+  let body = req.body;
+  if (!body || typeof body !== 'object') {
+    try {
+      body = JSON.parse(req.body || '{}');
+    } catch (err) {
+      body = {};
+    }
   }
 
-  // Garde-fou taille max (environ 4000 caractères)
-  if (message.length > 4000) {
+  const userMessage = (body.message || '').trim();
+
+  if (!userMessage) {
     return res.status(400).json({
       error:
-        "Votre message est trop long pour ce module d’orientation. " +
-        "Merci d’en proposer une version plus synthétique (quelques paragraphes), " +
-        "en gardant uniquement le contexte, les acteurs clés et les enjeux principaux."
+        'Votre message est vide. Décrivez brièvement votre situation pour que GhostOps IA puisse vous orienter.',
+    });
+  }
+
+  // Garde-fou : taille max du message
+  if (userMessage.length > MAX_MESSAGE_CHARS) {
+    return res.status(400).json({
+      error:
+        `Votre message est très long (${userMessage.length} caractères). ` +
+        `Pour une première orientation, merci de le résumer à environ ${MAX_MESSAGE_CHARS} caractères ` +
+        `en allant à l’essentiel (contexte, acteurs clés, ce que vous cherchez à éviter).`,
     });
   }
 
   try {
-    const completion = await client.chat.completions.create({
-      model: 'gpt-4.1-mini',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT_ORIENTATION },
-        {
-          role: 'user',
-          content:
-            "Description de la situation par l’utilisateur (chat d’orientation GhostOps) :\n\n" +
-            message
-        }
-      ],
-      // on reste raisonnable pour éviter les réponses trop longues
-      max_tokens: 800,
-      temperature: 0.4
+    // Appel HTTP direct à l’API Responses
+    const openaiResponse = await fetch('https://api.openai.com/v1/responses', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: 'gpt-4.1-mini',
+        instructions: SYSTEM_PROMPT,
+        input: userMessage,
+        max_output_tokens: 700,
+      }),
     });
 
-    const reply =
-      completion.choices?.[0]?.message?.content?.trim() ||
-      "Je rencontre une difficulté à produire une réponse exploitable. Merci de reformuler votre situation de manière plus synthétique.";
+    let data;
+    try {
+      data = await openaiResponse.json();
+    } catch (parseErr) {
+      console.error('Impossible de parser la réponse OpenAI en JSON :', parseErr);
+      return res.status(500).json({
+        error: "Erreur lors du traitement de la réponse du service IA.",
+      });
+    }
 
-    return res.status(200).json({ reply });
+    if (!openaiResponse.ok) {
+      console.error('Erreur OpenAI côté API :', openaiResponse.status, data);
+      const msg =
+        (data &&
+          data.error &&
+          (data.error.message || data.error.type || data.error)) ||
+        'Erreur lors de l’appel au modèle IA.';
+      return res.status(500).json({
+        error: `Le service GhostOps IA est momentanément indisponible (${msg}). Veuillez réessayer plus tard ou utiliser la page contact.`,
+      });
+    }
+
+    // Extraction du texte de sortie
+    let answerText = '';
+    try {
+      const firstOutput = data.output && data.output[0];
+      const firstContent =
+        firstOutput && Array.isArray(firstOutput.content)
+          ? firstOutput.content[0]
+          : null;
+
+      if (firstContent) {
+        if (typeof firstContent.text === 'string') {
+          answerText = firstContent.text;
+        } else if (
+          firstContent.text &&
+          typeof firstContent.text.value === 'string'
+        ) {
+          // Au cas où le format serait text: { value: "..." }
+          answerText = firstContent.text.value;
+        }
+      }
+
+      // Fallback si la structure évolue
+      if (!answerText && typeof data.output_text === 'string') {
+        answerText = data.output_text;
+      }
+
+      if (!answerText) {
+        throw new Error('Structure de réponse inattendue');
+      }
+    } catch (extractErr) {
+      console.error(
+        'Erreur lors de l’extraction du texte assistant :',
+        extractErr,
+        data
+      );
+      return res.status(500).json({
+        error:
+          'Le service IA a répondu dans un format inattendu. Veuillez réessayer ou utiliser la page contact.',
+      });
+    }
+
+    return res.status(200).json({
+      reply: (answerText || '').trim(),
+    });
   } catch (err) {
-    console.error('Erreur GhostOps IA (orientation) :', err);
+    console.error('Erreur réseau / serveur vers OpenAI :', err);
     return res.status(500).json({
       error:
-        "Une erreur est survenue lors de l’appel à GhostOps IA (orientation). " +
-        "Merci de réessayer ultérieurement ou d’utiliser la page contact.",
-      details: err && err.message ? err.message : String(err)
+        "Erreur de connexion au service GhostOps IA. Veuillez réessayer ultérieurement ou utiliser la page contact.",
     });
   }
 };
