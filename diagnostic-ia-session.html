@@ -1,21 +1,27 @@
 <!DOCTYPE html>
 <html lang="fr">
   <head>
-    <!-- AOS (optionnel) -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Diagnostic IA – Espace sécurisé | GhostOps</title>
-    <meta name="description" content="Espace sécurisé GhostOps pour le Diagnostic IA – 90 minutes. Déposez votre situation, obtenez une lecture IA structurée, des risques et 2 à 3 options de lecture tactique." />
+
+    <title>GhostOps Diagnostic IA – Session 90 minutes</title>
+    <meta name="description" content="Espace de travail GhostOps Diagnostic IA – 90 minutes, réservé aux dirigeants et décideurs ayant validé le paiement. Structuration de la situation, lecture IA et premières options de lecture tactique." />
+
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="canonical" href="https://www.ghostops.tech/diagnostic-ia-session.html" />
 
     <!-- Open Graph -->
-    <meta property="og:title" content="Diagnostic IA – Espace sécurisé | GhostOps" />
-    <meta property="og:description" content="Accès réservé après paiement au Diagnostic IA – 90 minutes. Lecture tactique IA d’une situation à fort enjeu humain, politique ou de gouvernance." />
+    <meta property="og:title" content="GhostOps Diagnostic IA – Session 90 minutes" />
+    <meta property="og:description" content="Session Diagnostic IA GhostOps : espace de travail confidentiel pour structurer votre situation et obtenir une première lecture IA à haute valeur décisionnelle." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.ghostops.tech/diagnostic-ia-session.html" />
     <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="GhostOps Diagnostic IA – Session 90 minutes" />
+    <meta name="twitter:description" content="Espace de travail confidentiel réservé aux sessions Diagnostic IA GhostOps." />
+    <meta name="twitter:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
 
     <!-- Fonts & Tailwind -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
@@ -37,7 +43,7 @@
         transition: opacity .4s ease;
       }
       @keyframes bgPulse {
-        0%   { filter: brightness(1) contrast(1); }
+        0% { filter: brightness(1) contrast(1); }
         100% { filter: brightness(1.05) contrast(1.05); }
       }
       .text-shadow { text-shadow: 1px 1px 4px rgba(0,0,0,.6); }
@@ -46,7 +52,7 @@
     </style>
   </head>
 
-  <body class="bg-gray-900 text-white font-sans leading-relaxed" onload="AOS.init && AOS.init();">
+  <body class="bg-gray-900 text-white font-sans leading-relaxed">
     <!-- HEADER -->
     <header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
       <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
@@ -63,149 +69,175 @@
       </nav>
     </header>
 
-    <main class="px-6 md:px-24 pb-20">
-      <!-- BLOC CONFIRMATION -->
-      <section class="max-w-4xl mx-auto mt-6 md:mt-10">
-        <div class="bg-gray-800/80 border border-gray-700 rounded-2xl p-6 md:p-8">
-          <p class="text-xs uppercase tracking-[.22em] text-gray-400 mb-2">
-            Accès réservé · Diagnostic IA – 90&nbsp;minutes
-          </p>
-          <h1 class="text-2xl md:text-3xl font-bold text-white text-shadow mb-3">
-            Espace sécurisé – Diagnostic IA
+    <main class="px-6 md:px-24 pb-24">
+      <!-- BLOC SI PAIEMENT NON DÉTECTÉ -->
+      <section id="diagnostic-not-paid"
+               class="hidden max-w-3xl mx-auto mt-10 mb-10">
+        <div class="bg-red-900/40 border border-red-500/70 rounded-2xl p-6 md:p-8">
+          <h1 class="text-2xl md:text-3xl font-bold mb-3 text-white text-shadow">
+            Accès réservé – GhostOps Diagnostic IA
           </h1>
-          <p class="text-sm md:text-base text-gray-200 mb-3">
-            Votre paiement pour le <span class="font-semibold">Diagnostic IA – 90&nbsp;minutes</span> a été validé.
-            Cet espace est réservé à la préparation de votre diagnostic&nbsp;: il n’a pas vocation à délivrer
-            une “stratégie clé en main”, mais à produire une <span class="font-semibold">lecture IA structurée</span>
-            de votre situation.
+          <p class="text-gray-200 text-sm md:text-base mb-3">
+            Cette page est réservée aux dirigeants, boards ou directions ayant validé un
+            <span class="font-semibold">Diagnostic IA GhostOps – 90&nbsp;minutes</span> via le module de paiement sécurisé.
           </p>
-          <p class="text-xs md:text-sm text-gray-400">
-            Le Diagnostic IA restitue&nbsp;:
-            <span class="font-semibold">une reformulation précise</span> de votre contexte,
-            une <span class="font-semibold">cartographie des risques humains, politiques et narratifs</span>,
-            et <span class="font-semibold">2 à 3 options de lecture tactique</span> pour éclairer vos décisions
-            ou une éventuelle intervention GhostOps.
+          <p class="text-gray-300 text-sm md:text-base mb-4">
+            Si vous pensez être arrivé ici par erreur, vous pouvez revenir à la page de présentation du format
+            ou nous contacter en toute confidentialité.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 mt-4">
+            <a href="/diagnostic-ia.html"
+               class="inline-block px-5 py-2 text-xs md:text-sm border border-white rounded-md hover:bg-white hover:text-black transition text-center">
+              Revenir à la page Diagnostic IA
+            </a>
+            <a href="/contact.html"
+               class="inline-block px-5 py-2 text-xs md:text-sm border border-gray-400 rounded-md hover:bg-gray-100 hover:text-black transition text-center">
+              Contacter GhostOps
+            </a>
+          </div>
+          <p class="text-gray-500 text-[11px] mt-4">
+            Si vous venez de procéder au paiement, vérifiez que vous utilisez bien le lien complet fourni
+            en fin de parcours de paiement. En cas de doute, envoyez-nous un message via la page contact.
           </p>
         </div>
       </section>
 
-      <!-- INSTRUCTIONS STRUCTURÉES -->
-      <section class="max-w-4xl mx-auto mt-8">
-        <div class="grid md:grid-cols-2 gap-6">
-          <!-- Comment briefer l’IA -->
-          <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-5">
-            <h2 class="text-base md:text-lg font-semibold mb-3 text-white">
-              Comment préparer votre brief&nbsp;?
-            </h2>
-            <ol class="list-decimal list-inside text-gray-300 text-sm space-y-2">
-              <li>
-                <span class="font-semibold">Contexte</span>&nbsp;:
-                type d’organisation, périmètre concerné, secteur (sans nommer l’entreprise si possible).
-              </li>
-              <li>
-                <span class="font-semibold">Acteurs clés</span>&nbsp;:
-                fonctions (PDG, DRH groupe, directeur de site, représentants du personnel…), alliances ou tensions.
-              </li>
-              <li>
-                <span class="font-semibold">Historique</span>&nbsp;:
-                faits marquants, décisions récentes, signaux faibles ou incidents déclencheurs.
-              </li>
-              <li>
-                <span class="font-semibold">Ce que vous cherchez à éviter</span>&nbsp;:
-                crise ouverte, départ brutal, médiatisation, perte de contrôle, dégradation d’image, etc.
-              </li>
-              <li>
-                <span class="font-semibold">Horizon temporel</span>&nbsp;:
-                échéances critiques (prochaine réunion de board, renégociation, audit, visite d’autorité…).
-              </li>
-            </ol>
-          </div>
+      <!-- BLOC SI PAIEMENT OK -->
+      <section id="diagnostic-paid"
+               class="hidden max-w-5xl mx-auto mt-10 mb-10">
+        <!-- Bandeau de confirmation -->
+        <div class="bg-emerald-900/40 border border-emerald-500/70 rounded-2xl p-4 mb-6">
+          <p class="text-xs md:text-sm text-emerald-100">
+            Paiement <span class="font-semibold">GhostOps Diagnostic IA – 90&nbsp;minutes</span> confirmé.<br/>
+            Vous êtes dans l’espace IA dédié au Niveau&nbsp;1 – Diagnostic IA. Les échanges qui suivent servent à
+            préparer une lecture tactique structurée de votre situation.
+          </p>
+        </div>
 
-          <!-- Données & confidentialité -->
-          <div class="bg-gray-900/80 border border-gray-800 rounded-2xl p-5">
-            <h2 class="text-base md:text-lg font-semibold mb-3 text-white">
-              Données &amp; confidentialité
+        <!-- Intro -->
+        <header class="mb-8">
+          <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">
+            GhostOps IA · Diagnostic – Espace de travail 90&nbsp;minutes
+          </p>
+          <h1 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
+            Session Diagnostic IA – structurer la lecture de votre situation
+          </h1>
+          <p class="text-gray-200 text-sm md:text-base mb-3 max-w-3xl">
+            Vous avez activé un <span class="font-semibold">Diagnostic IA GhostOps – 90&nbsp;minutes</span>.
+            L’objectif de cette session est de clarifier votre contexte, de mettre en lumière les risques humains,
+            narratifs et de gouvernance, et d’ouvrir <span class="font-semibold">2 à 3 options de lecture</span>
+            cohérentes avec vos enjeux.
+          </p>
+          <p class="text-gray-300 text-sm md:text-base max-w-3xl">
+            GhostOps utilise l’IA comme instrument de lecture et de simulation. Le Diagnostic IA ne se substitue
+            pas à une mission GhostOps complète&nbsp;: il vous fournit une grille de lecture structurée pour décider
+            si et comment aller plus loin (Studio Scénarios, Pré-brief Board ou prise en charge confidentielle).
+          </p>
+        </header>
+
+        <!-- Étape 1 : préparer les éléments -->
+        <section class="mb-8">
+          <div class="bg-gray-800/80 rounded-2xl p-6 md:p-8">
+            <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">
+              Étape&nbsp;1 – Poser les éléments de contexte
             </h2>
-            <ul class="text-gray-300 text-sm space-y-2">
+            <p class="text-gray-300 text-sm md:text-base mb-4 max-w-3xl">
+              Le Diagnostic IA gagne en précision si vous structurez quelques éléments avant de lancer la première lecture.
+              Vous pouvez vous appuyer sur la trame suivante (sans obligation de tout remplir)&nbsp;:
+            </p>
+            <ul class="list-disc list-inside text-gray-300 text-sm md:text-base space-y-2 max-w-3xl">
               <li>
-                • Évitez de mentionner des <span class="font-semibold">noms complets</span> ou des
-                informations directement identifiantes si ce n’est pas indispensable.
+                <span class="font-semibold">Périmètre concerné</span> (groupe / filiale / site / fonction, sans noms
+                si vous préférez rester à un niveau anonymisé).
               </li>
               <li>
-                • Ne partagez pas de <span class="font-semibold">données sensibles</span>
-                (santé, orientation, données très personnelles) ni de secrets industriels précis.
+                <span class="font-semibold">Situation actuelle</span> : faits observables, tensions, décisions en suspens,
+                signaux faibles qui vous inquiètent.
               </li>
               <li>
-                • Restez centré sur les <span class="font-semibold">faits, comportements, décisions et mécanismes</span>
-                plutôt que sur les jugements de valeur.
+                <span class="font-semibold">Acteurs et lignes de force</span> : qui détient réellement le levier&nbsp;?
+                Qui freine, qui accélère, qui est exposé publiquement&nbsp;?
               </li>
               <li>
-                • Le Diagnostic IA vise à éclairer votre lecture et la nôtre&nbsp;:
-                l’éventuelle intervention GhostOps fera l’objet d’un cadrage distinct.
+                <span class="font-semibold">Ce que vous cherchez à éviter</span> : rupture de mandat, crise sociale,
+                conflit de gouvernance, fuite presse, perte d’un site ou d’un périmètre stratégique, etc.
+              </li>
+              <li>
+                <span class="font-semibold">Horizon de décision</span> : dates clés (board, comité, AG, échéance sociale
+                ou réglementaire…).
               </li>
             </ul>
+            <p class="text-gray-400 text-xs md:text-sm mt-4 max-w-3xl">
+              Vous pouvez saisir directement ces éléments dans le module IA ci-dessous, ou en donner une synthèse
+              plus courte si certaines informations doivent rester strictement internes.
+            </p>
           </div>
-        </div>
-      </section>
+        </section>
 
-      <!-- BLOC CHAT DIAGNOSTIC IA -->
-      <section class="max-w-4xl mx-auto mt-10">
-        <div class="bg-gray-900/85 border border-gray-800 rounded-2xl p-5 md:p-6 flex flex-col min-h-[430px]">
-          <div class="mb-4 flex items-start justify-between gap-3">
-            <div>
-              <p class="text-[10px] uppercase tracking-[.25em] text-gray-400 mb-1">
-                GhostOps IA – Diagnostic
-              </p>
-              <h2 class="text-base md:text-lg font-semibold text-white">
-                Décrivez votre situation, l’IA vous répond
-              </h2>
-              <p class="text-xs md:text-sm text-gray-400 mt-1 max-w-xl">
-                Vous pouvez coller un texte structuré ou écrire directement dans le champ ci-dessous.
-                L’IA vous répondra avec une <span class="font-semibold">lecture structurée</span>
-                et des <span class="font-semibold">options d’analyse</span>, sans dévoiler de plan GhostOps complet.
-              </p>
+        <!-- Étape 2 : workspace IA -->
+        <section>
+          <div class="bg-gray-900/80 border border-gray-700 rounded-2xl p-6 md:p-8">
+            <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">
+              Étape&nbsp;2 – Lecture initiale avec GhostOps IA – Diagnostic
+            </h2>
+            <p class="text-gray-300 text-sm md:text-base mb-4 max-w-3xl">
+              Le module ci-dessous permet une <span class="font-semibold">lecture IA structurée</span> de votre situation&nbsp;:
+              clarification des enjeux, identification des principaux risques (humains, narratifs, de gouvernance)
+              et ouverture de quelques angles de lecture possibles.
+            </p>
+            <p class="text-gray-400 text-xs md:text-sm mb-4 max-w-3xl">
+              Il ne s’agit ni d’une stratégie complète ni d’un avis juridique ou social. C’est une base de travail
+              qui vous aide à décider de la suite du parcours&nbsp;: rester à un niveau de veille, activer un Studio Scénarios
+              (Niveau&nbsp;2) ou envisager un Pré-brief Board (Niveau&nbsp;3).
+            </p>
+
+            <!-- Zone d'échanges IA -->
+            <div class="bg-gray-950/80 rounded-xl border border-gray-700 max-h-[360px] flex flex-col">
+              <!-- Messages -->
+              <div id="diagnostic-chat-messages"
+                   class="flex-1 px-4 py-3 space-y-3 overflow-y-auto text-xs md:text-sm">
+                <div class="text-gray-300 text-xs md:text-[13px]">
+                  <span class="font-semibold">GhostOps IA – Diagnostic&nbsp;:</span>
+                  <span>
+                    Vous pouvez me décrire votre situation en quelques paragraphes&nbsp;:<br /><br />
+                    – périmètre (groupe, filiale, site, fonction),<br />
+                    – ce qui se passe concrètement (faits, blocages, signaux faibles),<br />
+                    – les acteurs qui comptent réellement,<br />
+                    – ce que vous cherchez surtout à éviter,<br />
+                    – et les échéances qui vous préoccupent le plus.<br /><br />
+                    Je vous proposerai une première lecture organisée&nbsp;:<br />
+                    (1) clarification des enjeux,<br />
+                    (2) principaux risques humains / narratifs / de gouvernance,<br />
+                    (3) pistes de lecture possibles et questions structurantes pour la suite.<br /><br />
+                    Vous pouvez rester à un niveau anonymisé (rôles, fonctions, périmètres) sans citer de noms complets.
+                  </span>
+                </div>
+              </div>
+
+              <!-- Formulaire -->
+              <form id="diagnostic-chat-form"
+                    class="border-t border-gray-800 px-3 py-2 flex items-center gap-2">
+                <textarea id="diagnostic-chat-input"
+                          class="flex-1 text-xs bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-1 resize-none focus:outline-none focus:border-gray-400"
+                          rows="3"
+                          placeholder="Décrivez ici votre situation (contexte, acteurs, risques, échéances)…"></textarea>
+                <button type="submit"
+                        class="text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
+                  Envoyer pour diagnostic
+                </button>
+              </form>
             </div>
-            <button id="diag-template-btn"
-                    class="hidden md:inline-block px-3 py-1 text-[11px] border border-gray-600 rounded-full text-gray-200 hover:bg-gray-100 hover:text-black transition">
-              Insérer un canevas de brief
-            </button>
+
+            <p class="text-gray-500 text-[11px] mt-3 max-w-3xl">
+              Ce module IA ne remplace pas un échange direct. Si nécessaire, des clarifications complémentaires pourront être réalisées
+              dans le cadre du périmètre convenu, ou via une activation ultérieure du Studio Scénarios ou d’une intervention GhostOps.
+            </p>
           </div>
-
-          <!-- Zone messages -->
-          <div id="diag-messages"
-               class="flex-1 rounded-xl border border-gray-800 bg-gray-950/80 px-3 py-3 overflow-y-auto text-xs md:text-sm space-y-3">
-            <div class="text-gray-300">
-              <span class="font-semibold">GhostOps IA – Diagnostic&nbsp;:</span>
-              <span>
-                pour commencer, décrivez votre situation en suivant, si possible, la structure suivante&nbsp;:
-                contexte, acteurs, historique, ce que vous cherchez à éviter, horizon temporel.
-              </span>
-            </div>
-          </div>
-
-          <!-- Formulaire d’envoi -->
-          <form id="diag-form" class="mt-3 border-t border-gray-800 pt-3 flex flex-col gap-2">
-            <textarea id="diag-input"
-                      class="w-full text-xs md:text-sm bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-2 resize-none focus:outline-none focus:border-gray-400"
-                      rows="4"
-                      placeholder="Décrivez votre situation (crise RH, dirigeant, gouvernance, jeux de pouvoir…) en restant factuel et structuré."></textarea>
-            <div class="flex items-center justify-between gap-3">
-              <p class="text-[10px] text-gray-500">
-                L’IA fournit un diagnostic et des options de lecture. Pour une opération GhostOps complète,
-                un cadrage séparé sera nécessaire.
-              </p>
-              <button type="submit"
-                      class="shrink-0 px-4 py-2 bg-white text-black text-xs md:text-sm font-semibold rounded-md hover:bg-gray-200">
-                Envoyer pour diagnostic
-              </button>
-            </div>
-          </form>
-        </div>
+        </section>
       </section>
     </main>
 
-    <!-- FOOTER -->
-    <footer class="w-full px-6 md:px-24 pb-8 text-xs text-gray-400">
+    <footer class="w-full px-6 md:px-24 pb-8 mt-8 text-xs text-gray-400">
       <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <p>© GhostOps – Tous droits réservés.</p>
         <nav class="flex flex-wrap items-center gap-3">
@@ -220,13 +252,25 @@
       </div>
     </footer>
 
-    <!-- Script Diagnostic IA – connecté à /api/ghostops-diagnostic -->
+    <!-- Script d'activation (paid / non paid) + module IA -->
     <script>
       (function () {
-        const form     = document.getElementById('diag-form');
-        const input    = document.getElementById('diag-input');
-        const messages = document.getElementById('diag-messages');
-        const tplBtn   = document.getElementById('diag-template-btn');
+        const params = new URLSearchParams(window.location.search);
+        const paid   = params.get('paid');
+
+        const paidBlock    = document.getElementById('diagnostic-paid');
+        const notPaidBlock = document.getElementById('diagnostic-not-paid');
+
+        if (paid === '1') {
+          if (paidBlock) paidBlock.classList.remove('hidden');
+        } else {
+          if (notPaidBlock) notPaidBlock.classList.remove('hidden');
+        }
+
+        // Module IA – Diagnostic
+        const form     = document.getElementById('diagnostic-chat-form');
+        const input    = document.getElementById('diagnostic-chat-input');
+        const messages = document.getElementById('diagnostic-chat-messages');
 
         if (!form || !input || !messages) return;
 
@@ -237,46 +281,19 @@
         function addMessage(sender, text) {
           const wrapper = document.createElement('div');
           wrapper.className = sender === 'user'
-            ? 'text-right'
-            : 'text-left';
+            ? 'mb-2 text-right'
+            : 'mb-2 text-left';
 
           const bubble = document.createElement('div');
           bubble.className = sender === 'user'
-            ? 'inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg mb-2'
-            : 'inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg mb-2';
+            ? 'inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg'
+            : 'inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg';
 
           bubble.textContent = text;
           wrapper.appendChild(bubble);
           messages.appendChild(wrapper);
           scrollToBottom();
           return wrapper;
-        }
-
-        // Canevas de brief inséré dans le textarea
-        if (tplBtn) {
-          tplBtn.addEventListener('click', () => {
-            const template = [
-              '1. Contexte :',
-              '- Type d’organisation, périmètre, secteur.',
-              '- Situation actuelle en une phrase.',
-              '',
-              '2. Acteurs clés :',
-              '- Instances (board, comité exécutif, représentants du personnel…).',
-              '- Fonctions impliquées (PDG, DRH groupe, directeur de site, juridique, etc.).',
-              '',
-              '3. Historique :',
-              '- Faits marquants des 6 à 18 derniers mois.',
-              '- Décisions ou événements déclencheurs.',
-              '',
-              '4. Ce que je veux surtout éviter :',
-              '- Crise ouverte, départ brutal, médiatisation, perte de contrôle…',
-              '',
-              '5. Horizon temporel :',
-              '- Échéances critiques (réunion de board, audit, visite d’autorité, renégociation, etc.).'
-            ].join('\n');
-            input.value = template;
-            input.focus();
-          });
         }
 
         async function sendMessage() {
@@ -289,7 +306,7 @@
           const waitingElem = addMessage('bot', 'Diagnostic IA en cours…');
 
           try {
-            const response = await fetch('/api/ghostops-diagnostic', {
+            const response = await fetch('/api/ghostops-diagnostic-ia', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ message: userMessage })
@@ -298,7 +315,9 @@
             let data = {};
             try {
               data = await response.json();
-            } catch (_) {}
+            } catch (_) {
+              // réponse non-JSON
+            }
 
             if (waitingElem && waitingElem.parentNode) {
               waitingElem.parentNode.removeChild(waitingElem);
@@ -312,11 +331,11 @@
 
             addMessage('bot', data.reply);
           } catch (err) {
-            console.error('Erreur /api/ghostops-diagnostic :', err);
+            console.error('Erreur lors de l’appel /api/ghostops-diagnostic-ia :', err);
             if (waitingElem && waitingElem.parentNode) {
               waitingElem.parentNode.removeChild(waitingElem);
             }
-            addMessage('bot', 'Erreur de connexion au Diagnostic IA. Réessayez ultérieurement ou passez par le contact GhostOps.');
+            addMessage('bot', 'Erreur de connexion à GhostOps IA. Veuillez réessayer ultérieurement ou utiliser la page contact.');
           }
         }
 
