@@ -340,13 +340,18 @@
           const waiting = addMessage('bot', 'Diagnostic IA en cours…');
 
           try {
+            const payload = {
+              description: userMessage,
+              message: userMessage,
+              contexte: '',
+              enjeu: '',
+              mode: 'diagnostic-ia-session-v1'
+            };
+
             const response = await fetch('/api/ghostops-diagnostic-ia', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                message: userMessage,
-                mode: 'diagnostic-ia-session-v1'
-              })
+              body: JSON.stringify(payload)
             });
 
             let data = {};
