@@ -208,7 +208,7 @@
             </ul>
           </div>
 
-          <!-- Carte 3 : Contraintes & cadre -->
+          <!-- Carte 3 : Contraintes & cadre d’intervention -->
           <div class="bg-gray-800/80 rounded-xl p-6">
             <h3 class="text-base md:text-lg font-semibold mb-3 text-white">
               Contraintes &amp; cadre d’intervention
@@ -818,6 +818,17 @@
         async function sendMessage() {
           const userMessage = (input.value || '').trim();
           if (!userMessage) return;
+
+          // Garde-fou côté front : limiter la taille du message
+          if (userMessage.length > 1500) {
+            addMessage(
+              'bot',
+              "Pour des raisons de confidentialité et d’efficacité, merci de limiter votre description " +
+              "à quelques paragraphes, en vous concentrant sur le contexte, les acteurs clés " +
+              "et ce que vous cherchez surtout à éviter ou sécuriser."
+            );
+            return;
+          }
 
           // Afficher le message utilisateur
           addMessage('user', userMessage);
