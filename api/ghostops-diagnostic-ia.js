@@ -23,11 +23,20 @@ export default async function handler(req, res) {
   let payload = {};
 
   try {
+    let rawBody = null;
+
+    // Vercel / Node : body peut être string, Buffer ou objet déjà parsé
     if (typeof req.body === 'string') {
-      // Certains environnements passent le body brut en string
-      payload = JSON.parse(req.body || '{}');
+      rawBody = req.body;
+    } else if (typeof Buffer !== 'undefined' && Buffer.isBuffer(req.body)) {
+      rawBody = req.body.toString('utf8');
+    }
+
+    if (rawBody !== null) {
+      // On essaie de parser le JSON brut
+      payload = rawBody ? JSON.parse(rawBody) : {};
     } else if (req.body && typeof req.body === 'object') {
-      // Next.js (ou similaire) le fournit déjà parsé
+      // JSON déjà parsé par le runtime
       payload = req.body;
     } else {
       payload = {};
@@ -37,13 +46,13 @@ export default async function handler(req, res) {
     payload = {};
   }
 
-  // Log de debug (visible dans les logs Vercel)
-  console.log('Payload Diagnostic IA reçu :', payload);
+  // Log de debug (à vérifier dans les logs Vercel)
+  console.log('Payload Diagnostic IA reçu (type req.body =', typeof req.body, '):', payload);
 
   // On accepte plusieurs formats possibles :
   // - { description, contexte, enjeu }  -> pré-diagnostic (diagnostic-ia.html)
   // - { message }                      -> session complète (diagnostic-ia-session.html)
-  const { description, contexte, enjeu, message } = payload;
+  const { description, contexte, enjeu, message } = payload || {};
 
   // Priorité au champ "description" ; sinon "message" ; sinon 1er champ texte non vide
   let effectiveDescription = '';
