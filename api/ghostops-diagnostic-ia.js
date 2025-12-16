@@ -1,13 +1,17 @@
 // /api/ghostops-diagnostic-ia.js
 // Version sécurisée : Stripe cs_id -> token signé (TTL + itérations) -> décrément serveur.
-// Compatible avec votre front actuel (message seul) + prêt pour history (body.history).
+// + Support "continue" (suite) : permet d'obtenir la suite d'une réponse tronquée
+//   SANS consommer d’itération (itersLeft inchangé) + token rotatif conservé.
 //
-// Attendus côté front (recommandé) :
-// - 1er appel après paiement : envoyer cs_id (depuis l’URL) + message
-// - appels suivants : envoyer sessionToken + message (+ history si vous l’ajoutez)
+// Compatible avec votre front actuel :
+// - 1er appel : { cs_id, message }
+// - appels suivants : { sessionToken, message, history }
+// - suite : { sessionToken, continue:true, last_assistant:"...", history }
+//
 // Le serveur renvoie toujours { reply, sessionToken, itersLeft, expiresAt, meta }
 
 const Stripe = require("stripe");
+const crypto = require("crypto");
 
 // -------------------------
 // Utils lecture body
@@ -47,6 +51,13 @@ function extractReplyFromResponsesApi(data) {
 
   if (typeof hit?.text === "string") return hit.text.trim();
   return "";
+}
+
+function getBearerToken(req) {
+  const h = req.headers?.authorization || req.headers?.Authorization || "";
+  if (typeof h !== "string") return "";
+  const m = h.match(/^Bearer\s+(.+)$/i);
+  return m ? cleanStr(m[1]) : "";
 }
 
 // -------------------------
@@ -104,10 +115,8 @@ function buildInputs({ systemPrompt, userPrompt, history }) {
 // -------------------------
 // Token signé (HMAC)
 // -------------------------
-const crypto = require("crypto");
-
-function b64urlEncode(buf) {
-  return Buffer.from(buf)
+function b64urlEncode(bufOrStr) {
+  return Buffer.from(bufOrStr)
     .toString("base64")
     .replace(/=/g, "")
     .replace(/\+/g, "-")
@@ -138,7 +147,11 @@ function verifyToken(token, secret) {
 
   const [payload, sig] = parts;
   const expected = b64urlEncode(hmacSha256(secret, payload));
-  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
+
+  // timingSafeEqual exige des buffers de même longueur
+  const sigBuf = Buffer.from(sig);
+  const expBuf = Buffer.from(expected);
+  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
     return { ok: false, reason: "bad_signature" };
   }
 
@@ -166,13 +179,14 @@ async function verifyStripeCheckoutSession({ stripe, csId }) {
     return { ok: false, reason: "stripe_retrieve_failed", message: e?.message || String(e) };
   }
 
-  // Conditions minimales
   const paid = session?.payment_status === "paid";
-  const complete = session?.status === "complete" || session?.status === "complete";
-  // Stripe renvoie souvent status='complete' pour checkout session finalisée.
-  // On accepte "paid" comme signal principal.
   if (!paid) {
-    return { ok: false, reason: "not_paid", status: session?.status, payment_status: session?.payment_status };
+    return {
+      ok: false,
+      reason: "not_paid",
+      status: session?.status,
+      payment_status: session?.payment_status,
+    };
   }
 
   return {
@@ -225,7 +239,7 @@ module.exports = async function handler(req, res) {
   // Paramètres session
   const MAX_ITERS = Number(process.env.GHOSTOPS_DIAGNOSTIC_MAX_ITERS || "5") || 5;
   const TTL_SECONDS =
-    Number(process.env.GHOSTOPS_DIAGNOSTIC_SESSION_TTL_SECONDS || "7200") || 7200; // 2h par défaut
+    Number(process.env.GHOSTOPS_DIAGNOSTIC_SESSION_TTL_SECONDS || "7200") || 7200; // 2h
 
   // Modèles
   const modelInitial =
@@ -238,7 +252,13 @@ module.exports = async function handler(req, res) {
     cleanStr(process.env.GHOSTOPS_DIAGNOSTIC_MODEL) ||
     "gpt-4.1-mini";
 
-  const maxOut = Number(process.env.GHOSTOPS_DIAGNOSTIC_MAX_OUTPUT_TOKENS || "1110") || 1110;
+  // ✅ Longueur de réponse (augmentée par défaut)
+  // Vous pouvez ajuster dans Vercel :
+  // - GHOSTOPS_DIAGNOSTIC_MAX_OUTPUT_TOKENS (ex: 1800-2600)
+  // - GHOSTOPS_DIAGNOSTIC_MAX_OUTPUT_TOKENS_CONTINUE (ex: 1400-2200)
+  const maxOutDefault = Number(process.env.GHOSTOPS_DIAGNOSTIC_MAX_OUTPUT_TOKENS || "1800") || 1800;
+  const maxOutContinue =
+    Number(process.env.GHOSTOPS_DIAGNOSTIC_MAX_OUTPUT_TOKENS_CONTINUE || "1600") || 1600;
 
   // Timeout OpenAI
   const OPENAI_TIMEOUT_MS = Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "35000") || 35000;
@@ -260,6 +280,9 @@ module.exports = async function handler(req, res) {
 
   body = body || {};
 
+  // Flags
+  const isContinue = Boolean(body.continue === true || body.continue === "true");
+
   // Champs message
   const effectiveDescription = cleanStr(body.description) || cleanStr(body.message);
   const safeContexte = cleanStr(body.contexte);
@@ -271,7 +294,13 @@ module.exports = async function handler(req, res) {
 
   // Sécurité session
   const csId = cleanStr(body.cs_id || body.csId);
-  const incomingToken = cleanStr(body.sessionToken || body.token);
+
+  // token peut venir du body OU du header Authorization: Bearer
+  const incomingToken =
+    cleanStr(body.sessionToken || body.token) || cleanStr(getBearerToken(req));
+
+  // Continue context
+  const lastAssistant = clampText(cleanStr(body.last_assistant || body.lastAssistant), 8000);
 
   console.log("[ghostops-diagnostic-ia] content-type:", contentType);
   console.log("[ghostops-diagnostic-ia] keys:", Object.keys(body || {}));
@@ -280,10 +309,26 @@ module.exports = async function handler(req, res) {
   console.log("[ghostops-diagnostic-ia] historyLen:", history.length);
   console.log("[ghostops-diagnostic-ia] hasToken:", Boolean(incomingToken));
   console.log("[ghostops-diagnostic-ia] hasCsId:", Boolean(csId));
+  console.log("[ghostops-diagnostic-ia] continue:", isContinue);
+  console.log("[ghostops-diagnostic-ia] lastAssistantLen:", lastAssistant.length);
 
-  if (!effectiveDescription) {
+  // ✅ En mode continue, on peut tolérer message vide côté UI,
+  // mais on veut au moins un contexte (last_assistant ou history).
+  if (!effectiveDescription && !isContinue) {
     return res.status(400).json({
       error: 'Le champ "message" (ou "description") est obligatoire.',
+    });
+  }
+  if (isContinue && !incomingToken) {
+    return res.status(401).json({
+      error:
+        "Accès non autorisé. La demande de suite nécessite un token de session (sessionToken).",
+    });
+  }
+  if (isContinue && !lastAssistant && history.length < 2) {
+    return res.status(400).json({
+      error:
+        "Impossible de produire la suite : contexte insuffisant (last_assistant ou historique manquant).",
     });
   }
 
@@ -297,7 +342,8 @@ module.exports = async function handler(req, res) {
     const v = verifyToken(incomingToken, tokenSecret);
     if (!v.ok) {
       return res.status(401).json({
-        error: "Session invalide ou altérée. Veuillez relancer depuis le lien de confirmation de paiement.",
+        error:
+          "Session invalide ou altérée. Veuillez relancer depuis le lien de confirmation de paiement.",
         debug: { reason: v.reason },
       });
     }
@@ -315,15 +361,18 @@ module.exports = async function handler(req, res) {
     const itersLeft = Number(p.itersLeft);
     if (!Number.isFinite(itersLeft) || itersLeft < 0) {
       return res.status(401).json({
-        error: "Session invalide. Veuillez relancer depuis le lien de confirmation de paiement.",
+        error:
+          "Session invalide. Veuillez relancer depuis le lien de confirmation de paiement.",
         debug: { reason: "bad_iters" },
       });
     }
 
+    // ✅ En mode continue : on autorise itersLeft=0 uniquement si la session n’est pas expirée ?
+    // Non : on reste strict — si itersLeft==0, plus d’accès, même pour suite (sinon contournement).
     if (itersLeft <= 0) {
       return res.status(403).json({
         error:
-          "Limite atteinte : vos 5 itérations ont été utilisées. Pour poursuivre, contactez GhostOps ou basculez vers Studio Scénarios.",
+          "Limite atteinte : vos itérations ont été utilisées. Pour poursuivre, contactez GhostOps ou basculez vers Studio Scénarios.",
         meta: { itersLeft: 0, expiresAt: exp },
       });
     }
@@ -334,7 +383,7 @@ module.exports = async function handler(req, res) {
       exp,
     };
 
-    isFollowup = true; // dès qu’on a un token, on est en mode itération
+    isFollowup = true;
   } else {
     // Pas de token : on exige cs_id et on vérifie Stripe
     if (!csId) {
@@ -353,18 +402,16 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // Session initialisée : iters = MAX_ITERS, exp = now+TTL
     sessionCtx = {
       cs_id: check.session.id,
       itersLeft: MAX_ITERS,
       exp: now + TTL_SECONDS,
     };
 
-    // Ici, initial = note complète
     isFollowup = false;
   }
 
-  // 2) Construire prompts (initial vs follow-up)
+  // 2) Construire prompts (initial vs follow-up vs continue)
   const systemPrompt = `
 Tu es "GhostOps IA – Diagnostic", IA utilisée en back-office dans le produit payant
 "GhostOps Diagnostic IA – 90 minutes".
@@ -433,10 +480,36 @@ Contraintes :
 - Si limite de longueur : terminer proprement puis ajouter "— FIN TRONQUÉE (demander la suite)".
 `.trim();
 
-  const userPrompt = isFollowup ? userPromptFollowup : userPromptInitial;
+  // ✅ Nouveau : prompt "continue"
+  const userPromptContinue = `
+Nous sommes en "suite" d'une réponse tronquée.
 
-  // Le modèle : initial vs follow-up (et history peut aussi déclencher follow-up)
-  const model = (isFollowup || isFollowupFromHistory) ? modelFollowup : modelInitial;
+Contexte :
+- Extrait du dernier message assistant (peut être tronqué) :
+"""${lastAssistant || "(non fourni)"}"""
+
+- Historique (si présent) : utilise-le uniquement pour éviter de contredire / répéter.
+
+Instruction :
+- Continue exactement là où la réponse s’est arrêtée.
+- Ne répète pas les sections déjà données ; reprends au bon endroit.
+- Ne réécris pas l'introduction.
+- Garde le même style, même structure implicite.
+- Si tu dois rappeler une phrase de transition, fais-le en 1 ligne maximum.
+- Si tu atteins encore une limite, termine proprement puis ajoute "— FIN TRONQUÉE (demander la suite)".
+`.trim();
+
+  const userPrompt = isContinue
+    ? userPromptContinue
+    : isFollowup
+      ? userPromptFollowup
+      : userPromptInitial;
+
+  // Modèle : initial vs follow-up vs continue
+  const model = (isContinue || isFollowup || isFollowupFromHistory) ? modelFollowup : modelInitial;
+
+  // max tokens : normal vs continue
+  const maxOut = isContinue ? maxOutContinue : maxOutDefault;
 
   // 3) Appel OpenAI
   const controller = new AbortController();
@@ -471,7 +544,8 @@ Contraintes :
 
     if (!openaiResponse.ok) {
       return res.status(openaiResponse.status).json({
-        error: data?.error?.message || data?.message || `Erreur OpenAI (HTTP ${openaiResponse.status})`,
+        error:
+          data?.error?.message || data?.message || `Erreur OpenAI (HTTP ${openaiResponse.status})`,
         debug: {
           model,
           openaiStatus: openaiResponse.status,
@@ -489,8 +563,11 @@ Contraintes :
       });
     }
 
-    // 4) Décrément itérations (uniquement si réponse OK)
-    const newItersLeft = Math.max(0, Number(sessionCtx.itersLeft) - 1);
+    // 4) Décrément itérations
+    // ✅ Si "continue": ne décrémente pas.
+    const newItersLeft = isContinue
+      ? Math.max(0, Number(sessionCtx.itersLeft))
+      : Math.max(0, Number(sessionCtx.itersLeft) - 1);
 
     // 5) Nouveau token (rotation à chaque réponse)
     const newToken = signToken(
@@ -498,7 +575,7 @@ Contraintes :
         cs_id: sessionCtx.cs_id,
         itersLeft: newItersLeft,
         exp: sessionCtx.exp,
-        v: 1,
+        v: 2,
       },
       tokenSecret
     );
@@ -510,14 +587,17 @@ Contraintes :
       expiresAt: sessionCtx.exp,
       meta: {
         model,
-        followup: isFollowup || isFollowupFromHistory,
+        followup: Boolean(isContinue || isFollowup || isFollowupFromHistory),
+        continue: Boolean(isContinue),
         historyUsed: history.length,
+        max_output_tokens: maxOut,
       },
     });
   } catch (err) {
     if (err?.name === "AbortError") {
       return res.status(504).json({
-        error: "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre message).",
+        error:
+          "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre message).",
         debug: { model, timeoutMs: OPENAI_TIMEOUT_MS, max_output_tokens: maxOut },
       });
     }
