@@ -37,15 +37,6 @@ function extractReplyFromResponsesApi(data) {
   return "";
 }
 
-function safePreview(value, maxLen = 300) {
-  try {
-    const s = typeof value === "string" ? value : JSON.stringify(value);
-    return s.length > maxLen ? s.slice(0, maxLen) + "…" : s;
-  } catch {
-    return "";
-  }
-}
-
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
@@ -59,8 +50,13 @@ export default async function handler(req, res) {
     });
   }
 
-  // ✅ Modèle (par défaut), surcharge possible via env
-  const model = cleanStr(process.env.GHOSTOPS_DIAGNOSTIC_MODEL) || "gpt-5-mini";
+  // ✅ Pour stopper les 504 : modèle plus rapide par défaut (modifiable via env)
+  const model = cleanStr(process.env.GHOSTOPS_DIAGNOSTIC_MODEL) || "gpt-4.1-mini";
+
+  // ✅ Pour stopper les 504 : sortie plus courte par défaut (modifiable via env)
+  const maxOut =
+    Number(process.env.GHOSTOPS_DIAGNOSTIC_MAX_OUTPUT_TOKENS || "650") || 650;
+
   const contentType = req.headers["content-type"] || "";
 
   // --- Lecture body robuste ---
@@ -73,9 +69,7 @@ export default async function handler(req, res) {
   let raw = "";
   if (!body) {
     raw = await readRaw(req);
-    if (raw && raw.trim()) {
-      body = safeJsonParse(raw) || null;
-    }
+    if (raw && raw.trim()) body = safeJsonParse(raw) || null;
   }
 
   body = body || {};
@@ -85,6 +79,7 @@ export default async function handler(req, res) {
   const safeEnjeu = cleanStr(body.enjeu);
 
   console.log("[ghostops-diagnostic-ia] model:", model);
+  console.log("[ghostops-diagnostic-ia] max_output_tokens:", maxOut);
   console.log("[ghostops-diagnostic-ia] content-type:", contentType);
   console.log("[ghostops-diagnostic-ia] keys:", Object.keys(body || {}));
   console.log("[ghostops-diagnostic-ia] rawLen:", raw ? raw.length : 0);
@@ -98,7 +93,7 @@ export default async function handler(req, res) {
         contentType,
         receivedKeys: Object.keys(body || {}),
         rawLen: raw ? raw.length : 0,
-        rawSample: raw ? raw.slice(0, 300) : "",
+        rawSample: raw ? raw.slice(0, 200) : "",
       },
     });
   }
@@ -136,11 +131,23 @@ Structure obligatoire (titres exacts) :
    4.3. Risques Narratifs / Réputation
 5) Niveau de tension estimé (indication qualitative)
 6) Conclusion et intérêt d’une séance GhostOps Diagnostic IA – 90 minutes
+
+Contraintes :
+- Synthétique et sélectif.
+- Pas de plan d’exécution détaillé.
 `.trim();
+
+  // ✅ Timeout explicite (sinon Vercel finit en 504)
+  const OPENAI_TIMEOUT_MS =
+    Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "25000") || 25000;
+
+  const controller = new AbortController();
+  const t = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
 
   try {
     const openaiResponse = await fetch("https://api.openai.com/v1/responses", {
       method: "POST",
+      signal: controller.signal,
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
@@ -151,58 +158,60 @@ Structure obligatoire (titres exacts) :
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        max_output_tokens: 1100,
+        max_output_tokens: maxOut,
       }),
     });
 
     let data = {};
     try {
       data = await openaiResponse.json();
-    } catch (e) {
-      // Réponse non-JSON (rare), on remonte un message exploitable
+    } catch {
       return res.status(502).json({
         error: "Réponse non-JSON reçue depuis OpenAI.",
-        debug: {
-          model,
-          openaiStatus: openaiResponse.status,
-          openaiStatusText: openaiResponse.statusText,
-        },
+        debug: { model, openaiStatus: openaiResponse.status },
       });
     }
 
     if (!openaiResponse.ok) {
-      // ✅ on renvoie un debug utile (sans exposer la clé)
-      const errMsg =
-        data?.error?.message ||
-        data?.message ||
-        `Erreur OpenAI (HTTP ${openaiResponse.status})`;
-
       return res.status(openaiResponse.status).json({
-        error: errMsg,
+        error:
+          data?.error?.message ||
+          data?.message ||
+          `Erreur OpenAI (HTTP ${openaiResponse.status})`,
         debug: {
           model,
           openaiStatus: openaiResponse.status,
-          openaiType: data?.error?.type || data?.type || "",
-          openaiCode: data?.error?.code || data?.code || "",
-          // petit extrait pour compréhension (évite d’inonder)
-          openaiPreview: safePreview(data, 400),
+          openaiType: data?.error?.type || "",
+          openaiCode: data?.error?.code || "",
         },
       });
     }
 
-    const reply =
-      extractReplyFromResponsesApi(data) || "Je n’ai pas pu générer de pré-diagnostic utile.";
+    const reply = extractReplyFromResponsesApi(data);
+    if (!reply) {
+      return res.status(502).json({
+        error: "Réponse OpenAI reçue, mais texte introuvable.",
+        debug: { model },
+      });
+    }
 
     return res.status(200).json({ reply });
   } catch (err) {
+    // Timeout OpenAI
+    if (err?.name === "AbortError") {
+      return res.status(504).json({
+        error:
+          "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre description).",
+        debug: { model, timeoutMs: OPENAI_TIMEOUT_MS, max_output_tokens: maxOut },
+      });
+    }
+
     console.error("[ghostops-diagnostic-ia] fatal:", err);
     return res.status(500).json({
-      error: "Une erreur interne est survenue lors de l’appel au moteur GhostOps Diagnostic IA.",
-      debug: {
-        model,
-        contentType,
-        message: err?.message || String(err),
-      },
+      error: "Erreur interne lors de l’appel au moteur GhostOps Diagnostic IA.",
+      debug: { model, message: err?.message || String(err) },
     });
+  } finally {
+    clearTimeout(t);
   }
 }
