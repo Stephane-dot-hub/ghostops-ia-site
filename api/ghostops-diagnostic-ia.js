@@ -1,17 +1,23 @@
 // /api/ghostops-diagnostic-ia.js
 
-export const config = {
-  api: {
-    bodyParser: true, // on reste simple : JSON / urlencoded gérés par Next/Vercel
-  },
-};
+async function readRaw(req) {
+  return await new Promise((resolve, reject) => {
+    try {
+      let data = "";
+      req.on("data", (chunk) => (data += chunk));
+      req.on("end", () => resolve(data));
+      req.on("error", reject);
+    } catch (e) {
+      reject(e);
+    }
+  });
+}
 
-function toCleanString(v) {
+function cleanStr(v) {
   return typeof v === "string" ? v.trim() : "";
 }
 
 export default async function handler(req, res) {
-  // Autoriser uniquement le POST
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
     return res.status(405).json({ error: "Méthode non autorisée. Utilisez POST." });
@@ -24,54 +30,62 @@ export default async function handler(req, res) {
     });
   }
 
-  // Payload (comme le chat) : on lit req.body, point.
-  const body = req.body || {};
+  const contentType = req.headers["content-type"] || "";
 
-  // Alignement “chat” :
-  // - la page Diagnostic peut envoyer { message: "..." }
-  // - l’API accepte aussi { description: "..." }
-  const effectiveDescription = toCleanString(body.description) || toCleanString(body.message);
+  // 1) Tentative body déjà parsé
+  let body = (req.body && typeof req.body === "object") ? req.body : null;
 
-  const safeContexte = toCleanString(body.contexte);
-  const safeEnjeu = toCleanString(body.enjeu);
+  // 2) Si req.body est une string JSON (ça arrive selon runtime)
+  if (!body && typeof req.body === "string" && req.body.trim()) {
+    try { body = JSON.parse(req.body); } catch { body = null; }
+  }
 
-  // Logs minimalistes (utiles en prod sans bruit excessif)
+  // 3) Sinon, lecture brute
+  let raw = "";
+  if (!body) {
+    raw = await readRaw(req);
+    if (raw && raw.trim()) {
+      try { body = JSON.parse(raw); } catch { body = null; }
+    }
+  }
+
+  body = body || {};
+
+  const effectiveDescription = cleanStr(body.description) || cleanStr(body.message);
+  const safeContexte = cleanStr(body.contexte);
+  const safeEnjeu = cleanStr(body.enjeu);
+
+  console.log("[ghostops-diagnostic-ia] content-type:", contentType);
   console.log("[ghostops-diagnostic-ia] keys:", Object.keys(body || {}));
-  console.log("[ghostops-diagnostic-ia] description length:", effectiveDescription.length);
+  console.log("[ghostops-diagnostic-ia] rawLen:", raw ? raw.length : 0);
+  console.log("[ghostops-diagnostic-ia] descLen:", effectiveDescription.length);
 
   if (!effectiveDescription) {
     return res.status(400).json({
       error: 'Le champ "description" est obligatoire pour le diagnostic.',
-      debug: { receivedKeys: Object.keys(body || {}) },
+      debug: {
+        contentType,
+        receivedKeys: Object.keys(body || {}),
+        rawLen: raw ? raw.length : 0,
+        rawSample: raw ? raw.slice(0, 300) : "",
+      },
     });
   }
 
-  // Prompts
   const systemPrompt = `
 Tu es "GhostOps IA – Diagnostic", IA utilisée en back-office dans le produit payant
 "GhostOps Diagnostic IA – 90 minutes".
-
-Ta mission :
-- produire une lecture tactique structurée d'une situation complexe
-  (crise RH, dirigeant exposé, jeux de pouvoir internes, blocages de gouvernance,
-   enjeux d'influence interne/externe),
-- sans résoudre totalement le cas,
-- et sans te substituer à un conseil humain (juridique, RH, gouvernance).
 
 Règles :
 - Réponds en français, ton formel, professionnel, sobre.
 - Pas de conseil juridique formel, pas de stratégie procédurale détaillée, pas de qualification pénale.
 - Aucune manœuvre illégale, représailles ou contournement de règles.
 - Niveau "lecture tactique" : clarification, cartographie, options de lecture, questions structurantes.
-- Style assumable devant un board (clair, dense, sans jargon creux).
+- Style assumable devant un board.
 - Termine par : "Ce pré-diagnostic ne remplace ni un avis juridique, ni un conseil RH individualisé, ni une mission GhostOps complète."
 `.trim();
 
   const userPrompt = `
-Tu vas produire un pré-diagnostic structuré à partir des éléments suivants.
-
-Données fournies par l’utilisateur :
-
 - Description principale :
 """${effectiveDescription}"""
 
@@ -81,8 +95,7 @@ Données fournies par l’utilisateur :
 - Enjeux / risques perçus (si présent) :
 """${safeEnjeu}"""
 
-Ta réponse doit suivre strictement la structure ci-dessous, avec les titres exacts :
-
+Structure obligatoire (titres exacts) :
 1) Synthèse de la situation telle que je la comprends
 2) Points de tension majeurs
 3) Questions à clarifier en priorité lors du Diagnostic IA (90 min)
@@ -92,11 +105,6 @@ Ta réponse doit suivre strictement la structure ci-dessous, avec les titres exa
    4.3. Risques Narratifs / Réputation
 5) Niveau de tension estimé (indication qualitative)
 6) Conclusion et intérêt d’une séance GhostOps Diagnostic IA – 90 minutes
-
-Contraintes :
-- Synthétique et sélectif.
-- Pas de plan d’exécution détaillé.
-- Ne modifie pas les titres.
 `.trim();
 
   try {
@@ -125,19 +133,13 @@ Contraintes :
       });
     }
 
-    // Extraction texte (Responses API)
-    let reply = "Je n’ai pas pu générer de pré-diagnostic utile.";
-
     const out0 = data?.output?.[0];
-    const outText =
+    const reply =
       out0?.content?.find?.((c) => c?.type === "output_text")?.text ||
-      out0?.content?.[0]?.text;
+      out0?.content?.[0]?.text ||
+      "Je n’ai pas pu générer de pré-diagnostic utile.";
 
-    if (typeof outText === "string" && outText.trim()) {
-      reply = outText.trim();
-    }
-
-    return res.status(200).json({ reply });
+    return res.status(200).json({ reply: String(reply).trim() });
   } catch (err) {
     console.error("[ghostops-diagnostic-ia] fatal:", err);
     return res.status(500).json({
