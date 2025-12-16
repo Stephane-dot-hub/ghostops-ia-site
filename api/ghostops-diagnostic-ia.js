@@ -17,6 +17,27 @@ function cleanStr(v) {
   return typeof v === "string" ? v.trim() : "";
 }
 
+function safeJsonParse(s) {
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
+}
+
+function extractReplyFromResponsesApi(data) {
+  // Format Responses API : data.output = [{ content: [{type:'output_text', text:'...'}]}]
+  const out0 = data?.output?.[0];
+  if (!out0?.content) return "";
+
+  const hit =
+    out0.content.find?.((c) => c?.type === "output_text" && typeof c?.text === "string") ||
+    out0.content[0];
+
+  if (typeof hit?.text === "string") return hit.text.trim();
+  return "";
+}
+
 export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
@@ -30,14 +51,17 @@ export default async function handler(req, res) {
     });
   }
 
+  // ✅ Modèle valide (par défaut), surcharge possible via env
+  const model = cleanStr(process.env.GHOSTOPS_DIAGNOSTIC_MODEL) || "gpt-5-mini";
+
   const contentType = req.headers["content-type"] || "";
 
   // 1) Tentative body déjà parsé
-  let body = (req.body && typeof req.body === "object") ? req.body : null;
+  let body = req.body && typeof req.body === "object" ? req.body : null;
 
-  // 2) Si req.body est une string JSON (ça arrive selon runtime)
+  // 2) Si req.body est une string JSON (selon runtime)
   if (!body && typeof req.body === "string" && req.body.trim()) {
-    try { body = JSON.parse(req.body); } catch { body = null; }
+    body = safeJsonParse(req.body) || null;
   }
 
   // 3) Sinon, lecture brute
@@ -45,16 +69,18 @@ export default async function handler(req, res) {
   if (!body) {
     raw = await readRaw(req);
     if (raw && raw.trim()) {
-      try { body = JSON.parse(raw); } catch { body = null; }
+      body = safeJsonParse(raw) || null;
     }
   }
 
   body = body || {};
 
+  // ✅ Alignement chat : on accepte description OU message
   const effectiveDescription = cleanStr(body.description) || cleanStr(body.message);
   const safeContexte = cleanStr(body.contexte);
   const safeEnjeu = cleanStr(body.enjeu);
 
+  console.log("[ghostops-diagnostic-ia] model:", model);
   console.log("[ghostops-diagnostic-ia] content-type:", contentType);
   console.log("[ghostops-diagnostic-ia] keys:", Object.keys(body || {}));
   console.log("[ghostops-diagnostic-ia] rawLen:", raw ? raw.length : 0);
@@ -64,6 +90,7 @@ export default async function handler(req, res) {
     return res.status(400).json({
       error: 'Le champ "description" est obligatoire pour le diagnostic.',
       debug: {
+        model,
         contentType,
         receivedKeys: Object.keys(body || {}),
         rawLen: raw ? raw.length : 0,
@@ -115,7 +142,7 @@ Structure obligatoire (titres exacts) :
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: "gpt-5.1-mini",
+        model,
         input: [
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
@@ -133,13 +160,9 @@ Structure obligatoire (titres exacts) :
       });
     }
 
-    const out0 = data?.output?.[0];
-    const reply =
-      out0?.content?.find?.((c) => c?.type === "output_text")?.text ||
-      out0?.content?.[0]?.text ||
-      "Je n’ai pas pu générer de pré-diagnostic utile.";
+    const reply = extractReplyFromResponsesApi(data) || "Je n’ai pas pu générer de pré-diagnostic utile.";
 
-    return res.status(200).json({ reply: String(reply).trim() });
+    return res.status(200).json({ reply });
   } catch (err) {
     console.error("[ghostops-diagnostic-ia] fatal:", err);
     return res.status(500).json({
