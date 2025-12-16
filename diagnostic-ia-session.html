@@ -290,7 +290,7 @@
             </div>
 
             <!-- Zone d'échanges IA -->
-            <div class="bg-gray-950/80 rounded-xl border border-gray-700 max-h-[360px] flex flex-col">
+            <div class="bg-gray-950/80 rounded-xl border border-gray-700 max-h-[420px] flex flex-col">
               <!-- Messages -->
               <div
                 id="diagnostic-chat-messages"
@@ -303,6 +303,23 @@
                     Ensuite, utilisez vos 5 itérations pour approfondir : décisions à 10 jours, options A/B/C, angles morts, conditions de succès.
                   </span>
                 </div>
+              </div>
+
+              <!-- Barre "suite" (affichée uniquement si tronqué) -->
+              <div
+                id="diag-continue-bar"
+                class="hidden border-t border-gray-800 px-3 py-2 flex items-center justify-between gap-2 bg-gray-950/90"
+              >
+                <div class="text-[11px] md:text-xs text-gray-300">
+                  La réponse semble tronquée. Vous pouvez demander la suite sans consommer d’itération.
+                </div>
+                <button
+                  id="diag-continue-btn"
+                  type="button"
+                  class="text-[11px] md:text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  Afficher la suite
+                </button>
               </div>
 
               <!-- Formulaire -->
@@ -368,7 +385,12 @@
         const messages = document.getElementById("diagnostic-chat-messages");
         const sendBtn = document.getElementById("diagnostic-send-btn");
 
+        // Continue UI
+        const continueBar = document.getElementById("diag-continue-bar");
+        const continueBtn = document.getElementById("diag-continue-btn");
+
         const MAX_ITERS = 5;
+        const TRUNC_MARKER = "— FIN TRONQUÉE (demander la suite)";
 
         // Token GhostOps (obtenu après validation Stripe)
         let sessionToken = "";
@@ -379,11 +401,32 @@
         // Historique pour itérations (envoyé au backend)
         const convo = []; // [{role:'user'|'assistant', content:'...'}]
 
+        // Mémo "suite"
+        let lastAssistantReply = "";
+        let lastWasTruncated = false;
+        let isTyping = false;
+
         function show(el) {
           if (el) el.classList.remove("hidden");
         }
         function hide(el) {
           if (el) el.classList.add("hidden");
+        }
+
+        function hideContinue() {
+          lastWasTruncated = false;
+          hide(continueBar);
+          if (continueBtn) continueBtn.disabled = false;
+        }
+
+        function maybeShowContinueFromText(text) {
+          const t = String(text || "");
+          lastWasTruncated = t.includes(TRUNC_MARKER);
+          if (lastWasTruncated && continueBar) {
+            show(continueBar);
+          } else {
+            hideContinue();
+          }
         }
 
         function scrollToBottom() {
@@ -411,6 +454,7 @@
           if (!sendBtn || !input) return;
           sendBtn.disabled = locked;
           input.disabled = locked;
+          if (continueBtn) continueBtn.disabled = locked;
         }
 
         function renderIters() {
@@ -459,6 +503,7 @@
 
         function hardEndToExpiredScreen(message) {
           setLockedUI(true);
+          hideContinue();
           if (message) addMessage("bot", message);
           hide(validatingBlock);
           hide(paidBlock);
@@ -466,8 +511,6 @@
           show(expiredBlock);
         }
 
-        // ✅ NOUVEAU : on ne valide plus via /api/ghostops-diagnostic-session.
-        // On effectue la validation au 1er "send" via /api/ghostops-diagnostic-ia avec cs_id.
         async function openPaidUIOrFallback() {
           hide(notPaidBlock);
           hide(expiredBlock);
@@ -479,18 +522,13 @@
             return;
           }
 
-          // On n'appelle pas l'API ici (pas de "message" encore).
-          // On ouvre l’UI, et le premier envoi déclenchera la validation Stripe + token serveur.
           hide(validatingBlock);
           show(paidBlock);
           renderIters();
-          // Le compte à rebours commencera dès qu'on aura expiresAt du serveur.
           if (expiryEl) expiryEl.textContent = "—";
         }
 
-        // Effet typewriter
-        let isTyping = false;
-        function addBotMessageTypewriter(text) {
+        function addBotMessageTypewriter(text, { onDone } = {}) {
           const { bubble } = addMessage("bot", "");
           let index = 0;
           isTyping = true;
@@ -506,6 +544,7 @@
               isTyping = false;
               const ok = itersLeft > 0 && (!expiresAtMs || Date.now() < expiresAtMs);
               setLockedUI(!ok);
+              if (typeof onDone === "function") onDone();
             }
           }
 
@@ -520,19 +559,15 @@
           return true;
         }
 
-        // ✅ IMPORTANT : l’API sécurisée renvoie itersLeft, expiresAt et surtout un sessionToken ROTATIF.
         function applyServerSessionState(data) {
-          // token
           if (typeof data?.sessionToken === "string" && data.sessionToken.trim()) {
             sessionToken = data.sessionToken.trim();
           }
 
-          // iters
           if (Number.isFinite(Number(data?.itersLeft))) {
             itersLeft = Number(data.itersLeft);
           }
 
-          // expiresAt (en secondes UNIX côté API -> ms ici)
           if (Number.isFinite(Number(data?.expiresAt))) {
             expiresAtMs = Number(data.expiresAt) * 1000;
           } else if (Number.isFinite(Number(data?.expiresAtMs))) {
@@ -540,14 +575,53 @@
           }
 
           renderIters();
-
           if (expiresAtMs) startCountdown();
+        }
+
+        async function callDiagnosticApi({ message, continueMode }) {
+          const payload = {
+            message,
+            contexte: "",
+            enjeu: "",
+            mode: "diagnostic-ia-session-v1",
+            history: convo,
+          };
+
+          if (continueMode) {
+            payload.continue = true;
+            payload.last_assistant = lastAssistantReply || "";
+          }
+
+          if (!sessionToken) {
+            payload.cs_id = csId;
+          } else {
+            payload.sessionToken = sessionToken;
+          }
+
+          const resp = await fetch("/api/ghostops-diagnostic-ia", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
+            },
+            body: JSON.stringify(payload),
+          });
+
+          let data = {};
+          try {
+            data = await resp.json();
+          } catch (_) {}
+
+          return { resp, data };
         }
 
         async function sendMessage() {
           if (isTyping) return;
 
-          // Expiration locale si on la connaît déjà
+          // si une "suite" est disponible, on ne la masque pas tant qu'elle n'est pas demandée
+          // mais dès qu'un nouveau message utilisateur part, on masque le bouton
+          hideContinue();
+
           if (expiresAtMs && Date.now() >= expiresAtMs) {
             hardEndToExpiredScreen("Session expirée. Pour poursuivre, contactez GhostOps ou activez un format supérieur.");
             return;
@@ -567,35 +641,7 @@
           setLockedUI(true);
 
           try {
-            const payload = {
-              message: userMessage,
-              contexte: "",
-              enjeu: "",
-              mode: "diagnostic-ia-session-v1",
-              history: convo,
-            };
-
-            // 1er appel : on envoie cs_id si pas encore de token
-            if (!sessionToken) {
-              payload.cs_id = csId;
-            } else {
-              payload.sessionToken = sessionToken;
-            }
-
-            const resp = await fetch("/api/ghostops-diagnostic-ia", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                // double compat : header + body
-                ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
-              },
-              body: JSON.stringify(payload),
-            });
-
-            let data = {};
-            try {
-              data = await resp.json();
-            } catch (_) {}
+            const { resp, data } = await callDiagnosticApi({ message: userMessage, continueMode: false });
 
             if (waiting?.wrapper?.parentNode) waiting.wrapper.parentNode.removeChild(waiting.wrapper);
 
@@ -604,7 +650,6 @@
                 data?.error ||
                 `Une erreur est survenue lors du Diagnostic IA (HTTP ${resp.status}). Veuillez réessayer.`;
 
-              // Cas “session terminée” (serveur)
               if (resp.status === 401 || resp.status === 403) {
                 addMessage("bot", errMsg);
                 hardEndToExpiredScreen("");
@@ -622,15 +667,25 @@
               return;
             }
 
-            // ✅ Appliquer l’état serveur : token rotatif + itersLeft + expiresAt
+            // Etat serveur
             applyServerSessionState(data);
 
-            // Ajouter réponse au contexte
-            convo.push({ role: "assistant", content: String(data.reply) });
+            // Décrémentation UI : UNIQUEMENT si ce n'est pas un continue (ici non)
+            // (Le vrai verrou doit être côté serveur)
+            // => on ne décrémente pas ici, car l’API renvoie itersLeft à jour
+            // et le serveur est la source de vérité.
 
-            addBotMessageTypewriter(String(data.reply));
+            // contexte
+            const replyText = String(data.reply);
+            lastAssistantReply = replyText;
+            convo.push({ role: "assistant", content: replyText });
 
-            // Si le serveur dit 0 itérations restantes : écran fin
+            addBotMessageTypewriter(replyText, {
+              onDone: () => {
+                maybeShowContinueFromText(replyText);
+              },
+            });
+
             if (itersLeft <= 0) {
               hardEndToExpiredScreen(
                 "Vous avez atteint la limite des 5 itérations. Pour aller plus loin, GhostOps peut activer un Studio Scénarios ou produire une note Pré-brief Board."
@@ -647,6 +702,85 @@
           }
         }
 
+        async function requestContinue() {
+          if (isTyping) return;
+          if (!lastWasTruncated) return;
+
+          if (expiresAtMs && Date.now() >= expiresAtMs) {
+            hardEndToExpiredScreen("Session expirée. Pour poursuivre, contactez GhostOps ou activez un format supérieur.");
+            return;
+          }
+
+          // IMPORTANT : la suite ne doit pas consommer d’itération (côté serveur à faire aussi)
+          // On envoie un message "virtuel" au backend en mode continue.
+          const waiting = addMessage("bot", "Suite en cours…");
+          setLockedUI(true);
+          if (continueBtn) continueBtn.disabled = true;
+
+          try {
+            const { resp, data } = await callDiagnosticApi({
+              message: "Suite, merci.",
+              continueMode: true,
+            });
+
+            if (waiting?.wrapper?.parentNode) waiting.wrapper.parentNode.removeChild(waiting.wrapper);
+
+            if (!resp.ok) {
+              const errMsg =
+                data?.error ||
+                `Une erreur est survenue lors de la suite (HTTP ${resp.status}). Veuillez réessayer.`;
+
+              if (resp.status === 401 || resp.status === 403) {
+                addMessage("bot", errMsg);
+                hardEndToExpiredScreen("");
+                return;
+              }
+
+              addMessage("bot", errMsg);
+              setLockedUI(false);
+              if (continueBtn) continueBtn.disabled = false;
+              return;
+            }
+
+            if (!data?.reply) {
+              addMessage("bot", "Réponse inattendue du serveur. Veuillez réessayer.");
+              setLockedUI(false);
+              if (continueBtn) continueBtn.disabled = false;
+              return;
+            }
+
+            // Etat serveur (token rotatif / expiration). IMPORTANT : itersLeft ne doit pas bouger si continue.
+            applyServerSessionState(data);
+
+            const replyText = String(data.reply);
+
+            // concat logique : on stocke la nouvelle fin comme dernier assistant
+            lastAssistantReply = replyText;
+            convo.push({ role: "assistant", content: replyText });
+
+            // masquer la barre avant d'afficher la suite (elle pourra réapparaître si la suite est elle-même tronquée)
+            hideContinue();
+
+            addBotMessageTypewriter(replyText, {
+              onDone: () => {
+                maybeShowContinueFromText(replyText);
+              },
+            });
+          } catch (err) {
+            console.error("Erreur lors du continue:", err);
+            if (waiting?.wrapper?.parentNode) waiting.wrapper.parentNode.removeChild(waiting.wrapper);
+            addMessage("bot", "Erreur de connexion. Veuillez réessayer.");
+            setLockedUI(false);
+            if (continueBtn) continueBtn.disabled = false;
+          }
+        }
+
+        if (continueBtn) {
+          continueBtn.addEventListener("click", () => {
+            requestContinue();
+          });
+        }
+
         if (form && input) {
           form.addEventListener("submit", (e) => {
             e.preventDefault();
@@ -661,7 +795,6 @@
           });
         }
 
-        // Init
         openPaidUIOrFallback();
       })();
     </script>
