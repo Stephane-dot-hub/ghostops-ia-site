@@ -1,1 +1,7 @@
-
+{
+  "functions": {
+    "api/ghostops-diagnostic-ia.js": {
+      "maxDuration": 60
+    }
+  }
+}
