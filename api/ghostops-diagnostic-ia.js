@@ -1,99 +1,50 @@
 // /api/ghostops-diagnostic-ia.js
 
-async function readRawBody(req) {
-  return await new Promise((resolve, reject) => {
-    try {
-      let data = '';
-      req.on('data', (chunk) => {
-        data += chunk;
-      });
-      req.on('end', () => resolve(data));
-      req.on('error', (err) => reject(err));
-    } catch (e) {
-      reject(e);
-    }
-  });
-}
+export const config = {
+  api: {
+    bodyParser: true, // on reste simple : JSON / urlencoded gérés par Next/Vercel
+  },
+};
 
-async function readJsonPayload(req) {
-  // 1) Si déjà parsé (cas Next.js classique)
-  if (req.body && typeof req.body === 'object') return req.body;
-
-  // 2) Si body fourni en string
-  if (typeof req.body === 'string' && req.body.trim()) {
-    try {
-      return JSON.parse(req.body);
-    } catch {
-      return {};
-    }
-  }
-
-  // 3) Sinon: lecture brute du flux HTTP (cas Vercel/serverless selon configuration)
-  const raw = await readRawBody(req);
-  if (!raw || !raw.trim()) return {};
-
-  try {
-    return JSON.parse(raw);
-  } catch {
-    return {};
-  }
-}
-
-function pickFirstNonEmptyString(...vals) {
-  for (const v of vals) {
-    if (typeof v === 'string' && v.trim().length > 0) return v.trim();
-  }
-  return '';
+function toCleanString(v) {
+  return typeof v === "string" ? v.trim() : "";
 }
 
 export default async function handler(req, res) {
   // Autoriser uniquement le POST
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    return res.status(405).json({ error: 'Méthode non autorisée. Utilisez POST.' });
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).json({ error: "Méthode non autorisée. Utilisez POST." });
   }
 
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     return res.status(500).json({
-      error: 'OPENAI_API_KEY non configurée sur le serveur (Vercel > Variables d’environnement).',
+      error: "OPENAI_API_KEY non configurée sur le serveur (Vercel > Variables d’environnement).",
     });
   }
 
-  // Lecture payload robuste
-  let payload = {};
-  try {
-    payload = await readJsonPayload(req);
-  } catch (e) {
-    console.error('Diagnostic IA - impossible de lire le body :', e);
-    payload = {};
-  }
+  // Payload (comme le chat) : on lit req.body, point.
+  const body = req.body || {};
 
-  // IMPORTANT : log utile (à regarder dans Vercel > Functions logs)
-  console.log('Diagnostic IA payload reçu :', payload);
+  // Alignement “chat” :
+  // - la page Diagnostic peut envoyer { message: "..." }
+  // - l’API accepte aussi { description: "..." }
+  const effectiveDescription = toCleanString(body.description) || toCleanString(body.message);
 
-  const description = payload?.description;
-  const message = payload?.message;
-  const contexte = payload?.contexte;
-  const enjeu = payload?.enjeu;
+  const safeContexte = toCleanString(body.contexte);
+  const safeEnjeu = toCleanString(body.enjeu);
 
-  // On accepte description OU message
-  const effectiveDescription = pickFirstNonEmptyString(description, message);
+  // Logs minimalistes (utiles en prod sans bruit excessif)
+  console.log("[ghostops-diagnostic-ia] keys:", Object.keys(body || {}));
+  console.log("[ghostops-diagnostic-ia] description length:", effectiveDescription.length);
 
   if (!effectiveDescription) {
-    // Log raw utile pour trancher définitivement
-    try {
-      const raw = await readRawBody(req);
-      console.log('Diagnostic IA raw body (debug) :', raw);
-    } catch (_) {}
-
     return res.status(400).json({
       error: 'Le champ "description" est obligatoire pour le diagnostic.',
+      debug: { receivedKeys: Object.keys(body || {}) },
     });
   }
-
-  const safeContexte = typeof contexte === 'string' ? contexte : '';
-  const safeEnjeu = typeof enjeu === 'string' ? enjeu : '';
 
   // Prompts
   const systemPrompt = `
@@ -149,17 +100,17 @@ Contraintes :
 `.trim();
 
   try {
-    const openaiResponse = await fetch('https://api.openai.com/v1/responses', {
-      method: 'POST',
+    const openaiResponse = await fetch("https://api.openai.com/v1/responses", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
-        model: 'gpt-5.1-mini',
+        model: "gpt-5.1-mini",
         input: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
         ],
         max_output_tokens: 1100,
       }),
@@ -168,28 +119,29 @@ Contraintes :
     const data = await openaiResponse.json();
 
     if (!openaiResponse.ok) {
-      console.error('Erreur OpenAI Diagnostic IA :', data);
+      console.error("[ghostops-diagnostic-ia] OpenAI error:", data);
       return res.status(openaiResponse.status).json({
         error: data?.error?.message || `Erreur OpenAI (HTTP ${openaiResponse.status})`,
       });
     }
 
-    let reply = 'Je n’ai pas pu générer de pré-diagnostic utile.';
+    // Extraction texte (Responses API)
+    let reply = "Je n’ai pas pu générer de pré-diagnostic utile.";
 
-    // Format Responses API
-    const maybeText =
-      data?.output?.[0]?.content?.find?.((c) => c?.type === 'output_text')?.text ||
-      data?.output?.[0]?.content?.[0]?.text;
+    const out0 = data?.output?.[0];
+    const outText =
+      out0?.content?.find?.((c) => c?.type === "output_text")?.text ||
+      out0?.content?.[0]?.text;
 
-    if (typeof maybeText === 'string' && maybeText.trim()) {
-      reply = maybeText.trim();
+    if (typeof outText === "string" && outText.trim()) {
+      reply = outText.trim();
     }
 
     return res.status(200).json({ reply });
   } catch (err) {
-    console.error('Erreur lors de l’appel à OpenAI (Diagnostic IA) :', err);
+    console.error("[ghostops-diagnostic-ia] fatal:", err);
     return res.status(500).json({
-      error: 'Une erreur interne est survenue lors de l’appel au moteur GhostOps Diagnostic IA.',
+      error: "Une erreur interne est survenue lors de l’appel au moteur GhostOps Diagnostic IA.",
     });
   }
 }
