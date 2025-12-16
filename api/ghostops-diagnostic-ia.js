@@ -50,12 +50,12 @@ export default async function handler(req, res) {
     });
   }
 
-  // ✅ Pour stopper les 504 : modèle plus rapide par défaut (modifiable via env)
+  // ✅ Modèle rapide (modifiable via env)
   const model = cleanStr(process.env.GHOSTOPS_DIAGNOSTIC_MODEL) || "gpt-4.1-mini";
 
-  // ✅ Pour stopper les 504 : sortie plus courte par défaut (modifiable via env)
+  // ✅ Sortie par défaut plus longue : 1110 tokens (modifiable via env)
   const maxOut =
-    Number(process.env.GHOSTOPS_DIAGNOSTIC_MAX_OUTPUT_TOKENS || "650") || 650;
+    Number(process.env.GHOSTOPS_DIAGNOSTIC_MAX_OUTPUT_TOKENS || "1110") || 1110;
 
   const contentType = req.headers["content-type"] || "";
 
@@ -135,11 +135,13 @@ Structure obligatoire (titres exacts) :
 Contraintes :
 - Synthétique et sélectif.
 - Pas de plan d’exécution détaillé.
+- Si vous atteignez une limite de longueur, terminez la phrase proprement puis ajoutez :
+  "— FIN TRONQUÉE (demander la suite)".
 `.trim();
 
-  // ✅ Timeout explicite (sinon Vercel finit en 504)
+  // ✅ Timeout explicite (à augmenter légèrement si sortie plus longue)
   const OPENAI_TIMEOUT_MS =
-    Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "25000") || 25000;
+    Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "35000") || 35000;
 
   const controller = new AbortController();
   const t = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
@@ -197,7 +199,6 @@ Contraintes :
 
     return res.status(200).json({ reply });
   } catch (err) {
-    // Timeout OpenAI
     if (err?.name === "AbortError") {
       return res.status(504).json({
         error:
