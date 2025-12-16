@@ -23,22 +23,28 @@ module.exports = async function handler(req, res) {
     });
   }
 
+  // Stripe client
   const stripe = new Stripe(stripeSecretKey);
 
   try {
-    const origin =
-      req.headers.origin ||
+    // Origin fiable : header > URL publique configurée > VERCEL_URL > localhost
+    const publicOrigin =
+      process.env.PUBLIC_SITE_ORIGIN ||
       (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
 
-    // Optionnel : durée de validité de la Checkout Session (ex: 1h)
-    // Stripe attend un timestamp UNIX (en secondes)
+    const origin = req.headers.origin || publicOrigin;
+
+    // Durée de validité de la Checkout Session (timestamp UNIX en secondes)
     const now = Math.floor(Date.now() / 1000);
     const expiresInSeconds = Number(process.env.STRIPE_CHECKOUT_EXPIRES_IN || "3600") || 3600;
     const expiresAt = now + expiresInSeconds;
 
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
+
+      // (Optionnel) vous pouvez supprimer cette ligne : Stripe déduira automatiquement selon config
       payment_method_types: ["card"],
+
       line_items: [
         {
           price: priceId, // prix géré côté Stripe (Diagnostic IA – 790 € TTC)
@@ -46,7 +52,7 @@ module.exports = async function handler(req, res) {
         },
       ],
 
-      // 🔁 Après paiement OK → redirection vers l’espace IA (avec l’ID Stripe)
+      // ✅ Après paiement OK → redirection vers l’espace IA avec l’ID Stripe
       // Stripe remplacera automatiquement {CHECKOUT_SESSION_ID}
       success_url: `${origin}/diagnostic-ia-session.html?cs_id={CHECKOUT_SESSION_ID}`,
 
@@ -58,14 +64,13 @@ module.exports = async function handler(req, res) {
         product: "ghostops_diagnostic_ia",
       },
 
-      // Optionnel mais utile pour retrouver une session côté Stripe
+      // Utile côté Stripe pour tracer
       client_reference_id: "ghostops_diagnostic_ia",
 
-      // Optionnel : expiration de la Checkout Session (limite le “replay”)
-      // Si vous ne voulez pas d’expiration Stripe, supprimez cette ligne.
+      // Expiration de la Checkout Session (limite certains “replay”)
       expires_at: expiresAt,
 
-      // Optionnel : metadata aussi au niveau PaymentIntent
+      // Metadata également au niveau PaymentIntent
       payment_intent_data: {
         metadata: {
           product: "ghostops_diagnostic_ia",
