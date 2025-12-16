@@ -106,6 +106,21 @@
     </header>
 
     <main class="px-6 md:px-24 pb-24">
+      <!-- BLOC EN COURS DE VALIDATION -->
+      <section id="diagnostic-validating" class="hidden max-w-3xl mx-auto mt-10 mb-10">
+        <div class="bg-gray-900/60 border border-gray-700 rounded-2xl p-6 md:p-8">
+          <h1 class="text-2xl md:text-3xl font-bold mb-3 text-white text-shadow">
+            Vérification de votre accès…
+          </h1>
+          <p class="text-gray-200 text-sm md:text-base mb-3">
+            Nous validons votre session de paiement afin d’ouvrir l’espace Diagnostic IA.
+          </p>
+          <p class="text-gray-400 text-xs md:text-sm">
+            Si la vérification échoue, vous serez redirigé vers l’écran d’accès réservé.
+          </p>
+        </div>
+      </section>
+
       <!-- BLOC SI PAIEMENT NON DÉTECTÉ -->
       <section id="diagnostic-not-paid" class="hidden max-w-3xl mx-auto mt-10 mb-10">
         <div class="bg-red-900/40 border border-red-500/70 rounded-2xl p-6 md:p-8">
@@ -142,14 +157,46 @@
         </div>
       </section>
 
+      <!-- BLOC SI SESSION EXPIRÉE / LIMITES ATTEINTES -->
+      <section id="diagnostic-expired" class="hidden max-w-3xl mx-auto mt-10 mb-10">
+        <div class="bg-amber-900/30 border border-amber-500/70 rounded-2xl p-6 md:p-8">
+          <h1 class="text-2xl md:text-3xl font-bold mb-3 text-white text-shadow">
+            Session terminée
+          </h1>
+          <p class="text-gray-200 text-sm md:text-base mb-3">
+            Cette session Diagnostic IA est arrivée à son terme (expiration ou itérations consommées).
+          </p>
+          <p class="text-gray-300 text-sm md:text-base mb-4">
+            Si vous souhaitez poursuivre, GhostOps peut enclencher un <span class="font-semibold">Studio Scénarios</span>
+            ou produire une note <span class="font-semibold">Pré-brief Board</span>.
+          </p>
+          <div class="flex flex-col sm:flex-row gap-3 mt-4">
+            <a
+              href="/studio-scenarios.html"
+              class="inline-block px-5 py-2 text-xs md:text-sm border border-white rounded-md hover:bg-white hover:text-black transition text-center"
+            >
+              Découvrir le Studio Scénarios
+            </a>
+            <a
+              href="/contact.html"
+              class="inline-block px-5 py-2 text-xs md:text-sm border border-gray-400 rounded-md hover:bg-gray-100 hover:text-black transition text-center"
+            >
+              Contacter GhostOps
+            </a>
+          </div>
+          <p class="text-gray-500 text-[11px] mt-4">
+            Si vous venez juste de payer et que vous voyez cet écran, contactez-nous : un problème de session peut exister.
+          </p>
+        </div>
+      </section>
+
       <!-- BLOC SI PAIEMENT OK -->
       <section id="diagnostic-paid" class="hidden max-w-5xl mx-auto mt-10 mb-10">
         <!-- Bandeau de confirmation -->
         <div class="bg-emerald-900/40 border border-emerald-500/70 rounded-2xl p-4 mb-6">
           <p class="text-xs md:text-sm text-emerald-100">
-            Paiement <span class="font-semibold">GhostOps Diagnostic IA – 90&nbsp;minutes</span> confirmé.<br />
-            Vous êtes dans l’espace IA dédié au Niveau&nbsp;1 – Diagnostic IA. Les échanges qui suivent servent à
-            préparer une <span class="font-semibold">note structurée</span> de votre situation.
+            Accès <span class="font-semibold">GhostOps Diagnostic IA – 90&nbsp;minutes</span> validé.<br />
+            Cette session inclut <span class="font-semibold">5 itérations</span> (questions / approfondissements) et une fenêtre de temps limitée.
           </p>
         </div>
 
@@ -162,22 +209,14 @@
             Session Diagnostic IA – structurer la lecture de votre situation
           </h1>
           <p class="text-gray-200 text-sm md:text-base mb-3 max-w-3xl">
-            Vous avez activé un <span class="font-semibold">Diagnostic IA GhostOps – 90&nbsp;minutes</span>.
             L’objectif de cette session est de clarifier votre contexte, de mettre en lumière les risques humains,
             narratifs et de gouvernance, et d’ouvrir <span class="font-semibold">2 à 3 options de lecture</span>.
           </p>
           <p class="text-gray-300 text-sm md:text-base max-w-3xl mb-3">
-            La réponse IA qui vous sera fournie est structurée comme une note courte, organisée autour de&nbsp;:
+            Vous pouvez poser <span class="font-semibold">jusqu’à 5 questions</span> (itérations) pour approfondir.
           </p>
-          <ul class="list-disc list-inside text-gray-300 text-sm md:text-base max-w-3xl space-y-1">
-            <li>un résumé exécutif&nbsp;;</li>
-            <li>une reformulation structurée de la situation&nbsp;;</li>
-            <li>une cartographie des risques principaux&nbsp;;</li>
-            <li>2 à 3 options de lecture possibles&nbsp;;</li>
-            <li>des points aveugles et questions à clarifier, ainsi que les suites possibles.</li>
-          </ul>
-          <p class="text-gray-400 text-xs md:text-sm max-w-3xl mt-3">
-            Cette session inclut <span class="font-semibold">5 itérations</span> (questions / approfondissements) afin de converger vers une lecture exploitable.
+          <p class="text-gray-400 text-xs md:text-sm max-w-3xl">
+            Bon usage : 1) description complète, 2) décisions à 10 jours, 3) options A/B/C, 4) angles morts, 5) conditions de succès.
           </p>
         </header>
 
@@ -225,29 +264,28 @@
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
               <div>
                 <h2 class="text-xl md:text-2xl font-semibold text-white text-shadow">
-                  Étape&nbsp;2 – Lecture initiale avec GhostOps IA – Diagnostic
+                  Étape&nbsp;2 – Module IA (5 itérations)
                 </h2>
                 <p class="text-gray-300 text-sm md:text-base mt-1 max-w-3xl">
                   Le module ci-dessous permet une <span class="font-semibold">lecture IA structurée</span> de votre situation.
                 </p>
               </div>
 
-              <!-- Compteur itérations -->
-              <div class="flex items-center gap-2">
+              <!-- Compteurs -->
+              <div class="flex flex-col items-start md:items-end gap-2">
                 <div
                   id="diag-iter-badge"
                   class="text-[11px] md:text-xs px-3 py-2 rounded-full border border-gray-600 bg-gray-900/60 text-gray-200"
                 >
                   Itérations restantes : <span id="diag-iter-count" class="font-semibold">5</span>/5
                 </div>
-                <button
-                  id="diag-reset-btn"
-                  type="button"
-                  class="text-[11px] md:text-xs px-3 py-2 rounded-full border border-gray-600 hover:bg-gray-100 hover:text-black transition"
-                  title="Réinitialiser la session (efface l’historique local et remet le compteur à 5)"
+                <div
+                  id="diag-expiry-badge"
+                  class="text-[11px] md:text-xs px-3 py-2 rounded-full border border-gray-600 bg-gray-900/60 text-gray-200"
+                  title="Cette session expire automatiquement."
                 >
-                  Réinitialiser
-                </button>
+                  Expire dans : <span id="diag-expiry-countdown" class="font-semibold">—</span>
+                </div>
               </div>
             </div>
 
@@ -262,8 +300,7 @@
                   <span class="font-semibold">GhostOps IA – Diagnostic&nbsp;:</span>
                   <span>
                     Décrivez votre situation en quelques paragraphes (même anonymisée).<br /><br />
-                    Vous disposez ensuite de <span class="font-semibold">5 itérations</span> pour approfondir et converger.
-                    Exemples : « Quelles décisions à 10 jours ? », « Quelles options A/B/C ? », « Où sont les angles morts ? ».
+                    Ensuite, utilisez vos 5 itérations pour approfondir : décisions à 10 jours, options A/B/C, angles morts, conditions de succès.
                   </span>
                 </div>
               </div>
@@ -311,53 +348,43 @@
       </div>
     </footer>
 
-    <!-- Script d'activation (paid / non paid) + module IA -->
+    <!-- Script : validation Stripe (cs_id) + session token + module IA -->
     <script>
       (function () {
-        // --- Access gate (simple) ---
         const params = new URLSearchParams(window.location.search);
-        const paid = params.get("paid");
+        const csId = params.get("cs_id"); // Stripe Checkout Session ID
 
+        const validatingBlock = document.getElementById("diagnostic-validating");
         const paidBlock = document.getElementById("diagnostic-paid");
         const notPaidBlock = document.getElementById("diagnostic-not-paid");
+        const expiredBlock = document.getElementById("diagnostic-expired");
 
-        if (paid === "1") {
-          if (paidBlock) paidBlock.classList.remove("hidden");
-        } else {
-          if (notPaidBlock) notPaidBlock.classList.remove("hidden");
-        }
+        const iterCountEl = document.getElementById("diag-iter-count");
+        const iterBadgeEl = document.getElementById("diag-iter-badge");
+        const expiryEl = document.getElementById("diag-expiry-countdown");
 
-        // --- Module IA (style chat d’orientation) ---
         const form = document.getElementById("diagnostic-chat-form");
         const input = document.getElementById("diagnostic-chat-input");
         const messages = document.getElementById("diagnostic-chat-messages");
         const sendBtn = document.getElementById("diagnostic-send-btn");
 
-        const iterCountEl = document.getElementById("diag-iter-count");
-        const iterBadgeEl = document.getElementById("diag-iter-badge");
-        const resetBtn = document.getElementById("diag-reset-btn");
-
-        if (!form || !input || !messages || !sendBtn || !iterCountEl || !iterBadgeEl || !resetBtn) return;
-
         const MAX_ITERS = 5;
-        const STORAGE_KEY = "ghostops_diag_session_v1_iters_left";
 
-        // Initialisation compteur (persistant)
-        function loadItersLeft() {
-          const v = Number(localStorage.getItem(STORAGE_KEY));
-          if (Number.isFinite(v) && v >= 0 && v <= MAX_ITERS) return v;
-          return MAX_ITERS;
+        // Token GhostOps (obtenu après validation Stripe)
+        let sessionToken = "";
+        let itersLeft = MAX_ITERS;
+        let expiresAtMs = 0;
+        let countdownTimer = null;
+
+        // Historique pour itérations (envoyé au backend)
+        const convo = []; // [{role:'user'|'assistant', content:'...'}]
+
+        function show(el) {
+          if (el) el.classList.remove("hidden");
         }
-
-        function saveItersLeft(v) {
-          try {
-            localStorage.setItem(STORAGE_KEY, String(v));
-          } catch (_) {}
+        function hide(el) {
+          if (el) el.classList.add("hidden");
         }
-
-        let itersLeft = loadItersLeft();
-
-        let isTyping = false;
 
         function scrollToBottom() {
           messages.scrollTop = messages.scrollHeight;
@@ -380,27 +407,140 @@
           return { wrapper, bubble };
         }
 
-        function renderIters() {
-          iterCountEl.textContent = String(itersLeft);
+        function setLockedUI(locked) {
+          if (!sendBtn || !input) return;
+          sendBtn.disabled = locked;
+          input.disabled = locked;
+        }
 
+        function renderIters() {
+          if (iterCountEl) iterCountEl.textContent = String(itersLeft);
+
+          if (!iterBadgeEl) return;
           if (itersLeft <= 0) {
-            iterBadgeEl.classList.add("border-amber-400");
-            iterBadgeEl.classList.add("text-amber-200");
-            sendBtn.disabled = true;
-            input.disabled = true;
+            iterBadgeEl.classList.add("border-amber-400", "text-amber-200");
+            setLockedUI(true);
           } else {
-            iterBadgeEl.classList.remove("border-amber-400");
-            iterBadgeEl.classList.remove("text-amber-200");
-            sendBtn.disabled = false;
-            input.disabled = false;
+            iterBadgeEl.classList.remove("border-amber-400", "text-amber-200");
+            setLockedUI(false);
           }
         }
 
+        function fmtCountdown(msLeft) {
+          const s = Math.max(0, Math.floor(msLeft / 1000));
+          const mm = String(Math.floor(s / 60)).padStart(2, "0");
+          const ss = String(s % 60).padStart(2, "0");
+          return `${mm}:${ss}`;
+        }
+
+        function startCountdown() {
+          if (!expiryEl || !expiresAtMs) return;
+
+          if (countdownTimer) clearInterval(countdownTimer);
+          countdownTimer = setInterval(() => {
+            const now = Date.now();
+            const msLeft = expiresAtMs - now;
+
+            expiryEl.textContent = fmtCountdown(msLeft);
+
+            if (msLeft <= 0) {
+              clearInterval(countdownTimer);
+              countdownTimer = null;
+              // Expiration : verrouiller et afficher écran
+              setLockedUI(true);
+              hide(validatingBlock);
+              hide(paidBlock);
+              hide(notPaidBlock);
+              show(expiredBlock);
+            }
+          }, 500);
+
+          // tick immédiat
+          expiryEl.textContent = fmtCountdown(expiresAtMs - Date.now());
+        }
+
+        function lockOutFinal(message) {
+          setLockedUI(true);
+          addMessage("bot", message);
+          hide(paidBlock);
+          show(expiredBlock);
+        }
+
+        async function validateAccess() {
+          hide(notPaidBlock);
+          hide(paidBlock);
+          hide(expiredBlock);
+          show(validatingBlock);
+
+          if (!csId) {
+            hide(validatingBlock);
+            show(notPaidBlock);
+            return;
+          }
+
+          try {
+            // ✅ Endpoint à créer : /api/ghostops-diagnostic-session
+            // Il doit :
+            // - vérifier cs_id côté Stripe (paid)
+            // - créer un token GhostOps (TTL + itersRemaining=5)
+            // - renvoyer { ok:true, token, itersRemaining, expiresAt }
+            const resp = await fetch("/api/ghostops-diagnostic-session", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ cs_id: csId }),
+            });
+
+            let data = {};
+            try {
+              data = await resp.json();
+            } catch (_) {}
+
+            if (!resp.ok || !data?.ok) {
+              hide(validatingBlock);
+              show(notPaidBlock);
+              return;
+            }
+
+            sessionToken = String(data.token || "");
+            itersLeft = Number.isFinite(Number(data.itersRemaining))
+              ? Number(data.itersRemaining)
+              : MAX_ITERS;
+
+            const expiresAt =
+              typeof data.expiresAt === "number"
+                ? data.expiresAt
+                : typeof data.expiresAtMs === "number"
+                  ? data.expiresAtMs
+                  : Date.now() + 90 * 60 * 1000;
+
+            expiresAtMs = expiresAt;
+
+            hide(validatingBlock);
+
+            // Session déjà épuisée ?
+            if (!sessionToken || itersLeft <= 0 || Date.now() >= expiresAtMs) {
+              show(expiredBlock);
+              setLockedUI(true);
+              return;
+            }
+
+            show(paidBlock);
+            renderIters();
+            startCountdown();
+          } catch (e) {
+            console.error("validateAccess error:", e);
+            hide(validatingBlock);
+            show(notPaidBlock);
+          }
+        }
+
+        // Effet typewriter
+        let isTyping = false;
         function addBotMessageTypewriter(text) {
           const { bubble } = addMessage("bot", "");
           let index = 0;
           isTyping = true;
-          sendBtn.disabled = true;
+          setLockedUI(true);
 
           function step() {
             if (index < text.length) {
@@ -410,35 +550,44 @@
               setTimeout(step, 12);
             } else {
               isTyping = false;
-              // réactiver seulement si itérations restantes
-              sendBtn.disabled = itersLeft <= 0;
+              // réactive seulement si encore des iters et non expiré
+              const ok = itersLeft > 0 && Date.now() < expiresAtMs;
+              setLockedUI(!ok);
             }
           }
 
           step();
         }
 
-        function lockOutIfNoIters() {
+        function lockIfNoIters() {
           if (itersLeft > 0) return false;
-          addMessage(
-            "bot",
-            "Limite atteinte : vos 5 itérations ont été utilisées. Si vous souhaitez poursuivre, contactez GhostOps ou basculez vers le Studio Scénarios."
+          lockOutFinal(
+            "Limite atteinte : vos 5 itérations ont été utilisées. Si vous souhaitez poursuivre, basculez vers le Studio Scénarios ou contactez GhostOps."
           );
-          renderIters();
           return true;
         }
 
         async function sendMessage() {
-          if (lockOutIfNoIters()) return;
+          if (isTyping) return;
+
+          // Expiration ?
+          if (expiresAtMs && Date.now() >= expiresAtMs) {
+            lockOutFinal("Session expirée. Pour poursuivre, contactez GhostOps ou activez un format supérieur.");
+            return;
+          }
+
+          if (lockIfNoIters()) return;
 
           const userMessage = (input.value || "").trim();
-          if (!userMessage || isTyping) return;
+          if (!userMessage) return;
 
           addMessage("user", userMessage);
+          convo.push({ role: "user", content: userMessage });
+
           input.value = "";
 
           const waiting = addMessage("bot", "Diagnostic IA en cours…");
-          sendBtn.disabled = true;
+          setLockedUI(true);
 
           try {
             const payload = {
@@ -446,49 +595,57 @@
               contexte: "",
               enjeu: "",
               mode: "diagnostic-ia-session-v1",
+              history: convo, // ✅ historique pour itérations
             };
 
-            const response = await fetch("/api/ghostops-diagnostic-ia", {
+            const resp = await fetch("/api/ghostops-diagnostic-ia", {
               method: "POST",
-              headers: { "Content-Type": "application/json" },
+              headers: {
+                "Content-Type": "application/json",
+                // ✅ token obligatoire (à faire respecter côté serveur ensuite)
+                Authorization: `Bearer ${sessionToken}`,
+              },
               body: JSON.stringify(payload),
             });
 
             let data = {};
             try {
-              data = await response.json();
+              data = await resp.json();
             } catch (_) {}
 
             if (waiting?.wrapper?.parentNode) waiting.wrapper.parentNode.removeChild(waiting.wrapper);
 
-            if (!response.ok) {
-              const errText =
-                data?.error ||
-                `Une erreur est survenue lors du Diagnostic IA (HTTP ${response.status}). Veuillez réessayer.`;
-              addMessage("bot", errText);
-              sendBtn.disabled = itersLeft <= 0;
+            if (!resp.ok) {
+              addMessage(
+                "bot",
+                data?.error || `Une erreur est survenue lors du Diagnostic IA (HTTP ${resp.status}). Veuillez réessayer.`
+              );
+              setLockedUI(false);
               return;
             }
 
             if (!data?.reply) {
               addMessage("bot", "Réponse inattendue du serveur. Veuillez réessayer.");
-              sendBtn.disabled = itersLeft <= 0;
+              setLockedUI(false);
               return;
             }
 
-            // ✅ Décrémenter uniquement si réponse OK
+            // ✅ Décrémentation côté UI (le vrai verrou sera côté serveur)
             itersLeft = Math.max(0, itersLeft - 1);
-            saveItersLeft(itersLeft);
             renderIters();
 
-            addBotMessageTypewriter(data.reply);
+            // Ajouter réponse au contexte
+            convo.push({ role: "assistant", content: String(data.reply) });
+
+            addBotMessageTypewriter(String(data.reply));
 
             if (itersLeft === 0) {
               addMessage(
                 "bot",
-                "Vous avez atteint la limite des 5 itérations. Si vous souhaitez aller plus loin, GhostOps peut produire une note Board-ready (Pré-brief Board) ou un Studio Scénarios."
+                "Vous avez atteint la limite des 5 itérations. Si vous souhaitez aller plus loin, GhostOps peut produire une note Pré-brief Board ou un Studio Scénarios."
               );
-              renderIters();
+              setLockedUI(true);
+              show(expiredBlock);
             }
           } catch (err) {
             console.error("Erreur lors de l’appel /api/ghostops-diagnostic-ia :", err);
@@ -497,33 +654,26 @@
               "bot",
               "Erreur de connexion à GhostOps IA. Veuillez réessayer ultérieurement ou utiliser la page contact."
             );
-            sendBtn.disabled = itersLeft <= 0;
+            setLockedUI(false);
           }
         }
 
-        resetBtn.addEventListener("click", () => {
-          // réinitialisation locale (utile en cas de test / démo)
-          itersLeft = MAX_ITERS;
-          saveItersLeft(itersLeft);
-
-          addMessage("bot", "Session réinitialisée. Vous disposez à nouveau de 5 itérations.");
-          renderIters();
-        });
-
-        form.addEventListener("submit", (e) => {
-          e.preventDefault();
-          sendMessage();
-        });
-
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
+        if (form && input) {
+          form.addEventListener("submit", (e) => {
             e.preventDefault();
             sendMessage();
-          }
-        });
+          });
 
-        // Init UI
-        renderIters();
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
+          });
+        }
+
+        // Init : validation Stripe obligatoire
+        validateAccess();
       })();
     </script>
   </body>
