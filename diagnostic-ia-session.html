@@ -446,7 +446,6 @@
             if (msLeft <= 0) {
               clearInterval(countdownTimer);
               countdownTimer = null;
-              // Expiration : verrouiller et afficher écran
               setLockedUI(true);
               hide(validatingBlock);
               hide(paidBlock);
@@ -455,20 +454,22 @@
             }
           }, 500);
 
-          // tick immédiat
           expiryEl.textContent = fmtCountdown(expiresAtMs - Date.now());
         }
 
-        function lockOutFinal(message) {
+        function hardEndToExpiredScreen(message) {
           setLockedUI(true);
-          addMessage("bot", message);
+          if (message) addMessage("bot", message);
+          hide(validatingBlock);
           hide(paidBlock);
+          hide(notPaidBlock);
           show(expiredBlock);
         }
 
-        async function validateAccess() {
+        // ✅ NOUVEAU : on ne valide plus via /api/ghostops-diagnostic-session.
+        // On effectue la validation au 1er "send" via /api/ghostops-diagnostic-ia avec cs_id.
+        async function openPaidUIOrFallback() {
           hide(notPaidBlock);
-          hide(paidBlock);
           hide(expiredBlock);
           show(validatingBlock);
 
@@ -478,60 +479,13 @@
             return;
           }
 
-          try {
-            // ✅ Endpoint à créer : /api/ghostops-diagnostic-session
-            // Il doit :
-            // - vérifier cs_id côté Stripe (paid)
-            // - créer un token GhostOps (TTL + itersRemaining=5)
-            // - renvoyer { ok:true, token, itersRemaining, expiresAt }
-            const resp = await fetch("/api/ghostops-diagnostic-session", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ cs_id: csId }),
-            });
-
-            let data = {};
-            try {
-              data = await resp.json();
-            } catch (_) {}
-
-            if (!resp.ok || !data?.ok) {
-              hide(validatingBlock);
-              show(notPaidBlock);
-              return;
-            }
-
-            sessionToken = String(data.token || "");
-            itersLeft = Number.isFinite(Number(data.itersRemaining))
-              ? Number(data.itersRemaining)
-              : MAX_ITERS;
-
-            const expiresAt =
-              typeof data.expiresAt === "number"
-                ? data.expiresAt
-                : typeof data.expiresAtMs === "number"
-                  ? data.expiresAtMs
-                  : Date.now() + 90 * 60 * 1000;
-
-            expiresAtMs = expiresAt;
-
-            hide(validatingBlock);
-
-            // Session déjà épuisée ?
-            if (!sessionToken || itersLeft <= 0 || Date.now() >= expiresAtMs) {
-              show(expiredBlock);
-              setLockedUI(true);
-              return;
-            }
-
-            show(paidBlock);
-            renderIters();
-            startCountdown();
-          } catch (e) {
-            console.error("validateAccess error:", e);
-            hide(validatingBlock);
-            show(notPaidBlock);
-          }
+          // On n'appelle pas l'API ici (pas de "message" encore).
+          // On ouvre l’UI, et le premier envoi déclenchera la validation Stripe + token serveur.
+          hide(validatingBlock);
+          show(paidBlock);
+          renderIters();
+          // Le compte à rebours commencera dès qu'on aura expiresAt du serveur.
+          if (expiryEl) expiryEl.textContent = "—";
         }
 
         // Effet typewriter
@@ -550,8 +504,7 @@
               setTimeout(step, 12);
             } else {
               isTyping = false;
-              // réactive seulement si encore des iters et non expiré
-              const ok = itersLeft > 0 && Date.now() < expiresAtMs;
+              const ok = itersLeft > 0 && (!expiresAtMs || Date.now() < expiresAtMs);
               setLockedUI(!ok);
             }
           }
@@ -561,18 +514,42 @@
 
         function lockIfNoIters() {
           if (itersLeft > 0) return false;
-          lockOutFinal(
-            "Limite atteinte : vos 5 itérations ont été utilisées. Si vous souhaitez poursuivre, basculez vers le Studio Scénarios ou contactez GhostOps."
+          hardEndToExpiredScreen(
+            "Limite atteinte : vos 5 itérations ont été utilisées. Pour poursuivre, basculez vers le Studio Scénarios ou contactez GhostOps."
           );
           return true;
+        }
+
+        // ✅ IMPORTANT : l’API sécurisée renvoie itersLeft, expiresAt et surtout un sessionToken ROTATIF.
+        function applyServerSessionState(data) {
+          // token
+          if (typeof data?.sessionToken === "string" && data.sessionToken.trim()) {
+            sessionToken = data.sessionToken.trim();
+          }
+
+          // iters
+          if (Number.isFinite(Number(data?.itersLeft))) {
+            itersLeft = Number(data.itersLeft);
+          }
+
+          // expiresAt (en secondes UNIX côté API -> ms ici)
+          if (Number.isFinite(Number(data?.expiresAt))) {
+            expiresAtMs = Number(data.expiresAt) * 1000;
+          } else if (Number.isFinite(Number(data?.expiresAtMs))) {
+            expiresAtMs = Number(data.expiresAtMs);
+          }
+
+          renderIters();
+
+          if (expiresAtMs) startCountdown();
         }
 
         async function sendMessage() {
           if (isTyping) return;
 
-          // Expiration ?
+          // Expiration locale si on la connaît déjà
           if (expiresAtMs && Date.now() >= expiresAtMs) {
-            lockOutFinal("Session expirée. Pour poursuivre, contactez GhostOps ou activez un format supérieur.");
+            hardEndToExpiredScreen("Session expirée. Pour poursuivre, contactez GhostOps ou activez un format supérieur.");
             return;
           }
 
@@ -595,15 +572,22 @@
               contexte: "",
               enjeu: "",
               mode: "diagnostic-ia-session-v1",
-              history: convo, // ✅ historique pour itérations
+              history: convo,
             };
+
+            // 1er appel : on envoie cs_id si pas encore de token
+            if (!sessionToken) {
+              payload.cs_id = csId;
+            } else {
+              payload.sessionToken = sessionToken;
+            }
 
             const resp = await fetch("/api/ghostops-diagnostic-ia", {
               method: "POST",
               headers: {
                 "Content-Type": "application/json",
-                // ✅ token obligatoire (à faire respecter côté serveur ensuite)
-                Authorization: `Bearer ${sessionToken}`,
+                // double compat : header + body
+                ...(sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {}),
               },
               body: JSON.stringify(payload),
             });
@@ -616,10 +600,18 @@
             if (waiting?.wrapper?.parentNode) waiting.wrapper.parentNode.removeChild(waiting.wrapper);
 
             if (!resp.ok) {
-              addMessage(
-                "bot",
-                data?.error || `Une erreur est survenue lors du Diagnostic IA (HTTP ${resp.status}). Veuillez réessayer.`
-              );
+              const errMsg =
+                data?.error ||
+                `Une erreur est survenue lors du Diagnostic IA (HTTP ${resp.status}). Veuillez réessayer.`;
+
+              // Cas “session terminée” (serveur)
+              if (resp.status === 401 || resp.status === 403) {
+                addMessage("bot", errMsg);
+                hardEndToExpiredScreen("");
+                return;
+              }
+
+              addMessage("bot", errMsg);
               setLockedUI(false);
               return;
             }
@@ -630,22 +622,19 @@
               return;
             }
 
-            // ✅ Décrémentation côté UI (le vrai verrou sera côté serveur)
-            itersLeft = Math.max(0, itersLeft - 1);
-            renderIters();
+            // ✅ Appliquer l’état serveur : token rotatif + itersLeft + expiresAt
+            applyServerSessionState(data);
 
             // Ajouter réponse au contexte
             convo.push({ role: "assistant", content: String(data.reply) });
 
             addBotMessageTypewriter(String(data.reply));
 
-            if (itersLeft === 0) {
-              addMessage(
-                "bot",
-                "Vous avez atteint la limite des 5 itérations. Si vous souhaitez aller plus loin, GhostOps peut produire une note Pré-brief Board ou un Studio Scénarios."
+            // Si le serveur dit 0 itérations restantes : écran fin
+            if (itersLeft <= 0) {
+              hardEndToExpiredScreen(
+                "Vous avez atteint la limite des 5 itérations. Pour aller plus loin, GhostOps peut activer un Studio Scénarios ou produire une note Pré-brief Board."
               );
-              setLockedUI(true);
-              show(expiredBlock);
             }
           } catch (err) {
             console.error("Erreur lors de l’appel /api/ghostops-diagnostic-ia :", err);
@@ -672,8 +661,8 @@
           });
         }
 
-        // Init : validation Stripe obligatoire
-        validateAccess();
+        // Init
+        openPaidUIOrFallback();
       })();
     </script>
   </body>
