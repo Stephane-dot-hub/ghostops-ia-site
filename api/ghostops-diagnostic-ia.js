@@ -26,7 +26,6 @@ function safeJsonParse(s) {
 }
 
 function extractReplyFromResponsesApi(data) {
-  // Format Responses API : data.output = [{ content: [{type:'output_text', text:'...'}]}]
   const out0 = data?.output?.[0];
   if (!out0?.content) return "";
 
@@ -36,6 +35,15 @@ function extractReplyFromResponsesApi(data) {
 
   if (typeof hit?.text === "string") return hit.text.trim();
   return "";
+}
+
+function safePreview(value, maxLen = 300) {
+  try {
+    const s = typeof value === "string" ? value : JSON.stringify(value);
+    return s.length > maxLen ? s.slice(0, maxLen) + "…" : s;
+  } catch {
+    return "";
+  }
 }
 
 export default async function handler(req, res) {
@@ -51,20 +59,17 @@ export default async function handler(req, res) {
     });
   }
 
-  // ✅ Modèle valide (par défaut), surcharge possible via env
+  // ✅ Modèle (par défaut), surcharge possible via env
   const model = cleanStr(process.env.GHOSTOPS_DIAGNOSTIC_MODEL) || "gpt-5-mini";
-
   const contentType = req.headers["content-type"] || "";
 
-  // 1) Tentative body déjà parsé
+  // --- Lecture body robuste ---
   let body = req.body && typeof req.body === "object" ? req.body : null;
 
-  // 2) Si req.body est une string JSON (selon runtime)
   if (!body && typeof req.body === "string" && req.body.trim()) {
     body = safeJsonParse(req.body) || null;
   }
 
-  // 3) Sinon, lecture brute
   let raw = "";
   if (!body) {
     raw = await readRaw(req);
@@ -75,7 +80,6 @@ export default async function handler(req, res) {
 
   body = body || {};
 
-  // ✅ Alignement chat : on accepte description OU message
   const effectiveDescription = cleanStr(body.description) || cleanStr(body.message);
   const safeContexte = cleanStr(body.contexte);
   const safeEnjeu = cleanStr(body.enjeu);
@@ -151,22 +155,54 @@ Structure obligatoire (titres exacts) :
       }),
     });
 
-    const data = await openaiResponse.json();
-
-    if (!openaiResponse.ok) {
-      console.error("[ghostops-diagnostic-ia] OpenAI error:", data);
-      return res.status(openaiResponse.status).json({
-        error: data?.error?.message || `Erreur OpenAI (HTTP ${openaiResponse.status})`,
+    let data = {};
+    try {
+      data = await openaiResponse.json();
+    } catch (e) {
+      // Réponse non-JSON (rare), on remonte un message exploitable
+      return res.status(502).json({
+        error: "Réponse non-JSON reçue depuis OpenAI.",
+        debug: {
+          model,
+          openaiStatus: openaiResponse.status,
+          openaiStatusText: openaiResponse.statusText,
+        },
       });
     }
 
-    const reply = extractReplyFromResponsesApi(data) || "Je n’ai pas pu générer de pré-diagnostic utile.";
+    if (!openaiResponse.ok) {
+      // ✅ on renvoie un debug utile (sans exposer la clé)
+      const errMsg =
+        data?.error?.message ||
+        data?.message ||
+        `Erreur OpenAI (HTTP ${openaiResponse.status})`;
+
+      return res.status(openaiResponse.status).json({
+        error: errMsg,
+        debug: {
+          model,
+          openaiStatus: openaiResponse.status,
+          openaiType: data?.error?.type || data?.type || "",
+          openaiCode: data?.error?.code || data?.code || "",
+          // petit extrait pour compréhension (évite d’inonder)
+          openaiPreview: safePreview(data, 400),
+        },
+      });
+    }
+
+    const reply =
+      extractReplyFromResponsesApi(data) || "Je n’ai pas pu générer de pré-diagnostic utile.";
 
     return res.status(200).json({ reply });
   } catch (err) {
     console.error("[ghostops-diagnostic-ia] fatal:", err);
     return res.status(500).json({
       error: "Une erreur interne est survenue lors de l’appel au moteur GhostOps Diagnostic IA.",
+      debug: {
+        model,
+        contentType,
+        message: err?.message || String(err),
+      },
     });
   }
 }
