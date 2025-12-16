@@ -177,9 +177,7 @@
             <li>des points aveugles et questions à clarifier, ainsi que les suites possibles.</li>
           </ul>
           <p class="text-gray-400 text-xs md:text-sm max-w-3xl mt-3">
-            GhostOps utilise l’IA comme instrument de lecture et de simulation. Le Diagnostic IA ne se substitue
-            pas à une mission GhostOps complète&nbsp;: il vous fournit une grille de lecture exploitable pour décider
-            si et comment aller plus loin.
+            Cette session inclut <span class="font-semibold">5 itérations</span> (questions / approfondissements) afin de converger vers une lecture exploitable.
           </p>
         </header>
 
@@ -215,7 +213,8 @@
               </li>
             </ul>
             <p class="text-gray-400 text-xs md:text-sm mt-4 max-w-3xl">
-              Vous pouvez saisir directement ces éléments dans le module IA ci-dessous, ou en donner une synthèse plus courte.
+              Conseil : après la première note, utilisez vos itérations pour demander des clarifications ciblées
+              (priorités, zones d’ombre, options, conditions de succès, risques narratifs).
             </p>
           </div>
         </section>
@@ -223,12 +222,34 @@
         <!-- Étape 2 -->
         <section>
           <div class="bg-gray-900/80 border border-gray-700 rounded-2xl p-6 md:p-8">
-            <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">
-              Étape&nbsp;2 – Lecture initiale avec GhostOps IA – Diagnostic
-            </h2>
-            <p class="text-gray-300 text-sm md:text-base mb-4 max-w-3xl">
-              Le module ci-dessous permet une <span class="font-semibold">lecture IA structurée</span> de votre situation.
-            </p>
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+              <div>
+                <h2 class="text-xl md:text-2xl font-semibold text-white text-shadow">
+                  Étape&nbsp;2 – Lecture initiale avec GhostOps IA – Diagnostic
+                </h2>
+                <p class="text-gray-300 text-sm md:text-base mt-1 max-w-3xl">
+                  Le module ci-dessous permet une <span class="font-semibold">lecture IA structurée</span> de votre situation.
+                </p>
+              </div>
+
+              <!-- Compteur itérations -->
+              <div class="flex items-center gap-2">
+                <div
+                  id="diag-iter-badge"
+                  class="text-[11px] md:text-xs px-3 py-2 rounded-full border border-gray-600 bg-gray-900/60 text-gray-200"
+                >
+                  Itérations restantes : <span id="diag-iter-count" class="font-semibold">5</span>/5
+                </div>
+                <button
+                  id="diag-reset-btn"
+                  type="button"
+                  class="text-[11px] md:text-xs px-3 py-2 rounded-full border border-gray-600 hover:bg-gray-100 hover:text-black transition"
+                  title="Réinitialiser la session (efface l’historique local et remet le compteur à 5)"
+                >
+                  Réinitialiser
+                </button>
+              </div>
+            </div>
 
             <!-- Zone d'échanges IA -->
             <div class="bg-gray-950/80 rounded-xl border border-gray-700 max-h-[360px] flex flex-col">
@@ -241,7 +262,8 @@
                   <span class="font-semibold">GhostOps IA – Diagnostic&nbsp;:</span>
                   <span>
                     Décrivez votre situation en quelques paragraphes (même anonymisée).<br /><br />
-                    À partir de votre description, je produirai une note structurée (synthèse, tensions, questions, cartographie des risques, niveau de tension, suites possibles).
+                    Vous disposez ensuite de <span class="font-semibold">5 itérations</span> pour approfondir et converger.
+                    Exemples : « Quelles décisions à 10 jours ? », « Quelles options A/B/C ? », « Où sont les angles morts ? ».
                   </span>
                 </div>
               </div>
@@ -257,12 +279,13 @@
                   rows="3"
                   placeholder="Décrivez ici votre situation (contexte, acteurs, risques, échéances)…"
                 ></textarea>
+
                 <button
                   id="diagnostic-send-btn"
                   type="submit"
                   class="text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Envoyer pour diagnostic
+                  Envoyer
                 </button>
               </form>
             </div>
@@ -310,7 +333,29 @@
         const messages = document.getElementById("diagnostic-chat-messages");
         const sendBtn = document.getElementById("diagnostic-send-btn");
 
-        if (!form || !input || !messages || !sendBtn) return;
+        const iterCountEl = document.getElementById("diag-iter-count");
+        const iterBadgeEl = document.getElementById("diag-iter-badge");
+        const resetBtn = document.getElementById("diag-reset-btn");
+
+        if (!form || !input || !messages || !sendBtn || !iterCountEl || !iterBadgeEl || !resetBtn) return;
+
+        const MAX_ITERS = 5;
+        const STORAGE_KEY = "ghostops_diag_session_v1_iters_left";
+
+        // Initialisation compteur (persistant)
+        function loadItersLeft() {
+          const v = Number(localStorage.getItem(STORAGE_KEY));
+          if (Number.isFinite(v) && v >= 0 && v <= MAX_ITERS) return v;
+          return MAX_ITERS;
+        }
+
+        function saveItersLeft(v) {
+          try {
+            localStorage.setItem(STORAGE_KEY, String(v));
+          } catch (_) {}
+        }
+
+        let itersLeft = loadItersLeft();
 
         let isTyping = false;
 
@@ -335,6 +380,22 @@
           return { wrapper, bubble };
         }
 
+        function renderIters() {
+          iterCountEl.textContent = String(itersLeft);
+
+          if (itersLeft <= 0) {
+            iterBadgeEl.classList.add("border-amber-400");
+            iterBadgeEl.classList.add("text-amber-200");
+            sendBtn.disabled = true;
+            input.disabled = true;
+          } else {
+            iterBadgeEl.classList.remove("border-amber-400");
+            iterBadgeEl.classList.remove("text-amber-200");
+            sendBtn.disabled = false;
+            input.disabled = false;
+          }
+        }
+
         function addBotMessageTypewriter(text) {
           const { bubble } = addMessage("bot", "");
           let index = 0;
@@ -349,14 +410,27 @@
               setTimeout(step, 12);
             } else {
               isTyping = false;
-              sendBtn.disabled = false;
+              // réactiver seulement si itérations restantes
+              sendBtn.disabled = itersLeft <= 0;
             }
           }
 
           step();
         }
 
+        function lockOutIfNoIters() {
+          if (itersLeft > 0) return false;
+          addMessage(
+            "bot",
+            "Limite atteinte : vos 5 itérations ont été utilisées. Si vous souhaitez poursuivre, contactez GhostOps ou basculez vers le Studio Scénarios."
+          );
+          renderIters();
+          return true;
+        }
+
         async function sendMessage() {
+          if (lockOutIfNoIters()) return;
+
           const userMessage = (input.value || "").trim();
           if (!userMessage || isTyping) return;
 
@@ -367,7 +441,6 @@
           sendBtn.disabled = true;
 
           try {
-            // ✅ Simple, comme le chat : un seul champ "message"
             const payload = {
               message: userMessage,
               contexte: "",
@@ -375,7 +448,6 @@
               mode: "diagnostic-ia-session-v1",
             };
 
-            // ✅ Endpoint UNIQUE (pas de -v2)
             const response = await fetch("/api/ghostops-diagnostic-ia", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -392,19 +464,32 @@
             if (!response.ok) {
               const errText =
                 data?.error ||
-                "Une erreur est survenue lors du Diagnostic IA. Veuillez réessayer.";
+                `Une erreur est survenue lors du Diagnostic IA (HTTP ${response.status}). Veuillez réessayer.`;
               addMessage("bot", errText);
-              sendBtn.disabled = false;
+              sendBtn.disabled = itersLeft <= 0;
               return;
             }
 
             if (!data?.reply) {
               addMessage("bot", "Réponse inattendue du serveur. Veuillez réessayer.");
-              sendBtn.disabled = false;
+              sendBtn.disabled = itersLeft <= 0;
               return;
             }
 
+            // ✅ Décrémenter uniquement si réponse OK
+            itersLeft = Math.max(0, itersLeft - 1);
+            saveItersLeft(itersLeft);
+            renderIters();
+
             addBotMessageTypewriter(data.reply);
+
+            if (itersLeft === 0) {
+              addMessage(
+                "bot",
+                "Vous avez atteint la limite des 5 itérations. Si vous souhaitez aller plus loin, GhostOps peut produire une note Board-ready (Pré-brief Board) ou un Studio Scénarios."
+              );
+              renderIters();
+            }
           } catch (err) {
             console.error("Erreur lors de l’appel /api/ghostops-diagnostic-ia :", err);
             if (waiting?.wrapper?.parentNode) waiting.wrapper.parentNode.removeChild(waiting.wrapper);
@@ -412,9 +497,18 @@
               "bot",
               "Erreur de connexion à GhostOps IA. Veuillez réessayer ultérieurement ou utiliser la page contact."
             );
-            sendBtn.disabled = false;
+            sendBtn.disabled = itersLeft <= 0;
           }
         }
+
+        resetBtn.addEventListener("click", () => {
+          // réinitialisation locale (utile en cas de test / démo)
+          itersLeft = MAX_ITERS;
+          saveItersLeft(itersLeft);
+
+          addMessage("bot", "Session réinitialisée. Vous disposez à nouveau de 5 itérations.");
+          renderIters();
+        });
 
         form.addEventListener("submit", (e) => {
           e.preventDefault();
@@ -427,6 +521,9 @@
             sendMessage();
           }
         });
+
+        // Init UI
+        renderIters();
       })();
     </script>
   </body>
