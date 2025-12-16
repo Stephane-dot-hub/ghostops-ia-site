@@ -348,7 +348,8 @@
               mode: 'diagnostic-ia-session-v1'
             };
 
-            const response = await fetch('/api/ghostops-diagnostic-ia', {
+            // ✅ MODIFICATION : appel vers l'endpoint V2
+            const response = await fetch('/api/ghostops-diagnostic-ia-v2', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)
@@ -373,7 +374,7 @@
 
             addBotMessageTypewriter(data.reply);
           } catch (err) {
-            console.error('Erreur lors de l’appel /api/ghostops-diagnostic-ia :', err);
+            console.error('Erreur lors de l’appel /api/ghostops-diagnostic-ia-v2 :', err);
             if (waiting && waiting.wrapper && waiting.wrapper.parentNode) {
               waiting.wrapper.parentNode.removeChild(waiting.wrapper);
             }
