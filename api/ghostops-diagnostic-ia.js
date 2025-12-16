@@ -1,7 +1,17 @@
 // /api/ghostops-diagnostic-ia.js
-// Version : Diagnostic IA "premium" avec support d’itérations (5) + historique optionnel.
-// Compatible avec votre front actuel (message seul) ET prêt pour envoyer un historique (body.history).
+// Version sécurisée : Stripe cs_id -> token signé (TTL + itérations) -> décrément serveur.
+// Compatible avec votre front actuel (message seul) + prêt pour history (body.history).
+//
+// Attendus côté front (recommandé) :
+// - 1er appel après paiement : envoyer cs_id (depuis l’URL) + message
+// - appels suivants : envoyer sessionToken + message (+ history si vous l’ajoutez)
+// Le serveur renvoie toujours { reply, sessionToken, itersLeft, expiresAt, meta }
 
+const Stripe = require("stripe");
+
+// -------------------------
+// Utils lecture body
+// -------------------------
 async function readRaw(req) {
   return await new Promise((resolve, reject) => {
     try {
@@ -39,7 +49,9 @@ function extractReplyFromResponsesApi(data) {
   return "";
 }
 
-// --- Helpers historique (optionnel) ---
+// -------------------------
+// Historique optionnel
+// -------------------------
 function clampText(s, maxChars) {
   const t = cleanStr(s);
   if (!t) return "";
@@ -47,10 +59,9 @@ function clampText(s, maxChars) {
 }
 
 function normalizeHistory(rawHistory) {
-  // Attend: [{role:'user'|'assistant', content:'...'}] (simple) — ou formats proches
   if (!Array.isArray(rawHistory)) return [];
-
   const out = [];
+
   for (const item of rawHistory) {
     const role = cleanStr(item?.role);
     const content =
@@ -60,13 +71,12 @@ function normalizeHistory(rawHistory) {
           ? item.text
           : "";
 
-    if ((role === "user" || role === "assistant" || role === "system") && cleanStr(content)) {
+    if ((role === "user" || role === "assistant") && cleanStr(content)) {
       out.push({ role, content: clampText(content, 3000) });
     }
   }
 
-  // Limiter la taille globale (anti-timeout / anti-contexte énorme)
-  // On garde la fin (plus récent)
+  // garde la fin (plus récent) – limite taille globale
   const MAX_TOTAL_CHARS = 12000;
   let total = 0;
   const trimmed = [];
@@ -85,20 +95,104 @@ function hasAssistantInHistory(history) {
 }
 
 function buildInputs({ systemPrompt, userPrompt, history }) {
-  // On construit un input compatible Responses API :
-  // system + historique (user/assistant) + prompt courant
   const input = [{ role: "system", content: systemPrompt }];
-
-  for (const m of history) {
-    // on évite d’injecter des "system" historiques
-    if (m.role === "user" || m.role === "assistant") input.push({ role: m.role, content: m.content });
-  }
-
+  for (const m of history) input.push({ role: m.role, content: m.content });
   input.push({ role: "user", content: userPrompt });
   return input;
 }
 
-export default async function handler(req, res) {
+// -------------------------
+// Token signé (HMAC)
+// -------------------------
+const crypto = require("crypto");
+
+function b64urlEncode(buf) {
+  return Buffer.from(buf)
+    .toString("base64")
+    .replace(/=/g, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
+}
+
+function b64urlDecodeToString(s) {
+  const pad = 4 - (s.length % 4 || 4);
+  const base64 = (s + "=".repeat(pad)).replace(/-/g, "+").replace(/_/g, "/");
+  return Buffer.from(base64, "base64").toString("utf8");
+}
+
+function hmacSha256(secret, data) {
+  return crypto.createHmac("sha256", secret).update(data).digest();
+}
+
+function signToken(payloadObj, secret) {
+  const payloadJson = JSON.stringify(payloadObj);
+  const payload = b64urlEncode(payloadJson);
+  const sig = b64urlEncode(hmacSha256(secret, payload));
+  return `${payload}.${sig}`;
+}
+
+function verifyToken(token, secret) {
+  if (!token || typeof token !== "string") return { ok: false, reason: "missing_token" };
+  const parts = token.split(".");
+  if (parts.length !== 2) return { ok: false, reason: "bad_format" };
+
+  const [payload, sig] = parts;
+  const expected = b64urlEncode(hmacSha256(secret, payload));
+  if (!crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(expected))) {
+    return { ok: false, reason: "bad_signature" };
+  }
+
+  let obj = null;
+  try {
+    obj = JSON.parse(b64urlDecodeToString(payload));
+  } catch {
+    return { ok: false, reason: "bad_payload" };
+  }
+
+  return { ok: true, payload: obj };
+}
+
+// -------------------------
+// Stripe verification
+// -------------------------
+async function verifyStripeCheckoutSession({ stripe, csId }) {
+  const id = cleanStr(csId);
+  if (!id) return { ok: false, reason: "missing_cs_id" };
+
+  let session;
+  try {
+    session = await stripe.checkout.sessions.retrieve(id);
+  } catch (e) {
+    return { ok: false, reason: "stripe_retrieve_failed", message: e?.message || String(e) };
+  }
+
+  // Conditions minimales
+  const paid = session?.payment_status === "paid";
+  const complete = session?.status === "complete" || session?.status === "complete";
+  // Stripe renvoie souvent status='complete' pour checkout session finalisée.
+  // On accepte "paid" comme signal principal.
+  if (!paid) {
+    return { ok: false, reason: "not_paid", status: session?.status, payment_status: session?.payment_status };
+  }
+
+  return {
+    ok: true,
+    session: {
+      id: session.id,
+      payment_status: session.payment_status,
+      status: session.status,
+      created: session.created,
+      expires_at: session.expires_at || null,
+      metadata: session.metadata || {},
+      customer_email: session.customer_details?.email || null,
+    },
+  };
+}
+
+// -------------------------
+// Handler
+// -------------------------
+module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
     return res.status(405).json({ error: "Méthode non autorisée. Utilisez POST." });
@@ -111,9 +205,29 @@ export default async function handler(req, res) {
     });
   }
 
-  // ✅ Modèles (meilleure qualité possible au 1er bloc)
-  // - INITIAL : vous pouvez mettre "gpt-4.1" si vous voulez un rendu plus dense
-  // - FOLLOWUP : "gpt-4.1-mini" pour les itérations (rapide)
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+  if (!stripeSecretKey) {
+    return res.status(500).json({
+      error: "STRIPE_SECRET_KEY non configurée (Vercel > Variables d’environnement).",
+    });
+  }
+
+  const tokenSecret = cleanStr(process.env.GHOSTOPS_DIAGNOSTIC_TOKEN_SECRET);
+  if (!tokenSecret) {
+    return res.status(500).json({
+      error:
+        "GHOSTOPS_DIAGNOSTIC_TOKEN_SECRET manquant. Ajoutez une clé longue et aléatoire dans Vercel (Variables d’environnement).",
+    });
+  }
+
+  const stripe = new Stripe(stripeSecretKey);
+
+  // Paramètres session
+  const MAX_ITERS = Number(process.env.GHOSTOPS_DIAGNOSTIC_MAX_ITERS || "5") || 5;
+  const TTL_SECONDS =
+    Number(process.env.GHOSTOPS_DIAGNOSTIC_SESSION_TTL_SECONDS || "7200") || 7200; // 2h par défaut
+
+  // Modèles
   const modelInitial =
     cleanStr(process.env.GHOSTOPS_DIAGNOSTIC_MODEL_INITIAL) ||
     cleanStr(process.env.GHOSTOPS_DIAGNOSTIC_MODEL) ||
@@ -124,8 +238,10 @@ export default async function handler(req, res) {
     cleanStr(process.env.GHOSTOPS_DIAGNOSTIC_MODEL) ||
     "gpt-4.1-mini";
 
-  // ✅ Tokens de sortie
   const maxOut = Number(process.env.GHOSTOPS_DIAGNOSTIC_MAX_OUTPUT_TOKENS || "1110") || 1110;
+
+  // Timeout OpenAI
+  const OPENAI_TIMEOUT_MS = Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "35000") || 35000;
 
   const contentType = req.headers["content-type"] || "";
 
@@ -144,39 +260,111 @@ export default async function handler(req, res) {
 
   body = body || {};
 
-  // Champs compatibles "chat"
+  // Champs message
   const effectiveDescription = cleanStr(body.description) || cleanStr(body.message);
   const safeContexte = cleanStr(body.contexte);
   const safeEnjeu = cleanStr(body.enjeu);
 
-  // Historique optionnel (pour itérations)
+  // Historique optionnel
   const history = normalizeHistory(body.history || body.conversation || body.messages);
-  const isFollowup = hasAssistantInHistory(history);
+  const isFollowupFromHistory = hasAssistantInHistory(history);
 
-  const model = isFollowup ? modelFollowup : modelInitial;
+  // Sécurité session
+  const csId = cleanStr(body.cs_id || body.csId);
+  const incomingToken = cleanStr(body.sessionToken || body.token);
 
-  console.log("[ghostops-diagnostic-ia] model:", model);
-  console.log("[ghostops-diagnostic-ia] max_output_tokens:", maxOut);
   console.log("[ghostops-diagnostic-ia] content-type:", contentType);
   console.log("[ghostops-diagnostic-ia] keys:", Object.keys(body || {}));
   console.log("[ghostops-diagnostic-ia] rawLen:", raw ? raw.length : 0);
   console.log("[ghostops-diagnostic-ia] descLen:", effectiveDescription.length);
   console.log("[ghostops-diagnostic-ia] historyLen:", history.length);
-  console.log("[ghostops-diagnostic-ia] followup:", isFollowup);
+  console.log("[ghostops-diagnostic-ia] hasToken:", Boolean(incomingToken));
+  console.log("[ghostops-diagnostic-ia] hasCsId:", Boolean(csId));
 
   if (!effectiveDescription) {
     return res.status(400).json({
-      error: 'Le champ "description" (ou "message") est obligatoire pour le diagnostic.',
-      debug: {
-        model,
-        contentType,
-        receivedKeys: Object.keys(body || {}),
-        rawLen: raw ? raw.length : 0,
-        rawSample: raw ? raw.slice(0, 200) : "",
-      },
+      error: 'Le champ "message" (ou "description") est obligatoire.',
     });
   }
 
+  // 1) Vérifier / initialiser session (token)
+  const now = Math.floor(Date.now() / 1000);
+
+  let sessionCtx = null; // { cs_id, itersLeft, exp }
+  let isFollowup = false;
+
+  if (incomingToken) {
+    const v = verifyToken(incomingToken, tokenSecret);
+    if (!v.ok) {
+      return res.status(401).json({
+        error: "Session invalide ou altérée. Veuillez relancer depuis le lien de confirmation de paiement.",
+        debug: { reason: v.reason },
+      });
+    }
+
+    const p = v.payload || {};
+    const exp = Number(p.exp || 0);
+
+    if (!exp || now > exp) {
+      return res.status(401).json({
+        error: "Session expirée. Veuillez relancer une session Diagnostic IA ou contacter GhostOps.",
+        debug: { reason: "expired", exp },
+      });
+    }
+
+    const itersLeft = Number(p.itersLeft);
+    if (!Number.isFinite(itersLeft) || itersLeft < 0) {
+      return res.status(401).json({
+        error: "Session invalide. Veuillez relancer depuis le lien de confirmation de paiement.",
+        debug: { reason: "bad_iters" },
+      });
+    }
+
+    if (itersLeft <= 0) {
+      return res.status(403).json({
+        error:
+          "Limite atteinte : vos 5 itérations ont été utilisées. Pour poursuivre, contactez GhostOps ou basculez vers Studio Scénarios.",
+        meta: { itersLeft: 0, expiresAt: exp },
+      });
+    }
+
+    sessionCtx = {
+      cs_id: cleanStr(p.cs_id),
+      itersLeft,
+      exp,
+    };
+
+    isFollowup = true; // dès qu’on a un token, on est en mode itération
+  } else {
+    // Pas de token : on exige cs_id et on vérifie Stripe
+    if (!csId) {
+      return res.status(401).json({
+        error:
+          "Accès non autorisé. Cette session nécessite un identifiant de paiement (cs_id) ou un token de session.",
+      });
+    }
+
+    const check = await verifyStripeCheckoutSession({ stripe, csId });
+    if (!check.ok) {
+      return res.status(401).json({
+        error:
+          "Paiement non vérifié. Veuillez utiliser le lien de fin de paiement (avec cs_id) ou contacter GhostOps.",
+        debug: check,
+      });
+    }
+
+    // Session initialisée : iters = MAX_ITERS, exp = now+TTL
+    sessionCtx = {
+      cs_id: check.session.id,
+      itersLeft: MAX_ITERS,
+      exp: now + TTL_SECONDS,
+    };
+
+    // Ici, initial = note complète
+    isFollowup = false;
+  }
+
+  // 2) Construire prompts (initial vs follow-up)
   const systemPrompt = `
 Tu es "GhostOps IA – Diagnostic", IA utilisée en back-office dans le produit payant
 "GhostOps Diagnostic IA – 90 minutes".
@@ -191,7 +379,6 @@ Règles :
 - Termine par : "Ce pré-diagnostic ne remplace ni un avis juridique, ni un conseil RH individualisé, ni une mission GhostOps complète."
 `.trim();
 
-  // --- Prompt initial vs itération ---
   const userPromptInitial = `
 Tu vas produire un pré-diagnostic structuré à partir des éléments suivants.
 
@@ -216,7 +403,7 @@ Ta réponse doit suivre strictement la structure ci-dessous, avec les titres exa
 5) Niveau de tension estimé (indication qualitative)
 6) Conclusion et intérêt d’une séance GhostOps Diagnostic IA – 90 minutes
 
-Exigences de niveau (obligatoires) :
+Exigences de niveau :
 - Chaque section contient 3 à 7 puces concrètes.
 - Inclure 2 à 3 options de lecture (A/B/C) avec bénéfices/risques/conditions.
 - Inclure une mini-liste "Décisions / priorités à 10 jours" (3 à 5 points) dans la section 6.
@@ -230,11 +417,11 @@ Contraintes :
   const userPromptFollowup = `
 Nous sommes en itération d’approfondissement (session Diagnostic IA).
 
-Contexte (historique) : utilise l’historique fourni pour rester cohérent.
+Contexte : utilise l’historique fourni pour rester cohérent si présent.
 Nouvelle question / précision de l’utilisateur :
 """${effectiveDescription}"""
 
-Règles de réponse (obligatoires) :
+Règles de réponse :
 - Réponds en profondeur, orienté décision.
 - Ne réécris pas toute la note : réponds à la question en 3 blocs maximum :
   A) Ce que cela change dans la lecture (impact sur risques / tensions / hypothèses)
@@ -248,10 +435,12 @@ Contraintes :
 
   const userPrompt = isFollowup ? userPromptFollowup : userPromptInitial;
 
-  // ✅ Timeout explicite
-  const OPENAI_TIMEOUT_MS = Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "35000") || 35000;
+  // Le modèle : initial vs follow-up (et history peut aussi déclencher follow-up)
+  const model = (isFollowup || isFollowupFromHistory) ? modelFollowup : modelInitial;
+
+  // 3) Appel OpenAI
   const controller = new AbortController();
-  const t = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
+  const timeout = setTimeout(() => controller.abort(), OPENAI_TIMEOUT_MS);
 
   try {
     const input = buildInputs({ systemPrompt, userPrompt, history });
@@ -282,10 +471,7 @@ Contraintes :
 
     if (!openaiResponse.ok) {
       return res.status(openaiResponse.status).json({
-        error:
-          data?.error?.message ||
-          data?.message ||
-          `Erreur OpenAI (HTTP ${openaiResponse.status})`,
+        error: data?.error?.message || data?.message || `Erreur OpenAI (HTTP ${openaiResponse.status})`,
         debug: {
           model,
           openaiStatus: openaiResponse.status,
@@ -303,19 +489,35 @@ Contraintes :
       });
     }
 
+    // 4) Décrément itérations (uniquement si réponse OK)
+    const newItersLeft = Math.max(0, Number(sessionCtx.itersLeft) - 1);
+
+    // 5) Nouveau token (rotation à chaque réponse)
+    const newToken = signToken(
+      {
+        cs_id: sessionCtx.cs_id,
+        itersLeft: newItersLeft,
+        exp: sessionCtx.exp,
+        v: 1,
+      },
+      tokenSecret
+    );
+
     return res.status(200).json({
       reply,
+      sessionToken: newToken,
+      itersLeft: newItersLeft,
+      expiresAt: sessionCtx.exp,
       meta: {
-        followup: isFollowup,
         model,
+        followup: isFollowup || isFollowupFromHistory,
         historyUsed: history.length,
       },
     });
   } catch (err) {
     if (err?.name === "AbortError") {
       return res.status(504).json({
-        error:
-          "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre description).",
+        error: "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre message).",
         debug: { model, timeoutMs: OPENAI_TIMEOUT_MS, max_output_tokens: maxOut },
       });
     }
@@ -326,6 +528,6 @@ Contraintes :
       debug: { model, message: err?.message || String(err) },
     });
   } finally {
-    clearTimeout(t);
+    clearTimeout(timeout);
   }
-}
+};
