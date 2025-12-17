@@ -61,6 +61,31 @@ function getBearerToken(req) {
 }
 
 // -------------------------
+// Troncature : marqueur + heuristique (back-end)
+// -------------------------
+const TRUNC_MARKER = "— FIN TRONQUÉE (demander la suite)";
+
+function looksTruncated(text) {
+  const t = String(text || "").trim();
+  if (!t) return false;
+
+  // fin “propre” (ponctuation forte / ellipsis / parenthèse fermante)
+  if (/[.!?…)]\s*$/.test(t)) return false;
+
+  // si trop court, on évite les faux positifs
+  if (t.length < 200) return false;
+
+  return true;
+}
+
+function ensureTruncMarker(text) {
+  const t = String(text || "").trim();
+  if (!t) return t;
+  if (t.includes(TRUNC_MARKER)) return t;
+  return `${t}\n\n${TRUNC_MARKER}`;
+}
+
+// -------------------------
 // Historique optionnel
 // -------------------------
 function clampText(s, maxChars) {
@@ -465,7 +490,7 @@ Exigences de niveau :
 Contraintes :
 - Synthétique et sélectif, mais dense.
 - Pas de plan d’exécution détaillé.
-- Si limite de longueur : terminer proprement puis ajouter "— FIN TRONQUÉE (demander la suite)".
+- Si limite de longueur : terminer proprement puis ajouter "${TRUNC_MARKER}".
 
 Format de sortie impératif (très important) :
 - Écris chaque titre sur sa propre ligne, en gras : "**1) ...**".
@@ -490,7 +515,7 @@ Règles de réponse :
 
 Contraintes :
 - Pas d’avis juridique formel, pas de qualification pénale.
-- Si limite de longueur : terminer proprement puis ajouter "— FIN TRONQUÉE (demander la suite)".
+- Si limite de longueur : terminer proprement puis ajouter "${TRUNC_MARKER}".
 
 Format de sortie impératif (très important) :
 - Utilise 3 titres en gras sur une ligne chacun : "**A) ...**", "**B) ...**", "**C) ...**".
@@ -515,7 +540,7 @@ Instruction :
 - Ne réécris pas l'introduction.
 - Garde le même style, ET une mise en forme aérée en Markdown.
 - Si tu dois rappeler une phrase de transition, fais-le en 1 ligne maximum.
-- Si tu atteins encore une limite, termine proprement puis ajoute "— FIN TRONQUÉE (demander la suite)".
+- Si tu atteins encore une limite, termine proprement puis ajoute "${TRUNC_MARKER}".
 
 Format impératif :
 - Conserve la structure en titres en gras + listes "- ".
@@ -568,7 +593,8 @@ Format impératif :
 
     if (!openaiResponse.ok) {
       return res.status(openaiResponse.status).json({
-        error: data?.error?.message || data?.message || `Erreur OpenAI (HTTP ${openaiResponse.status})`,
+        error:
+          data?.error?.message || data?.message || `Erreur OpenAI (HTTP ${openaiResponse.status})`,
         debug: {
           model,
           openaiStatus: openaiResponse.status,
@@ -578,12 +604,20 @@ Format impératif :
       });
     }
 
-    const reply = extractReplyFromResponsesApi(data);
+    // ✅ MODIF : on capture puis on force le marqueur si sortie "incomplete" ou phrase coupée.
+    let reply = extractReplyFromResponsesApi(data);
     if (!reply) {
       return res.status(502).json({
         error: "Réponse OpenAI reçue, mais texte introuvable.",
         debug: { model },
       });
+    }
+
+    // API Responses : status "incomplete" + incomplete_details quand max_output_tokens est atteint
+    const apiSaysIncomplete = data?.status === "incomplete" || Boolean(data?.incomplete_details);
+
+    if (apiSaysIncomplete || looksTruncated(reply)) {
+      reply = ensureTruncMarker(reply);
     }
 
     // 4) Décrément itérations
@@ -614,12 +648,14 @@ Format impératif :
         continue: Boolean(isContinue),
         historyUsed: history.length,
         max_output_tokens: maxOut,
+        incomplete: Boolean(apiSaysIncomplete),
       },
     });
   } catch (err) {
     if (err?.name === "AbortError") {
       return res.status(504).json({
-        error: "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre message).",
+        error:
+          "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre message).",
         debug: { model, timeoutMs: OPENAI_TIMEOUT_MS, max_output_tokens: maxOut },
       });
     }
