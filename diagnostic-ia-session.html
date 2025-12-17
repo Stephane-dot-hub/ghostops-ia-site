@@ -167,8 +167,9 @@
             Cette session Diagnostic IA est arrivée à son terme (expiration ou itérations consommées).
           </p>
           <p class="text-gray-300 text-sm md:text-base mb-4">
-            Si vous souhaitez poursuivre, GhostOps peut enclencher un <span class="font-semibold">Studio Scénarios</span>
-            ou produire une note <span class="font-semibold">Pré-brief Board</span>.
+            Si vous souhaitez poursuivre, GhostOps peut enclencher un
+            <span class="font-semibold">Studio Scénarios</span> ou produire une note
+            <span class="font-semibold">Pré-brief Board</span>.
           </p>
           <div class="flex flex-col sm:flex-row gap-3 mt-4">
             <a
@@ -528,20 +529,156 @@
           if (expiryEl) expiryEl.textContent = "—";
         }
 
+        // -----------------------------
+        // ✅ (1) + (2) : rendu aéré
+        // - conserve typewriter
+        // - support titres / listes / sauts de ligne
+        // -----------------------------
+        function escapeHtml(s) {
+          return String(s || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
+
+        function formatAiTextToHtml(rawText) {
+          let text = String(rawText || "");
+
+          // Sécurité + base
+          text = escapeHtml(text);
+
+          // Normaliser les retours
+          text = text.replace(/\r\n/g, "\n");
+
+          // Transformer titres "1) ..." / "A) ..." en "blocs" lisibles
+          // On ajoute une ligne vide avant les titres pour aérer.
+          text = text.replace(
+            /(^|\n)(\s*(?:\d+|[A-C])\)\s+[^\n]+)/g,
+            (m, p1, titleLine) => `${p1}\n\n<strong>${titleLine.trim()}</strong>`
+          );
+
+          // Sous-sections "4.1." "4.2." etc.
+          text = text.replace(
+            /(^|\n)(\s*\d+\.\d+\.\s+[^\n]+)/g,
+            (m, p1, titleLine) => `${p1}\n\n<strong>${titleLine.trim()}</strong>`
+          );
+
+          // Listes : "- " ou "• " => puces HTML
+          // On convertit par "blocs" de lignes consécutives.
+          const lines = text.split("\n");
+          const out = [];
+          let inUl = false;
+
+          const flushUl = () => {
+            if (inUl) {
+              out.push("</ul>");
+              inUl = false;
+            }
+          };
+
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+
+            const bulletMatch = line.match(/^\s*(?:-|\u2022)\s+(.*)$/);
+            if (bulletMatch) {
+              if (!inUl) {
+                out.push('<ul class="list-disc pl-5 space-y-1 my-2">');
+                inUl = true;
+              }
+              out.push(`<li>${bulletMatch[1]}</li>`);
+              continue;
+            }
+
+            // Lignes vides : fermer liste, puis ajouter un saut
+            if (!line.trim()) {
+              flushUl();
+              out.push("");
+              continue;
+            }
+
+            // Ligne normale : fermer liste et pousser
+            flushUl();
+            out.push(line);
+          }
+
+          flushUl();
+
+          // Paragraphes + retours ligne
+          let html = out.join("\n");
+
+          // Double sauts -> paragraphes
+          html = html
+            .split(/\n{2,}/)
+            .map((block) => block.trim())
+            .filter(Boolean)
+            .map((block) => {
+              // si bloc commence par <ul>, on le garde tel quel
+              if (block.startsWith("<ul")) return block;
+              // sinon paragraphes, en respectant les \n simples en <br>
+              const withBr = block.replace(/\n/g, "<br />");
+              return `<p class="my-2">${withBr}</p>`;
+            })
+            .join("");
+
+          return html;
+        }
+
+        function addMessage(sender, text) {
+          const wrapper = document.createElement("div");
+          wrapper.className = sender === "user" ? "mb-2 text-right" : "mb-2 text-left";
+
+          const bubble = document.createElement("div");
+
+          if (sender === "user") {
+            bubble.className =
+              "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg whitespace-pre-wrap";
+            bubble.textContent = text; // user = texte brut
+          } else {
+            // bot = HTML formaté (mais safe car escapeHtml)
+            bubble.className =
+              "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg whitespace-normal leading-relaxed";
+            bubble.innerHTML = formatAiTextToHtml(text);
+          }
+
+          wrapper.appendChild(bubble);
+          messages.appendChild(wrapper);
+          scrollToBottom();
+          return { wrapper, bubble };
+        }
+
         function addBotMessageTypewriter(text, { onDone } = {}) {
-          const { bubble } = addMessage("bot", "");
+          // On génère le HTML final (aéré) puis on “tape” ce HTML caractère par caractère.
+          // On évite les clignotements en reconstruisant innerHTML régulièrement.
+          const wrapper = document.createElement("div");
+          wrapper.className = "mb-2 text-left";
+
+          const bubble = document.createElement("div");
+          bubble.className =
+            "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg whitespace-normal leading-relaxed";
+
+          wrapper.appendChild(bubble);
+          messages.appendChild(wrapper);
+          scrollToBottom();
+
+          const finalHtml = formatAiTextToHtml(text);
+
           let index = 0;
           isTyping = true;
           setLockedUI(true);
 
           function step() {
-            if (index < text.length) {
-              bubble.textContent += text.charAt(index);
+            if (index < finalHtml.length) {
+              // “Tape” l’HTML. Cela peut couper au milieu d’une balise -> on tolère :
+              // les navigateurs gèrent généralement en “best effort”.
+              bubble.innerHTML = finalHtml.slice(0, index + 1);
               index += 1;
               scrollToBottom();
-              setTimeout(step, 12);
+              setTimeout(step, 6);
             } else {
               isTyping = false;
+              bubble.innerHTML = finalHtml; // état final propre
               const ok = itersLeft > 0 && (!expiresAtMs || Date.now() < expiresAtMs);
               setLockedUI(!ok);
               if (typeof onDone === "function") onDone();
@@ -618,8 +755,6 @@
         async function sendMessage() {
           if (isTyping) return;
 
-          // si une "suite" est disponible, on ne la masque pas tant qu'elle n'est pas demandée
-          // mais dès qu'un nouveau message utilisateur part, on masque le bouton
           hideContinue();
 
           if (expiresAtMs && Date.now() >= expiresAtMs) {
@@ -632,12 +767,35 @@
           const userMessage = (input.value || "").trim();
           if (!userMessage) return;
 
-          addMessage("user", userMessage);
+          // user bubble (avec retours ligne conservés)
+          const userWrap = document.createElement("div");
+          userWrap.className = "mb-2 text-right";
+          const userBubble = document.createElement("div");
+          userBubble.className =
+            "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg whitespace-pre-wrap";
+          userBubble.textContent = userMessage;
+          userWrap.appendChild(userBubble);
+          messages.appendChild(userWrap);
+          scrollToBottom();
+
           convo.push({ role: "user", content: userMessage });
 
           input.value = "";
 
-          const waiting = addMessage("bot", "Diagnostic IA en cours…");
+          // waiting bot (simple)
+          const waiting = (function () {
+            const w = document.createElement("div");
+            w.className = "mb-2 text-left";
+            const b = document.createElement("div");
+            b.className =
+              "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg whitespace-pre-wrap";
+            b.textContent = "Diagnostic IA en cours…";
+            w.appendChild(b);
+            messages.appendChild(w);
+            scrollToBottom();
+            return { wrapper: w };
+          })();
+
           setLockedUI(true);
 
           try {
@@ -667,15 +825,8 @@
               return;
             }
 
-            // Etat serveur
             applyServerSessionState(data);
 
-            // Décrémentation UI : UNIQUEMENT si ce n'est pas un continue (ici non)
-            // (Le vrai verrou doit être côté serveur)
-            // => on ne décrémente pas ici, car l’API renvoie itersLeft à jour
-            // et le serveur est la source de vérité.
-
-            // contexte
             const replyText = String(data.reply);
             lastAssistantReply = replyText;
             convo.push({ role: "assistant", content: replyText });
@@ -711,9 +862,19 @@
             return;
           }
 
-          // IMPORTANT : la suite ne doit pas consommer d’itération (côté serveur à faire aussi)
-          // On envoie un message "virtuel" au backend en mode continue.
-          const waiting = addMessage("bot", "Suite en cours…");
+          const waiting = (function () {
+            const w = document.createElement("div");
+            w.className = "mb-2 text-left";
+            const b = document.createElement("div");
+            b.className =
+              "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg whitespace-pre-wrap";
+            b.textContent = "Suite en cours…";
+            w.appendChild(b);
+            messages.appendChild(w);
+            scrollToBottom();
+            return { wrapper: w };
+          })();
+
           setLockedUI(true);
           if (continueBtn) continueBtn.disabled = true;
 
@@ -749,16 +910,12 @@
               return;
             }
 
-            // Etat serveur (token rotatif / expiration). IMPORTANT : itersLeft ne doit pas bouger si continue.
             applyServerSessionState(data);
 
             const replyText = String(data.reply);
-
-            // concat logique : on stocke la nouvelle fin comme dernier assistant
             lastAssistantReply = replyText;
             convo.push({ role: "assistant", content: replyText });
 
-            // masquer la barre avant d'afficher la suite (elle pourra réapparaître si la suite est elle-même tronquée)
             hideContinue();
 
             addBotMessageTypewriter(replyText, {
