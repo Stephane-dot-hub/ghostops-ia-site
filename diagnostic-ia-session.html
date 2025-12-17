@@ -78,6 +78,21 @@
         position: relative;
         z-index: 1;
       }
+
+      /* ✅ Lisibilité : styles pour le rendu Markdown->HTML du bot */
+      .bot-bubble p {
+        margin: 0.5rem 0;
+      }
+      .bot-bubble strong {
+        display: inline-block;
+        margin-top: 0.25rem;
+      }
+      .bot-bubble ul {
+        margin: 0.5rem 0;
+      }
+      .bot-bubble li {
+        margin: 0.15rem 0;
+      }
     </style>
   </head>
 
@@ -434,23 +449,6 @@
           messages.scrollTop = messages.scrollHeight;
         }
 
-        function addMessage(sender, text) {
-          const wrapper = document.createElement("div");
-          wrapper.className = sender === "user" ? "mb-2 text-right" : "mb-2 text-left";
-
-          const bubble = document.createElement("div");
-          bubble.className =
-            sender === "user"
-              ? "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg"
-              : "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg";
-
-          bubble.textContent = text;
-          wrapper.appendChild(bubble);
-          messages.appendChild(wrapper);
-          scrollToBottom();
-          return { wrapper, bubble };
-        }
-
         function setLockedUI(locked) {
           if (!sendBtn || !input) return;
           sendBtn.disabled = locked;
@@ -505,7 +503,7 @@
         function hardEndToExpiredScreen(message) {
           setLockedUI(true);
           hideContinue();
-          if (message) addMessage("bot", message);
+          if (message) addBotMessageInstant(message);
           hide(validatingBlock);
           hide(paidBlock);
           hide(notPaidBlock);
@@ -533,6 +531,10 @@
         // ✅ (1) + (2) : rendu aéré
         // - conserve typewriter
         // - support titres / listes / sauts de ligne
+        //
+        // ✅ MODIF importante vs votre version :
+        // - le typewriter tape du TEXTE (pas du HTML) pour éviter les balises coupées
+        // - ensuite on "hydrate" en HTML formaté
         // -----------------------------
         function escapeHtml(s) {
           return String(s || "")
@@ -552,21 +554,18 @@
           // Normaliser les retours
           text = text.replace(/\r\n/g, "\n");
 
-          // Transformer titres "1) ..." / "A) ..." en "blocs" lisibles
-          // On ajoute une ligne vide avant les titres pour aérer.
+          // Aérer avant titres "1) ..." / "A) ..." + mettre en gras
           text = text.replace(
             /(^|\n)(\s*(?:\d+|[A-C])\)\s+[^\n]+)/g,
             (m, p1, titleLine) => `${p1}\n\n<strong>${titleLine.trim()}</strong>`
           );
 
-          // Sous-sections "4.1." "4.2." etc.
+          // Sous-sections "4.1." etc.
           text = text.replace(
             /(^|\n)(\s*\d+\.\d+\.\s+[^\n]+)/g,
             (m, p1, titleLine) => `${p1}\n\n<strong>${titleLine.trim()}</strong>`
           );
 
-          // Listes : "- " ou "• " => puces HTML
-          // On convertit par "blocs" de lignes consécutives.
           const lines = text.split("\n");
           const out = [];
           let inUl = false;
@@ -591,32 +590,26 @@
               continue;
             }
 
-            // Lignes vides : fermer liste, puis ajouter un saut
             if (!line.trim()) {
               flushUl();
               out.push("");
               continue;
             }
 
-            // Ligne normale : fermer liste et pousser
             flushUl();
             out.push(line);
           }
 
           flushUl();
 
-          // Paragraphes + retours ligne
           let html = out.join("\n");
 
-          // Double sauts -> paragraphes
           html = html
             .split(/\n{2,}/)
             .map((block) => block.trim())
             .filter(Boolean)
             .map((block) => {
-              // si bloc commence par <ul>, on le garde tel quel
               if (block.startsWith("<ul")) return block;
-              // sinon paragraphes, en respectant les \n simples en <br>
               const withBr = block.replace(/\n/g, "<br />");
               return `<p class="my-2">${withBr}</p>`;
             })
@@ -625,60 +618,67 @@
           return html;
         }
 
-        function addMessage(sender, text) {
+        function addUserMessage(text) {
           const wrapper = document.createElement("div");
-          wrapper.className = sender === "user" ? "mb-2 text-right" : "mb-2 text-left";
+          wrapper.className = "mb-2 text-right";
 
           const bubble = document.createElement("div");
-
-          if (sender === "user") {
-            bubble.className =
-              "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg whitespace-pre-wrap";
-            bubble.textContent = text; // user = texte brut
-          } else {
-            // bot = HTML formaté (mais safe car escapeHtml)
-            bubble.className =
-              "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg whitespace-normal leading-relaxed";
-            bubble.innerHTML = formatAiTextToHtml(text);
-          }
+          bubble.className =
+            "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg whitespace-pre-wrap";
+          bubble.textContent = text;
 
           wrapper.appendChild(bubble);
           messages.appendChild(wrapper);
           scrollToBottom();
+
           return { wrapper, bubble };
         }
 
-        function addBotMessageTypewriter(text, { onDone } = {}) {
-          // On génère le HTML final (aéré) puis on “tape” ce HTML caractère par caractère.
-          // On évite les clignotements en reconstruisant innerHTML régulièrement.
+        function addBotMessageInstant(text) {
           const wrapper = document.createElement("div");
           wrapper.className = "mb-2 text-left";
 
           const bubble = document.createElement("div");
           bubble.className =
-            "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg whitespace-normal leading-relaxed";
+            "bot-bubble inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg whitespace-normal leading-relaxed";
+          bubble.innerHTML = formatAiTextToHtml(text);
 
           wrapper.appendChild(bubble);
           messages.appendChild(wrapper);
           scrollToBottom();
 
-          const finalHtml = formatAiTextToHtml(text);
+          return { wrapper, bubble };
+        }
+
+        function addBotMessageTypewriter(text, { onDone } = {}) {
+          const wrapper = document.createElement("div");
+          wrapper.className = "mb-2 text-left";
+
+          const bubble = document.createElement("div");
+          bubble.className =
+            "bot-bubble inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg whitespace-pre-wrap leading-relaxed";
+
+          wrapper.appendChild(bubble);
+          messages.appendChild(wrapper);
+          scrollToBottom();
 
           let index = 0;
           isTyping = true;
           setLockedUI(true);
 
           function step() {
-            if (index < finalHtml.length) {
-              // “Tape” l’HTML. Cela peut couper au milieu d’une balise -> on tolère :
-              // les navigateurs gèrent généralement en “best effort”.
-              bubble.innerHTML = finalHtml.slice(0, index + 1);
+            if (index < text.length) {
+              bubble.textContent = text.slice(0, index + 1); // ✅ on tape du TEXTE
               index += 1;
               scrollToBottom();
-              setTimeout(step, 6);
+              setTimeout(step, 10);
             } else {
+              // ✅ une fois terminé : on convertit en HTML aéré
+              bubble.classList.remove("whitespace-pre-wrap");
+              bubble.classList.add("whitespace-normal");
+              bubble.innerHTML = formatAiTextToHtml(text);
+
               isTyping = false;
-              bubble.innerHTML = finalHtml; // état final propre
               const ok = itersLeft > 0 && (!expiresAtMs || Date.now() < expiresAtMs);
               setLockedUI(!ok);
               if (typeof onDone === "function") onDone();
@@ -758,7 +758,9 @@
           hideContinue();
 
           if (expiresAtMs && Date.now() >= expiresAtMs) {
-            hardEndToExpiredScreen("Session expirée. Pour poursuivre, contactez GhostOps ou activez un format supérieur.");
+            hardEndToExpiredScreen(
+              "Session expirée. Pour poursuivre, contactez GhostOps ou activez un format supérieur."
+            );
             return;
           }
 
@@ -767,22 +769,11 @@
           const userMessage = (input.value || "").trim();
           if (!userMessage) return;
 
-          // user bubble (avec retours ligne conservés)
-          const userWrap = document.createElement("div");
-          userWrap.className = "mb-2 text-right";
-          const userBubble = document.createElement("div");
-          userBubble.className =
-            "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg whitespace-pre-wrap";
-          userBubble.textContent = userMessage;
-          userWrap.appendChild(userBubble);
-          messages.appendChild(userWrap);
-          scrollToBottom();
-
+          addUserMessage(userMessage);
           convo.push({ role: "user", content: userMessage });
 
           input.value = "";
 
-          // waiting bot (simple)
           const waiting = (function () {
             const w = document.createElement("div");
             w.className = "mb-2 text-left";
@@ -809,18 +800,18 @@
                 `Une erreur est survenue lors du Diagnostic IA (HTTP ${resp.status}). Veuillez réessayer.`;
 
               if (resp.status === 401 || resp.status === 403) {
-                addMessage("bot", errMsg);
+                addBotMessageInstant(errMsg);
                 hardEndToExpiredScreen("");
                 return;
               }
 
-              addMessage("bot", errMsg);
+              addBotMessageInstant(errMsg);
               setLockedUI(false);
               return;
             }
 
             if (!data?.reply) {
-              addMessage("bot", "Réponse inattendue du serveur. Veuillez réessayer.");
+              addBotMessageInstant("Réponse inattendue du serveur. Veuillez réessayer.");
               setLockedUI(false);
               return;
             }
@@ -845,8 +836,7 @@
           } catch (err) {
             console.error("Erreur lors de l’appel /api/ghostops-diagnostic-ia :", err);
             if (waiting?.wrapper?.parentNode) waiting.wrapper.parentNode.removeChild(waiting.wrapper);
-            addMessage(
-              "bot",
+            addBotMessageInstant(
               "Erreur de connexion à GhostOps IA. Veuillez réessayer ultérieurement ou utiliser la page contact."
             );
             setLockedUI(false);
@@ -858,7 +848,9 @@
           if (!lastWasTruncated) return;
 
           if (expiresAtMs && Date.now() >= expiresAtMs) {
-            hardEndToExpiredScreen("Session expirée. Pour poursuivre, contactez GhostOps ou activez un format supérieur.");
+            hardEndToExpiredScreen(
+              "Session expirée. Pour poursuivre, contactez GhostOps ou activez un format supérieur."
+            );
             return;
           }
 
@@ -892,19 +884,19 @@
                 `Une erreur est survenue lors de la suite (HTTP ${resp.status}). Veuillez réessayer.`;
 
               if (resp.status === 401 || resp.status === 403) {
-                addMessage("bot", errMsg);
+                addBotMessageInstant(errMsg);
                 hardEndToExpiredScreen("");
                 return;
               }
 
-              addMessage("bot", errMsg);
+              addBotMessageInstant(errMsg);
               setLockedUI(false);
               if (continueBtn) continueBtn.disabled = false;
               return;
             }
 
             if (!data?.reply) {
-              addMessage("bot", "Réponse inattendue du serveur. Veuillez réessayer.");
+              addBotMessageInstant("Réponse inattendue du serveur. Veuillez réessayer.");
               setLockedUI(false);
               if (continueBtn) continueBtn.disabled = false;
               return;
@@ -926,7 +918,7 @@
           } catch (err) {
             console.error("Erreur lors du continue:", err);
             if (waiting?.wrapper?.parentNode) waiting.wrapper.parentNode.removeChild(waiting.wrapper);
-            addMessage("bot", "Erreur de connexion. Veuillez réessayer.");
+            addBotMessageInstant("Erreur de connexion. Veuillez réessayer.");
             setLockedUI(false);
             if (continueBtn) continueBtn.disabled = false;
           }
