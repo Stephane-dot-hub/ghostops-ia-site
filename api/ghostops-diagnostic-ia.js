@@ -296,8 +296,7 @@ module.exports = async function handler(req, res) {
   const csId = cleanStr(body.cs_id || body.csId);
 
   // token peut venir du body OU du header Authorization: Bearer
-  const incomingToken =
-    cleanStr(body.sessionToken || body.token) || cleanStr(getBearerToken(req));
+  const incomingToken = cleanStr(body.sessionToken || body.token) || cleanStr(getBearerToken(req));
 
   // Continue context
   const lastAssistant = clampText(cleanStr(body.last_assistant || body.lastAssistant), 8000);
@@ -321,8 +320,7 @@ module.exports = async function handler(req, res) {
   }
   if (isContinue && !incomingToken) {
     return res.status(401).json({
-      error:
-        "Accès non autorisé. La demande de suite nécessite un token de session (sessionToken).",
+      error: "Accès non autorisé. La demande de suite nécessite un token de session (sessionToken).",
     });
   }
   if (isContinue && !lastAssistant && history.length < 2) {
@@ -361,14 +359,12 @@ module.exports = async function handler(req, res) {
     const itersLeft = Number(p.itersLeft);
     if (!Number.isFinite(itersLeft) || itersLeft < 0) {
       return res.status(401).json({
-        error:
-          "Session invalide. Veuillez relancer depuis le lien de confirmation de paiement.",
+        error: "Session invalide. Veuillez relancer depuis le lien de confirmation de paiement.",
         debug: { reason: "bad_iters" },
       });
     }
 
-    // ✅ En mode continue : on autorise itersLeft=0 uniquement si la session n’est pas expirée ?
-    // Non : on reste strict — si itersLeft==0, plus d’accès, même pour suite (sinon contournement).
+    // ✅ On reste strict : si itersLeft==0, plus d’accès, même pour suite.
     if (itersLeft <= 0) {
       return res.status(403).json({
         error:
@@ -412,6 +408,7 @@ module.exports = async function handler(req, res) {
   }
 
   // 2) Construire prompts (initial vs follow-up vs continue)
+  // ✅ MODIF POINT 2 : forcer une sortie aérée, structurée et lisible (Markdown simple).
   const systemPrompt = `
 Tu es "GhostOps IA – Diagnostic", IA utilisée en back-office dans le produit payant
 "GhostOps Diagnostic IA – 90 minutes".
@@ -423,6 +420,16 @@ Règles :
 - Niveau "lecture tactique" : clarification, cartographie, options, priorités, conditions de succès.
 - Style assumable devant un board : dense, concret, sans jargon creux.
 - Quand tu proposes des options, donne : intention / bénéfice / risque / condition de succès.
+
+Mise en forme obligatoire (lisibilité) :
+- Utilise un format Markdown lisible.
+- Titres sur une ligne dédiée, en gras (ex: "**1) ...**").
+- Listes exclusivement en puces avec "- " (pas de paragraphes longs).
+- Une ligne vide entre chaque section.
+- Paragraphes très courts : max 2–3 lignes ; au-delà, découper en puces.
+- Interdiction des blocs compacts : jamais plus de 5 lignes sans saut de ligne.
+
+Clôture :
 - Termine par : "Ce pré-diagnostic ne remplace ni un avis juridique, ni un conseil RH individualisé, ni une mission GhostOps complète."
 `.trim();
 
@@ -459,6 +466,12 @@ Contraintes :
 - Synthétique et sélectif, mais dense.
 - Pas de plan d’exécution détaillé.
 - Si limite de longueur : terminer proprement puis ajouter "— FIN TRONQUÉE (demander la suite)".
+
+Format de sortie impératif (très important) :
+- Écris chaque titre sur sa propre ligne, en gras : "**1) ...**".
+- Sous chaque titre : uniquement des puces "- ".
+- Mets une ligne vide entre chaque section.
+- Zéro bloc compact : si tu sens un paragraphe long, transforme-le en 2 à 5 puces.
 `.trim();
 
   const userPromptFollowup = `
@@ -478,9 +491,15 @@ Règles de réponse :
 Contraintes :
 - Pas d’avis juridique formel, pas de qualification pénale.
 - Si limite de longueur : terminer proprement puis ajouter "— FIN TRONQUÉE (demander la suite)".
+
+Format de sortie impératif (très important) :
+- Utilise 3 titres en gras sur une ligne chacun : "**A) ...**", "**B) ...**", "**C) ...**".
+- Sous chaque bloc : uniquement des puces "- ".
+- Mets une ligne vide entre A, B, C.
+- Évite les blocs compacts : max 5 lignes sans saut de ligne.
 `.trim();
 
-  // ✅ Nouveau : prompt "continue"
+  // ✅ Prompt "continue" : conserver le style + la structure aérée, sans répétitions.
   const userPromptContinue = `
 Nous sommes en "suite" d'une réponse tronquée.
 
@@ -494,9 +513,14 @@ Instruction :
 - Continue exactement là où la réponse s’est arrêtée.
 - Ne répète pas les sections déjà données ; reprends au bon endroit.
 - Ne réécris pas l'introduction.
-- Garde le même style, même structure implicite.
+- Garde le même style, ET une mise en forme aérée en Markdown.
 - Si tu dois rappeler une phrase de transition, fais-le en 1 ligne maximum.
 - Si tu atteins encore une limite, termine proprement puis ajoute "— FIN TRONQUÉE (demander la suite)".
+
+Format impératif :
+- Conserve la structure en titres en gras + listes "- ".
+- Ajoute des lignes vides entre sections.
+- Interdiction des blocs compacts : découpe en puces.
 `.trim();
 
   const userPrompt = isContinue
@@ -544,8 +568,7 @@ Instruction :
 
     if (!openaiResponse.ok) {
       return res.status(openaiResponse.status).json({
-        error:
-          data?.error?.message || data?.message || `Erreur OpenAI (HTTP ${openaiResponse.status})`,
+        error: data?.error?.message || data?.message || `Erreur OpenAI (HTTP ${openaiResponse.status})`,
         debug: {
           model,
           openaiStatus: openaiResponse.status,
@@ -596,8 +619,7 @@ Instruction :
   } catch (err) {
     if (err?.name === "AbortError") {
       return res.status(504).json({
-        error:
-          "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre message).",
+        error: "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre message).",
         debug: { model, timeoutMs: OPENAI_TIMEOUT_MS, max_output_tokens: maxOut },
       });
     }
