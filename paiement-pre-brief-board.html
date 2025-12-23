@@ -258,9 +258,19 @@
 
         if (!payBtn || !statusEl) return;
 
+        // ✅ IMPORTANT :
+        // Le "success_url" doit être fixé côté serveur (endpoint /api/create-checkout-session-pre-brief-board),
+        // sous la forme :
+        //   https://www.ghostops.tech/pre-brief-board-session.html?paid=1&cs_id={CHECKOUT_SESSION_ID}
+        //
+        // Ce fichier HTML n'a pas accès à {CHECKOUT_SESSION_ID}. Il se contente de rediriger vers Stripe Checkout.
+
         payBtn.addEventListener('click', async function () {
           statusEl.textContent = 'Connexion au service de paiement en cours…';
           statusEl.className = 'mt-3 text-xs text-gray-300';
+
+          payBtn.disabled = true;
+          payBtn.classList.add('opacity-60', 'cursor-not-allowed');
 
           try {
             const response = await fetch('/api/create-checkout-session-pre-brief-board', {
@@ -268,12 +278,14 @@
               headers: { 'Content-Type': 'application/json' }
             });
 
-            const data = await response.json();
+            const data = await response.json().catch(() => ({}));
 
             if (!response.ok || !data.url) {
               const errText = data.error || 'Erreur lors de la création de la session de paiement Stripe.';
               statusEl.textContent = errText;
               statusEl.className = 'mt-3 text-xs text-red-400';
+              payBtn.disabled = false;
+              payBtn.classList.remove('opacity-60', 'cursor-not-allowed');
               return;
             }
 
@@ -283,6 +295,8 @@
             console.error('Erreur lors de l’appel /api/create-checkout-session-pre-brief-board :', err);
             statusEl.textContent = 'Erreur de connexion au service de paiement. Veuillez réessayer dans quelques instants.';
             statusEl.className = 'mt-3 text-xs text-red-400';
+            payBtn.disabled = false;
+            payBtn.classList.remove('opacity-60', 'cursor-not-allowed');
           }
         });
       })();
