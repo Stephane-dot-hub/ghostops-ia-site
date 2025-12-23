@@ -18,7 +18,7 @@ module.exports = async function handler(req, res) {
     return res.status(500).json({ error: "STRIPE_SECRET_KEY non configurée." });
   }
 
-  // Price ID Niveau 3 (env prioritaire, sinon fallback sur celui que vous m’avez donné)
+  // Price ID Niveau 3
   const priceId =
     cleanStr(process.env.GHOSTOPS_BOARD_STRIPE_PRICE_ID) ||
     "price_1SeWCRK0Qxok0kNVLzqMd4Au";
@@ -28,9 +28,11 @@ module.exports = async function handler(req, res) {
     cleanStr(process.env.GHOSTOPS_PUBLIC_ORIGIN) ||
     "https://www.ghostops.tech";
 
-  // URLs (ajustables)
+  // ✅ Succès : on revient sur la page session avec cs_id
   const success_url = `${origin}/pre-brief-board-session.html?cs_id={CHECKOUT_SESSION_ID}`;
-  const cancel_url = `${origin}/pre-brief-board.html?canceled=1`;
+
+  // ✅ Annulation : retour sur la page paiement (pour afficher le bandeau "annulé")
+  const cancel_url = `${origin}/paiement-pre-brief-board.html?canceled=1`;
 
   try {
     const stripe = new Stripe(stripeSecretKey);
@@ -41,9 +43,10 @@ module.exports = async function handler(req, res) {
       success_url,
       cancel_url,
       allow_promotion_codes: true,
-      // Vous pouvez activer la collecte d’email client si souhaité :
-      // customer_creation: "always",
-      // billing_address_collection: "auto",
+
+      // (Optionnel) utile en back-office
+      client_reference_id: "ghostops_level3_prebrief_board",
+
       metadata: {
         product: "ghostops_pre_brief_board",
         level: "3",
@@ -52,7 +55,7 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({ ok: true, url: session.url, id: session.id });
   } catch (err) {
-    console.error("[pre-brief-board-checkout] error:", err);
+    console.error("[ghostops-pre-brief-board-checkout] error:", err);
     return res.status(500).json({
       ok: false,
       error: "Impossible de créer la session de paiement.",
