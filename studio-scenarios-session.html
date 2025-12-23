@@ -10,7 +10,6 @@
       content="Espace IA sécurisé du GhostOps Studio Scénarios : construction de 2 à 3 scénarios tactiques comparables à partir de votre Diagnostic IA ou de votre dossier consolidé."
     />
     <meta name="robots" content="noindex, nofollow" />
-
     <link rel="canonical" href="https://www.ghostops.tech/studio-scenarios-session.html" />
 
     <!-- Open Graph -->
@@ -24,15 +23,10 @@
     <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
 
     <!-- Fonts & Tailwind -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      tailwind.config = {
-        theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } },
-      };
+      tailwind.config = { theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } } };
     </script>
 
     <style>
@@ -49,80 +43,29 @@
         transition: opacity 0.4s ease;
       }
       @keyframes bgPulse {
-        0% {
-          filter: brightness(1) contrast(1);
-        }
-        100% {
-          filter: brightness(1.05) contrast(1.05);
-        }
+        0% { filter: brightness(1) contrast(1); }
+        100% { filter: brightness(1.05) contrast(1.05); }
       }
-      .text-shadow {
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-      }
-      html {
-        scroll-behavior: smooth;
-      }
-      header,
-      main,
-      section,
-      footer {
-        position: relative;
-        z-index: 1;
-      }
+      .text-shadow { text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6); }
+      html { scroll-behavior: smooth; }
+      header, main, section, footer { position: relative; z-index: 1; }
 
-      /* Bubbles : lisibles et cohérentes */
+      /* Bulles lisibles */
       .bot-bubble {
-        background: rgba(17, 24, 39, 0.85);
-        border: 1px solid rgba(55, 65, 81, 0.9);
-        color: rgb(229, 231, 235);
-        padding: 10px 12px;
-        border-radius: 14px;
-        display: inline-block;
-        max-width: 100%;
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-      .user-bubble {
-        background: rgba(255, 255, 255, 0.9);
-        border: 1px solid rgba(229, 231, 235, 0.8);
-        color: #111827;
-        padding: 10px 12px;
-        border-radius: 14px;
-        display: inline-block;
-        max-width: 100%;
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-      .bot-row {
-        text-align: left;
-      }
-      .user-row {
-        text-align: right;
-      }
-
-      /* Markdown léger côté bot */
-      .bot-bubble h3,
-      .bot-bubble h2,
-      .bot-bubble h1 {
-        font-weight: 700;
-        margin: 10px 0 6px 0;
+        white-space: normal;
+        line-height: 1.55;
       }
       .bot-bubble ul {
-        margin: 6px 0 0 18px;
+        list-style: disc;
+        padding-left: 1.2rem;
+        margin: 0.35rem 0 0.35rem 0;
       }
-      .bot-bubble li {
-        margin: 3px 0;
-      }
-      .bot-bubble p {
-        margin: 6px 0;
-      }
-      .bot-bubble strong {
-        font-weight: 700;
-      }
-      .bot-bubble code {
-        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
-          "Courier New", monospace;
-        font-size: 0.95em;
+      .bot-bubble li { margin: 0.15rem 0; }
+      .bot-bubble strong { font-weight: 700; }
+      .bot-bubble p { margin: 0.25rem 0; }
+
+      .ghostops-btn {
+        border: 1px solid rgba(148, 163, 184, 0.35);
       }
     </style>
   </head>
@@ -130,18 +73,13 @@
   <body class="bg-gray-900 text-white font-sans leading-relaxed">
     <!-- HEADER -->
     <header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
-      <a
-        href="/index.html"
-        class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase"
-      >
+      <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
         GHOST<span class="text-gray-400">OPS</span>
       </a>
       <nav class="flex items-center gap-4 text-xs md:text-sm">
         <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
         <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
-        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white"
-          >Qui sommes-nous&nbsp;?</a
-        >
+        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
         <a
           href="/contact.html"
           class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition"
@@ -160,46 +98,29 @@
         >
           <p class="font-semibold mb-1">Paiement GhostOps Studio Scénarios confirmé.</p>
           <p>
-            Vous êtes dans l’espace IA dédié au
-            <span class="font-semibold">Niveau&nbsp;2 – GhostOps Studio Scénarios</span>.
-            Les échanges qui suivent servent à préparer vos
-            <span class="font-semibold">2 à 3 scénarios tactiques</span>.
-          </p>
-        </div>
-
-        <!-- Bandeau accès (cs_id manquant / invalide) -->
-        <div
-          id="ghostops-studio-access-banner"
-          class="hidden mb-4 rounded-xl border border-amber-500/70 bg-amber-900/30 px-4 py-3 text-xs md:text-sm text-amber-100"
-        >
-          <p class="font-semibold mb-1">Accès à valider</p>
-          <p id="ghostops-studio-access-text" class="text-amber-100">
-            Cette session nécessite un identifiant de paiement (<span class="font-semibold">cs_id</span>).
+            Vous êtes dans l’espace IA dédié au <span class="font-semibold">Niveau&nbsp;2 – GhostOps Studio Scénarios</span>.
+            Les échanges qui suivent servent à préparer vos <span class="font-semibold">2 à 3 scénarios tactiques</span>.
           </p>
         </div>
       </section>
 
       <!-- CONTEXTE NIVEAU 2 -->
       <section class="max-w-4xl mx-auto mt-4 mb-6">
-        <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">
-          GhostOps IA – Niveau&nbsp;2 · Studio Scénarios
-        </p>
-        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
-          Espace IA – GhostOps Studio Scénarios
-        </h1>
+        <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">GhostOps IA – Niveau&nbsp;2 · Studio Scénarios</p>
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">Espace IA – GhostOps Studio Scénarios</h1>
         <p class="text-gray-200 text-sm md:text-base mb-3">
           Cet espace est réservé au <span class="font-semibold">Niveau&nbsp;2 de la suite GhostOps IA</span>.
-          Il a pour objectif de transformer votre <span class="font-semibold">Diagnostic IA</span> ou votre
-          dossier consolidé en <span class="font-semibold">2 à 3 scénarios tactiques comparables</span>.
+          Il a pour objectif de transformer votre <span class="font-semibold">Diagnostic IA</span> ou votre dossier consolidé
+          en <span class="font-semibold">2 à 3 scénarios tactiques comparables</span>.
         </p>
         <p class="text-gray-300 text-xs md:text-sm mb-3">
-          L’IA GhostOps ne remplace pas l’intervention humaine ni les arbitrages de gouvernance.
-          Elle sert ici à <span class="font-semibold">structurer les options</span>, clarifier les
-          <span class="font-semibold">risques / gains / expositions</span> et tester différentes lignes d’action.
+          L’IA GhostOps ne remplace pas l’intervention humaine ni les arbitrages de gouvernance. Elle sert ici à
+          <span class="font-semibold">structurer les options</span>, clarifier les <span class="font-semibold">risques / gains / expositions</span>
+          et tester différentes lignes d’action.
         </p>
         <p class="text-gray-400 text-[11px] md:text-xs">
-          Évitez de saisir des noms complets ou des données directement identifiantes. Restez centré sur
-          les fonctions, les comportements, les rapports de force et les enjeux (humains, politiques, réputationnels).
+          Évitez de saisir des noms complets ou des données directement identifiantes. Restez centré sur les fonctions, les comportements,
+          les rapports de force et les enjeux (humains, politiques, réputationnels).
         </p>
       </section>
 
@@ -209,80 +130,53 @@
           <h2 class="text-lg md:text-xl font-semibold mb-3 text-white text-shadow">
             Atelier IA – Construction de scénarios tactiques
           </h2>
-          <p class="text-gray-300 text-xs md:text-sm mb-4">
-            Pour tirer pleinement parti de cet espace, commencez par rappeler en quelques lignes&nbsp;:
-          </p>
-          <ul class="list-disc list-inside text-gray-300 text-xs md:text-sm mb-4 space-y-1">
-            <li>le <span class="font-semibold">contexte</span> (périmètre, fonction, situation actuelle) ;</li>
-            <li>les <span class="font-semibold">acteurs clés</span> et leurs comportements visibles ;</li>
-            <li>
-              ce que vous cherchez surtout à <span class="font-semibold">éviter</span> et à
-              <span class="font-semibold">sécuriser</span> ;
-            </li>
-            <li>
-              les <span class="font-semibold">contraintes</span> non négociables (délai, confidentialité,
-              gouvernance, droit, etc.).
-            </li>
-          </ul>
-          <p class="text-gray-400 text-[11px] md:text-xs mb-4">
-            L’IA GhostOps pourra alors vous proposer plusieurs <span class="font-semibold">axes de scénarios</span>,
-            les décliner, comparer leurs implications et préparer une base exploitable pour la suite de l’intervention GhostOps.
-          </p>
 
-          <!-- Zone de chat IA Niveau 2 -->
           <div class="mt-5">
+            <!-- Zone messages -->
             <div
               id="ghostops-studio-messages"
               class="bg-gray-950/80 border border-gray-800 rounded-xl px-3 py-3 h-64 md:h-80 overflow-y-auto text-xs md:text-sm space-y-2"
             >
-              <div class="bot-row">
-                <div class="bot-bubble text-xs md:text-[13px]">
-                  <span class="font-semibold">GhostOps IA – Studio Scénarios&nbsp;:</span>
-                  <span>
-                    Pour commencer, décrivez votre situation en précisant&nbsp;:
-                    (1) le contexte, (2) les acteurs et leurs positions, (3) ce que vous cherchez surtout à éviter,
-                    (4) ce qui serait considéré comme une issue acceptable.<br /><br />
-                    Je vous répondrai avec une première <span class="font-semibold">lecture tactique</span> et
-                    2 à 3 pistes de scénarios à approfondir.
-                  </span>
-                </div>
+              <div class="text-gray-200 text-xs md:text-[13px]">
+                <span class="font-semibold">GhostOps IA – Studio Scénarios&nbsp;:</span>
+                <span>
+                  Pour commencer, décrivez votre situation en précisant&nbsp;: (1) le contexte, (2) les acteurs et leurs positions,
+                  (3) ce que vous cherchez surtout à éviter, (4) ce qui serait considéré comme une issue acceptable.
+                  <br /><br />
+                  Je répondrai avec une première structuration et 2 à 3 scénarios à approfondir.
+                </span>
               </div>
             </div>
 
+            <!-- Bouton suite -->
+            <div class="mt-3 flex items-center gap-2">
+              <button
+                id="ghostops-studio-continue"
+                type="button"
+                class="hidden ghostops-btn text-xs md:text-sm px-4 py-2 rounded-md bg-gray-900/70 hover:bg-gray-800 text-gray-100"
+              >
+                Demander la suite
+              </button>
+              <span id="ghostops-studio-continue-hint" class="hidden text-[11px] md:text-xs text-gray-400">
+                La suite ne consomme pas d’itération.
+              </span>
+            </div>
+
+            <!-- Form -->
             <form id="ghostops-studio-form" class="mt-3 flex flex-col gap-2 md:flex-row md:items-end">
               <textarea
                 id="ghostops-studio-input"
                 class="flex-1 text-xs md:text-sm bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-2 resize-none focus:outline-none focus:border-gray-400"
                 rows="3"
-                placeholder="Décrivez votre situation (contexte, acteurs, risques, ce que vous cherchez à sécuriser)…"
+                placeholder="Décrivez votre situation (contexte, acteurs, contraintes, ce que vous cherchez à sécuriser)…"
               ></textarea>
-              <button
-                id="ghostops-studio-send"
-                type="submit"
-                class="mt-1 md:mt-0 md:ml-2 text-xs md:text-sm px-4 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200 disabled:opacity-60 disabled:cursor-not-allowed"
-              >
+              <button type="submit" class="mt-1 md:mt-0 md:ml-2 text-xs md:text-sm px-4 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
                 Envoyer
               </button>
             </form>
 
-            <div class="mt-2 flex items-center justify-between gap-3 text-[11px] md:text-xs text-gray-400">
-              <div>
-                <span class="font-semibold">Itérations restantes :</span>
-                <span id="ghostops-studio-iters">—</span>
-              </div>
-              <button
-                id="ghostops-studio-continue"
-                type="button"
-                class="hidden px-3 py-1 rounded-md border border-gray-600 hover:border-gray-400 hover:text-white transition"
-                title="Demander la suite si la réponse est tronquée"
-              >
-                Demander la suite
-              </button>
-            </div>
-
             <p class="mt-3 text-[11px] md:text-xs text-gray-500">
-              Cet espace IA prépare les scénarios. La validation finale, le cadrage des décisions et les
-              communications sensibles sont toujours assumés par des humains (dirigeants, board, GhostOps).
+              Cet espace IA prépare les scénarios. La validation finale, le cadrage des décisions et les communications sensibles restent assumés par des humains.
             </p>
           </div>
         </div>
@@ -302,102 +196,72 @@
       </div>
     </footer>
 
-    <!-- Script : bandeaux + chat IA Niveau 2 (corrigé : envoi cs_id puis sessionToken) -->
     <script>
       (function () {
-        const API_URL = "/api/ghostops-studio-scenarios";
         const TRUNC_MARKER = "— FIN TRONQUÉE (demander la suite)";
 
         const params = new URLSearchParams(window.location.search);
-        const csIdFromUrl = params.get("cs_id") || "";
-        const paid = params.get("paid"); // compat legacy si vous l’utilisez ailleurs
-
+        const csId = params.get("cs_id") || "";
+        const paid = params.get("paid");
         const paidBanner = document.getElementById("ghostops-studio-paid-banner");
-        const accessBanner = document.getElementById("ghostops-studio-access-banner");
-        const accessText = document.getElementById("ghostops-studio-access-text");
+
+        // Affiche le bandeau si payé=1 OU si cs_id présent (cas standard Stripe)
+        if ((paid === "1" || csId) && paidBanner) {
+          paidBanner.classList.remove("hidden");
+        }
 
         const form = document.getElementById("ghostops-studio-form");
         const input = document.getElementById("ghostops-studio-input");
         const messages = document.getElementById("ghostops-studio-messages");
-        const sendBtn = document.getElementById("ghostops-studio-send");
-        const itersEl = document.getElementById("ghostops-studio-iters");
-        const continueBtn = document.getElementById("ghostops-studio-continue");
 
-        if (!form || !input || !messages || !sendBtn) return;
+        const btnContinue = document.getElementById("ghostops-studio-continue");
+        const hintContinue = document.getElementById("ghostops-studio-continue-hint");
 
-        // Affichage bandeau paiement : si cs_id présent, on considère que l'utilisateur arrive de Stripe.
-        if ((csIdFromUrl && paidBanner) || (paid === "1" && paidBanner)) {
-          paidBanner.classList.remove("hidden");
-        }
+        if (!form || !input || !messages) return;
 
-        // Si pas de cs_id et pas de token, on informe l'utilisateur (sans empêcher l'UI, mais l'API refusera).
-        if (!csIdFromUrl) {
-          accessBanner && accessBanner.classList.remove("hidden");
-          if (accessText) {
-            accessText.textContent =
-              "Aucun identifiant de paiement (cs_id) détecté dans l’URL. Merci d’accéder à cet espace via la confirmation de paiement.";
-          }
-        }
-
-        // Session state (token + iters + last assistant)
-        const STATE = {
-          sessionToken: "",
-          itersLeft: null,
-          expiresAt: null,
-          lastAssistant: "",
-          history: [], // {role, content}
-          busy: false,
-        };
+        // État session
+        let sessionToken = "";
+        let itersLeft = null;
+        let lastAssistantRaw = "";
+        let history = []; // {role:"user"|"assistant", content:"..."}
 
         function scrollToBottom() {
           messages.scrollTop = messages.scrollHeight;
         }
 
-        function setBusy(on) {
-          STATE.busy = on;
-          sendBtn.disabled = on;
-          input.disabled = on;
-          if (continueBtn) continueBtn.disabled = on;
+        function escapeHtml(str) {
+          return String(str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
         }
 
-        function setIters(itersLeft) {
-          STATE.itersLeft = typeof itersLeft === "number" ? itersLeft : STATE.itersLeft;
-          if (itersEl) itersEl.textContent = STATE.itersLeft === null ? "—" : String(STATE.itersLeft);
-        }
+        // Convertit un texte Markdown simple (vos contraintes) en HTML aéré
+        function formatAiTextToHtml(raw) {
+          const text = String(raw || "").replace(/\r\n/g, "\n").trim();
+          if (!text) return "";
 
-        function showContinueIfNeeded(botText) {
-          if (!continueBtn) return;
-          const need = typeof botText === "string" && botText.includes(TRUNC_MARKER);
-          continueBtn.classList.toggle("hidden", !need);
-        }
-
-        // Markdown léger : titres en gras "**...**" -> <strong>... </strong>, puces "- " -> <ul><li>...
-        function formatAiTextToHtml(text) {
-          const t = String(text || "");
-          const esc = (s) =>
-            s
-              .replace(/&/g, "&amp;")
-              .replace(/</g, "&lt;")
-              .replace(/>/g, "&gt;");
-
-          const lines = esc(t).split("\n");
+          // On travaille ligne par ligne
+          const lines = text.split("\n");
           let html = "";
           let inUl = false;
 
-          function closeUl() {
+          const closeUl = () => {
             if (inUl) {
               html += "</ul>";
               inUl = false;
             }
-          }
+          };
 
-          for (const rawLine of lines) {
-            const line = rawLine.trimEnd();
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
 
-            // Ligne vide
+            // Ligne vide => saut de paragraphe
             if (!line.trim()) {
               closeUl();
-              html += "<div style='height:6px'></div>";
+              html += "<p></p>";
               continue;
             }
 
@@ -407,211 +271,233 @@
                 html += "<ul>";
                 inUl = true;
               }
-              const item = line.trim().slice(2);
-              html += `<li>${item}</li>`;
+              let li = line.trim().slice(2);
+              li = escapeHtml(li);
+
+              // gras **...**
+              li = li.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+              html += `<li>${li}</li>`;
               continue;
             }
 
-            // Titre en gras : **...**
-            const m = line.match(/^\*\*(.+)\*\*$/);
+            // Titres en gras sur une ligne "**...**"
+            const m = line.trim().match(/^\*\*(.+?)\*\*$/);
             if (m) {
               closeUl();
-              html += `<h3>${m[1]}</h3>`;
+              const title = escapeHtml(m[1]).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+              html += `<p><strong>${title}</strong></p>`;
               continue;
             }
 
-            // Gras inline **...**
+            // Ligne normale
             closeUl();
-            html += `<p>${line.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")}</p>`;
+            let p = escapeHtml(line).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+            html += `<p>${p}</p>`;
           }
 
           closeUl();
+          // Nettoyage des paragraphes vides successifs
+          html = html.replace(/<p><\/p>\s*(<p><\/p>\s*)+/g, "<p></p>");
           return html;
         }
 
-        function addUserMessage(text) {
-          const row = document.createElement("div");
-          row.className = "user-row";
+        function addMessageBubble(sender) {
+          const wrapper = document.createElement("div");
+          wrapper.className = sender === "user" ? "text-right" : "text-left";
+
           const bubble = document.createElement("div");
-          bubble.className = "user-bubble text-xs md:text-sm";
-          bubble.textContent = text;
-          row.appendChild(bubble);
-          messages.appendChild(row);
+          bubble.className =
+            sender === "user"
+              ? "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg mb-1"
+              : "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg mb-1 bot-bubble";
+
+          // On tapera du texte brut dans bubble.textContent, puis on hydratera en HTML
+          wrapper.appendChild(bubble);
+          messages.appendChild(wrapper);
+          scrollToBottom();
+          return bubble;
+        }
+
+        function hideContinue() {
+          btnContinue.classList.add("hidden");
+          hintContinue.classList.add("hidden");
+        }
+
+        function showContinue() {
+          btnContinue.classList.remove("hidden");
+          hintContinue.classList.remove("hidden");
+        }
+
+        function stripTruncMarker(text) {
+          const t = String(text || "");
+          if (!t.includes(TRUNC_MARKER)) return { cleaned: t, truncated: false };
+          return { cleaned: t.replace(TRUNC_MARKER, "").trim(), truncated: true };
+        }
+
+        async function typewriterText(el, fullText, speedMs) {
+          el.textContent = "";
+          const txt = String(fullText || "");
+          for (let i = 0; i < txt.length; i++) {
+            el.textContent += txt[i];
+            if (i % 2 === 0) scrollToBottom();
+            await new Promise((r) => setTimeout(r, speedMs));
+          }
           scrollToBottom();
         }
 
-        function addBotMessageText(text) {
-          const row = document.createElement("div");
-          row.className = "bot-row";
-          const bubble = document.createElement("div");
-          bubble.className = "bot-bubble text-xs md:text-sm";
-          // IMPORTANT : on affiche l'IA en HTML aéré
-          bubble.innerHTML = formatAiTextToHtml(text);
-          row.appendChild(bubble);
-          messages.appendChild(row);
-          scrollToBottom();
-          return { row, bubble };
+        async function renderBotReply(replyRaw) {
+          // Stocke la version brute côté client (utile pour "continue")
+          lastAssistantRaw = String(replyRaw || "");
+
+          const { cleaned, truncated } = stripTruncMarker(lastAssistantRaw);
+
+          // Effet machine à écrire sur le texte brut
+          const bubble = addMessageBubble("bot");
+          await typewriterText(bubble, cleaned, 8);
+
+          // Puis conversion en HTML aéré (puces, titres)
+          const html = formatAiTextToHtml(cleaned);
+          if (html) {
+            bubble.innerHTML = html;
+          }
+
+          // Affiche le bouton suite si tronqué
+          if (truncated) showContinue();
+          else hideContinue();
+
+          // Historique (on conserve la version "cleaned" sans marqueur)
+          history.push({ role: "assistant", content: cleaned });
         }
 
-        function addBotWaiting() {
-          const row = document.createElement("div");
-          row.className = "bot-row";
-          const bubble = document.createElement("div");
-          bubble.className = "bot-bubble text-xs md:text-sm";
-          bubble.textContent = "Lecture scénarios en cours…";
-          row.appendChild(bubble);
-          messages.appendChild(row);
-          scrollToBottom();
-          return row;
-        }
-
-        async function postToApi(payload) {
-          const r = await fetch(API_URL, {
+        async function callApi(payload) {
+          const resp = await fetch("/api/ghostops-studio-scenarios", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(payload),
           });
 
-          const data = await r.json().catch(() => ({}));
-          if (!r.ok) {
-            const msg = data && data.error ? data.error : `Erreur HTTP ${r.status}`;
-            const err = new Error(msg);
-            err.status = r.status;
-            err.data = data;
-            throw err;
-          }
-          return data;
+          let data = {};
+          try { data = await resp.json(); } catch (_) {}
+          return { ok: resp.ok, status: resp.status, data };
         }
 
-        async function sendMessage() {
-          if (STATE.busy) return;
+        async function sendUserMessage() {
+          hideContinue();
 
           const userText = (input.value || "").trim();
           if (!userText) return;
 
-          addUserMessage(userText);
+          // garde-fou longueur (évite latence/timeout inutiles)
+          if (userText.length > 4000) {
+            const b = addMessageBubble("bot");
+            b.textContent = "Message trop long. Merci de condenser (max ~4000 caractères) ou de découper en 2 envois.";
+            return;
+          }
+
+          // UI + historique
+          const userBubble = addMessageBubble("user");
+          userBubble.textContent = userText;
+          history.push({ role: "user", content: userText });
+
           input.value = "";
 
-          // History
-          STATE.history.push({ role: "user", content: userText });
-
-          setBusy(true);
-          showContinueIfNeeded(""); // hide
-          const waitingRow = addBotWaiting();
+          // message attente
+          const waiting = addMessageBubble("bot");
+          waiting.textContent = "Lecture scénarios en cours…";
 
           try {
-            // IMPORTANT : 1er appel => cs_id ; puis token
-            const payload = {
-              ...(STATE.sessionToken ? { sessionToken: STATE.sessionToken } : { cs_id: csIdFromUrl }),
-              message: userText,
-              history: STATE.history,
-            };
+            const payload =
+              sessionToken
+                ? { sessionToken, message: userText, history }
+                : { cs_id: csId, message: userText }; // 1er appel : cs_id obligatoire
 
-            const data = await postToApi(payload);
+            const { ok, data } = await callApi(payload);
 
-            // store token
-            if (data.sessionToken) STATE.sessionToken = data.sessionToken;
-            setIters(typeof data.itersLeft === "number" ? data.itersLeft : null);
+            // retire "Lecture..."
+            if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
 
-            // remove waiting
-            waitingRow && waitingRow.parentNode && waitingRow.parentNode.removeChild(waitingRow);
-
-            const reply = data.reply || "";
-            STATE.lastAssistant = reply;
-            STATE.history.push({ role: "assistant", content: reply });
-
-            addBotMessageText(reply);
-            showContinueIfNeeded(reply);
-          } catch (err) {
-            console.error("Erreur /api/ghostops-studio-scenarios :", err);
-
-            waitingRow && waitingRow.parentNode && waitingRow.parentNode.removeChild(waitingRow);
-
-            // Si cs_id n'est pas envoyé ou absent, on le dit clairement
-            if (!csIdFromUrl && !STATE.sessionToken) {
-              accessBanner && accessBanner.classList.remove("hidden");
-              if (accessText) {
-                accessText.textContent =
-                  "Accès refusé : aucun cs_id détecté. Merci de revenir via la confirmation de paiement Stripe.";
-              }
+            if (!ok || !data.reply) {
+              const b = addMessageBubble("bot");
+              b.textContent = data.error || "Une erreur est survenue (Studio Scénarios). Veuillez réessayer.";
+              return;
             }
 
-            const errText =
-              (err && err.message) ||
-              "Une erreur est survenue lors de l’analyse IA (Studio Scénarios). Veuillez réessayer.";
-            addBotMessageText(`**Erreur**\n- ${errText}`);
-          } finally {
-            setBusy(false);
+            // met à jour session
+            if (data.sessionToken) sessionToken = data.sessionToken;
+            if (typeof data.itersLeft === "number") itersLeft = data.itersLeft;
+
+            await renderBotReply(data.reply);
+          } catch (err) {
+            console.error("Erreur /api/ghostops-studio-scenarios :", err);
+            if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
+            const b = addMessageBubble("bot");
+            b.textContent = "Erreur de connexion à GhostOps IA. Veuillez réessayer ou utiliser la page contact.";
           }
         }
 
         async function requestContinue() {
-          if (STATE.busy) return;
-          if (!STATE.sessionToken) {
-            addBotMessageText("**Erreur**\n- Impossible de demander la suite sans session active.");
-            return;
-          }
-          if (!STATE.lastAssistant) {
-            addBotMessageText("**Erreur**\n- Aucun contexte de réponse précédente disponible.");
-            return;
-          }
+          if (!sessionToken) return;
+          if (!lastAssistantRaw) return;
 
-          setBusy(true);
-          const waitingRow = addBotWaiting();
+          // UI attente
+          const waiting = addMessageBubble("bot");
+          waiting.textContent = "Suite en cours…";
 
           try {
             const payload = {
-              sessionToken: STATE.sessionToken,
+              sessionToken,
               continue: true,
-              last_assistant: STATE.lastAssistant,
-              history: STATE.history,
+              last_assistant: lastAssistantRaw,
+              history,
             };
 
-            const data = await postToApi(payload);
+            const { ok, data } = await callApi(payload);
 
-            if (data.sessionToken) STATE.sessionToken = data.sessionToken;
-            setIters(typeof data.itersLeft === "number" ? data.itersLeft : null);
+            if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
 
-            waitingRow && waitingRow.parentNode && waitingRow.parentNode.removeChild(waitingRow);
+            if (!ok || !data.reply) {
+              const b = addMessageBubble("bot");
+              b.textContent = data.error || "Impossible de récupérer la suite. Veuillez réessayer.";
+              return;
+            }
 
-            const reply = data.reply || "";
-            STATE.lastAssistant = reply;
-            STATE.history.push({ role: "assistant", content: reply });
+            // met à jour session (rotation token)
+            if (data.sessionToken) sessionToken = data.sessionToken;
+            if (typeof data.itersLeft === "number") itersLeft = data.itersLeft;
 
-            addBotMessageText(reply);
-            showContinueIfNeeded(reply);
+            // Important : la réponse "continue" est un nouvel assistant, on l'ajoute à l’historique
+            await renderBotReply(data.reply);
           } catch (err) {
-            console.error("Erreur continue /api/ghostops-studio-scenarios :", err);
-            waitingRow && waitingRow.parentNode && waitingRow.parentNode.removeChild(waitingRow);
-            const errText =
-              (err && err.message) ||
-              "Une erreur est survenue lors de la demande de suite. Veuillez réessayer.";
-            addBotMessageText(`**Erreur**\n- ${errText}`);
-          } finally {
-            setBusy(false);
+            console.error("Erreur continue :", err);
+            if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
+            const b = addMessageBubble("bot");
+            b.textContent = "Erreur lors de la récupération de la suite. Veuillez réessayer.";
           }
         }
 
+        // Events
         form.addEventListener("submit", function (e) {
           e.preventDefault();
-          sendMessage();
+          sendUserMessage();
         });
 
         input.addEventListener("keydown", function (e) {
           if (e.key === "Enter" && !e.shiftKey) {
             e.preventDefault();
-            sendMessage();
+            sendUserMessage();
           }
         });
 
-        if (continueBtn) {
-          continueBtn.addEventListener("click", function () {
-            requestContinue();
-          });
-        }
+        btnContinue.addEventListener("click", function () {
+          requestContinue();
+        });
 
-        // Affichage iters par défaut
-        setIters(null);
+        // Si pas de cs_id dans l’URL, l’espace ne peut pas initier la session (Niveau 2 indépendant)
+        if (!csId) {
+          const b = addMessageBubble("bot");
+          b.textContent =
+            "Accès non initialisé : identifiant de paiement manquant (cs_id). Veuillez revenir depuis la page de confirmation de paiement.";
+        }
       })();
     </script>
   </body>
