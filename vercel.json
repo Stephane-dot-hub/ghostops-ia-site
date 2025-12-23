@@ -1,5 +1,8 @@
 {
   "functions": {
+    "api/ghostops-studio-scenarios.js": {
+      "maxDuration": 60
+    },
     "api/ghostops-diagnostic-ia.js": {
       "maxDuration": 60
     }
