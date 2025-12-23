@@ -1,62 +1,62 @@
-// /api/create-checkout-session-pre-brief-board.js
-const Stripe = require('stripe');
+// /api/ghostops-pre-brief-board-checkout.js
+// Crée une Stripe Checkout Session pour le Niveau 3 (Pré-Brief Board)
 
-const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+const Stripe = require("stripe");
+
+function cleanStr(v) {
+  return typeof v === "string" ? v.trim() : "";
+}
 
 module.exports = async function handler(req, res) {
-  // Sécurité : uniquement POST
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', ['POST']);
-    return res
-      .status(405)
-      .json({ error: 'Méthode non autorisée. Utilisez POST.' });
+  if (req.method !== "POST") {
+    res.setHeader("Allow", ["POST"]);
+    return res.status(405).json({ error: "Méthode non autorisée. Utilisez POST." });
   }
 
-  // Vérification configuration Stripe
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeSecretKey) {
-    return res.status(500).json({
-      error: 'STRIPE_SECRET_KEY non configurée dans les variables d’environnement.'
-    });
+    return res.status(500).json({ error: "STRIPE_SECRET_KEY non configurée." });
   }
 
-  const stripe = new Stripe(stripeSecretKey);
+  // Price ID Niveau 3 (env prioritaire, sinon fallback sur celui que vous m’avez donné)
+  const priceId =
+    cleanStr(process.env.GHOSTOPS_BOARD_STRIPE_PRICE_ID) ||
+    "price_1SeWCRK0Qxok0kNVLzqMd4Au";
+
+  const origin =
+    cleanStr(req.headers.origin) ||
+    cleanStr(process.env.GHOSTOPS_PUBLIC_ORIGIN) ||
+    "https://www.ghostops.tech";
+
+  // URLs (ajustables)
+  const success_url = `${origin}/pre-brief-board-session.html?cs_id={CHECKOUT_SESSION_ID}`;
+  const cancel_url = `${origin}/pre-brief-board.html?canceled=1`;
 
   try {
-    const origin =
-      req.headers.origin ||
-      (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+    const stripe = new Stripe(stripeSecretKey);
 
     const session = await stripe.checkout.sessions.create({
-      mode: 'payment',
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: 'eur',
-            product_data: {
-              name: 'GhostOps Pré-brief Board – Note de gouvernance board-ready',
-            },
-            // 2 990 € TTC = 299 000 centimes
-            unit_amount: 299000,
-          },
-          quantity: 1,
-        },
-      ],
-      // Après paiement OK → retour vers pre-brief-board-session.html?paid=1
-      success_url: `${origin}/pre-brief-board-session.html?paid=1`,
-      // Si annulation → retour page de paiement Pré-brief Board
-      cancel_url: `${origin}/paiement-pre-brief-board.html?canceled=1`,
+      mode: "payment",
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url,
+      cancel_url,
+      allow_promotion_codes: true,
+      // Vous pouvez activer la collecte d’email client si souhaité :
+      // customer_creation: "always",
+      // billing_address_collection: "auto",
       metadata: {
-        product: 'ghostops_pre_brief_board',
+        product: "ghostops_pre_brief_board",
+        level: "3",
       },
     });
 
-    return res.status(200).json({ url: session.url });
+    return res.status(200).json({ ok: true, url: session.url, id: session.id });
   } catch (err) {
-    console.error('Erreur Stripe create-checkout-session-pre-brief-board :', err);
+    console.error("[pre-brief-board-checkout] error:", err);
     return res.status(500).json({
-      error: 'Erreur lors de la création de la session de paiement Stripe (Pré-brief Board).',
-      details: err && err.message ? err.message : String(err),
+      ok: false,
+      error: "Impossible de créer la session de paiement.",
+      debug: err?.message || String(err),
     });
   }
 };
