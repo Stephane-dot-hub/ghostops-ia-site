@@ -5,20 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>GhostOps Pré-brief Board – Espace de travail & activation</title>
-    <meta
-      name="description"
-      content="Espace de travail GhostOps Pré-brief Board, réservé aux dirigeants et boards ayant validé le paiement. Rappel du périmètre, préparation des éléments et première structuration du dossier."
-    />
+    <meta name="description" content="Espace de travail GhostOps Pré-brief Board, réservé aux dirigeants et boards ayant validé le paiement. Rappel du périmètre, préparation des éléments et première structuration du dossier." />
 
     <meta name="robots" content="noindex, nofollow" />
     <link rel="canonical" href="https://www.ghostops.tech/pre-brief-board-session.html" />
 
     <!-- Open Graph -->
     <meta property="og:title" content="GhostOps Pré-brief Board – Espace de travail" />
-    <meta
-      property="og:description"
-      content="Session Pré-brief Board GhostOps : espace de travail confidentiel pour structurer votre note board-ready après validation du paiement."
-    />
+    <meta property="og:description" content="Session Pré-brief Board GhostOps : espace de travail confidentiel pour structurer votre note board-ready après validation du paiement." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.ghostops.tech/pre-brief-board-session.html" />
     <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
@@ -34,86 +28,27 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
-        theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } },
+        theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } }
       };
     </script>
 
     <style>
       body::before {
         content: "";
-        background: url("/assets/background-ghostops.jpg") no-repeat center center fixed;
+        background: url('/assets/background-ghostops.jpg') no-repeat center center fixed;
         background-color: #0f172a;
         background-size: cover;
         animation: bgPulse 10s ease-in-out infinite alternate;
-        position: fixed;
-        inset: 0;
-        opacity: 0.25;
-        z-index: -1;
-        transition: opacity 0.4s ease;
+        position: fixed; inset: 0; opacity: 0.25; z-index: -1;
+        transition: opacity .4s ease;
       }
       @keyframes bgPulse {
-        0% {
-          filter: brightness(1) contrast(1);
-        }
-        100% {
-          filter: brightness(1.05) contrast(1.05);
-        }
+        0% { filter: brightness(1) contrast(1); }
+        100% { filter: brightness(1.05) contrast(1.05); }
       }
-      .text-shadow {
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-      }
-      html {
-        scroll-behavior: smooth;
-      }
-      header,
-      main,
-      section,
-      footer {
-        position: relative;
-        z-index: 1;
-      }
-
-      /* Bulles plus lisibles */
-      .user-bubble {
-        display: inline-block;
-        max-width: 85%;
-        background: rgba(59, 130, 246, 0.95);
-        color: white;
-        border-radius: 14px;
-        padding: 10px 12px;
-        white-space: pre-wrap;
-        word-break: break-word;
-      }
-      .bot-bubble {
-        display: inline-block;
-        max-width: 85%;
-        background: rgba(31, 41, 55, 0.95);
-        color: #e5e7eb;
-        border-radius: 14px;
-        padding: 10px 12px;
-        white-space: pre-wrap;
-        word-break: break-word;
-        border: 1px solid rgba(148, 163, 184, 0.25);
-      }
-      .ghostops-small {
-        font-size: 11px;
-        color: rgba(148, 163, 184, 0.9);
-      }
-
-      /* Bouton "suite" */
-      .ghostops-continue {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 11px;
-        border: 1px solid rgba(148, 163, 184, 0.35);
-        padding: 8px 10px;
-        border-radius: 10px;
-        transition: all 0.2s ease;
-      }
-      .ghostops-continue:hover {
-        background: rgba(148, 163, 184, 0.12);
-      }
+      .text-shadow { text-shadow: 1px 1px 4px rgba(0,0,0,.6); }
+      html { scroll-behavior: smooth; }
+      header, main, section, footer { position: relative; z-index: 1; }
     </style>
   </head>
 
@@ -127,10 +62,8 @@
         <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
         <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
         <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
-        <a
-          href="/contact.html"
-          class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition"
-        >
+        <a href="/contact.html"
+           class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition">
           Contact confidentiel
         </a>
       </nav>
@@ -140,32 +73,31 @@
       <!-- BLOC SI PAIEMENT NON DÉTECTÉ -->
       <section id="prebrief-not-paid" class="hidden max-w-3xl mx-auto mt-10 mb-10">
         <div class="bg-red-900/40 border border-red-500/70 rounded-2xl p-6 md:p-8">
-          <h1 class="text-2xl md:text-3xl font-bold mb-3 text-white text-shadow">Accès réservé – GhostOps Pré-brief Board</h1>
+          <h1 class="text-2xl md:text-3xl font-bold mb-3 text-white text-shadow">
+            Accès réservé – GhostOps Pré-brief Board
+          </h1>
+
           <p class="text-gray-200 text-sm md:text-base mb-3">
             Cette page est réservée aux dirigeants, boards ou directions ayant validé un
             <span class="font-semibold">GhostOps Pré-brief Board</span> via le module de paiement sécurisé.
           </p>
+
           <p class="text-gray-300 text-sm md:text-base mb-4">
-            Si vous pensez être arrivé ici par erreur, vous pouvez revenir à la page de présentation du format
-            ou nous contacter en toute confidentialité.
+            Après paiement, vous devez utiliser le lien complet contenant un identifiant <span class="font-semibold">cs_id</span>.
           </p>
+
           <div class="flex flex-col sm:flex-row gap-3 mt-4">
-            <a
-              href="/pre-brief-board.html"
-              class="inline-block px-5 py-2 text-xs md:text-sm border border-white rounded-md hover:bg-white hover:text-black transition text-center"
-            >
+            <a href="/pre-brief-board.html"
+               class="inline-block px-5 py-2 text-xs md:text-sm border border-white rounded-md hover:bg-white hover:text-black transition text-center">
               Revenir à la page Pré-brief Board
             </a>
-            <a
-              href="/contact.html"
-              class="inline-block px-5 py-2 text-xs md:text-sm border border-gray-400 rounded-md hover:bg-gray-100 hover:text-black transition text-center"
-            >
+            <a href="/contact.html"
+               class="inline-block px-5 py-2 text-xs md:text-sm border border-gray-400 rounded-md hover:bg-gray-100 hover:text-black transition text-center">
               Contacter GhostOps
             </a>
           </div>
-          <p class="text-gray-500 text-[11px] mt-4">
-            Après paiement, vous devez utiliser le lien complet contenant un identifiant <span class="font-semibold">cs_id</span>.
-          </p>
+
+          <p id="prebrief-debug" class="text-gray-500 text-[11px] mt-4"></p>
         </div>
       </section>
 
@@ -174,95 +106,87 @@
         <!-- Bandeau de confirmation -->
         <div class="bg-emerald-900/40 border border-emerald-500/70 rounded-2xl p-4 mb-6">
           <p class="text-xs md:text-sm text-emerald-100">
-            Accès Pré-brief Board actif. Cet espace sert à structurer votre contexte avant production de la note board-ready.
+            Votre paiement pour le <span class="font-semibold">GhostOps Pré-brief Board</span> a été validé.
+            Cet espace vous permet de préparer et structurer votre dossier pour la note board-ready.
           </p>
-          <p id="prebrief-meta" class="ghostops-small mt-2"></p>
         </div>
 
         <!-- Intro -->
         <header class="mb-8">
-          <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">GhostOps IA · Pré-brief Board – Espace de travail</p>
+          <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">
+            GhostOps IA · Pré-brief Board – Espace de travail
+          </p>
           <h1 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
             Session Pré-brief Board – préparation de la note board-ready
           </h1>
           <p class="text-gray-200 text-sm md:text-base mb-3 max-w-3xl">
-            L’objectif de cette session est de rassembler les éléments décisifs et de structurer le contexte avant la production de la
-            <span class="font-semibold">note board-ready</span>.
+            Vous avez activé un <span class="font-semibold">Pré-brief Board GhostOps</span>. L’objectif de cette session
+            est de rassembler les éléments décisifs et de structurer le contexte avant la production de la
+            <span class="font-semibold">note board-ready</span> destinée à votre conseil d’administration ou comité d’audit.
           </p>
           <p class="text-gray-300 text-sm md:text-base max-w-3xl">
             GhostOps utilise l’IA comme instrument de lecture et de simulation. La note finale reste un
-            <span class="font-semibold">livrable humain, assumé</span>.
+            <span class="font-semibold">livrable humain, assumé</span>, construit à partir de votre contexte, des échanges
+            et des arbitrages que vous validerez.
           </p>
         </header>
 
         <!-- Étape 1 -->
         <section class="mb-8">
           <div class="bg-gray-800/80 rounded-2xl p-6 md:p-8">
-            <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">Étape&nbsp;1 – Préparer vos éléments de contexte</h2>
+            <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">
+              Étape&nbsp;1 – Préparer vos éléments de contexte
+            </h2>
             <p class="text-gray-300 text-sm md:text-base mb-4 max-w-3xl">
+              Avant d’utiliser l’IA, il est utile de rassembler les informations qui structurent réellement votre dossier.
               Vous pouvez vous appuyer sur la trame suivante (vous n’êtes pas obligé de tout remplir) :
             </p>
             <ul class="list-disc list-inside text-gray-300 text-sm md:text-base space-y-2 max-w-3xl">
-              <li><span class="font-semibold">Périmètre</span> (groupe / filiale / site / fonction).</li>
-              <li><span class="font-semibold">Faits & dynamique</span> : tensions, décisions en suspens, signaux faibles.</li>
-              <li><span class="font-semibold">Acteurs</span> : influence réelle, lignes de force, zones d’exposition.</li>
-              <li><span class="font-semibold">Ce que vous cherchez à éviter</span> : crise, fuite, perte de mandat, etc.</li>
-              <li><span class="font-semibold">Horizon</span> : échéances board/comité/audit/AG/roadshow.</li>
+              <li><span class="font-semibold">Périmètre concerné</span> (groupe / filiale / site / fonction…).</li>
+              <li><span class="font-semibold">Situation actuelle</span> : faits, tensions, décisions en suspens.</li>
+              <li><span class="font-semibold">Acteurs clés et lignes de force</span> : influence réelle, blocages.</li>
+              <li><span class="font-semibold">Ce que vous cherchez à éviter</span> : crise ouverte, fuite presse, etc.</li>
+              <li><span class="font-semibold">Horizon de décision</span> : board, comité, échéances.</li>
             </ul>
             <p class="text-gray-400 text-xs md:text-sm mt-4 max-w-3xl">
-              Vous pouvez saisir ces éléments dans le module ci-dessous, en évitant les noms complets si vous le souhaitez.
+              Vous pouvez saisir ces éléments directement dans le module IA ci-dessous.
             </p>
           </div>
         </section>
 
-        <!-- Étape 2 : workspace IA -->
+        <!-- Étape 2 : chat -->
         <section>
           <div class="bg-gray-900/80 border border-gray-700 rounded-2xl p-6 md:p-8">
             <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">
-              Étape&nbsp;2 – Lecture IA structurée – Pré-brief Board
+              Étape&nbsp;2 – Première lecture avec GhostOps IA – Pré-brief Board
             </h2>
-            <p class="text-gray-300 text-sm md:text-base mb-4 max-w-3xl">
-              Clarification des enjeux, cartographie des risques humains / narratifs / gouvernance, pistes de cadrage.
-            </p>
 
-            <!-- Zone d'échanges IA -->
-            <div class="bg-gray-950/80 rounded-xl border border-gray-700 max-h-[420px] flex flex-col">
-              <!-- Messages -->
+            <div class="bg-gray-950/80 rounded-xl border border-gray-700 max-h-[360px] flex flex-col">
               <div id="prebrief-chat-messages" class="flex-1 px-4 py-3 space-y-3 overflow-y-auto text-xs md:text-sm">
                 <div class="text-gray-300 text-xs md:text-[13px]">
                   <span class="font-semibold">GhostOps IA – Pré-brief Board&nbsp;:</span>
                   <span>
-                    Décrivez votre situation (périmètre, faits, acteurs, risques, échéances). Je vous renverrai une première lecture structurée.
-                    <br /><br />
-                    Si une réponse est tronquée, utilisez le bouton <span class="font-semibold">“Demander la suite”</span>.
+                    Décrivez votre situation (périmètre, faits, acteurs, risques, échéances).<br /><br />
+                    Je vous proposerai une lecture structurée : enjeux, risques humains / narratifs / gouvernance,
+                    et pistes de cadrage pour préparer une note board-ready.
                   </span>
                 </div>
               </div>
 
-              <!-- Actions -->
-              <div class="px-3 pb-2 flex items-center justify-between gap-2">
-                <button id="prebrief-continue-btn" type="button" class="ghostops-continue hidden">
-                  Demander la suite
-                </button>
-                <div id="prebrief-status" class="ghostops-small"></div>
-              </div>
-
-              <!-- Formulaire -->
               <form id="prebrief-chat-form" class="border-t border-gray-800 px-3 py-2 flex items-center gap-2">
-                <textarea
-                  id="prebrief-chat-input"
-                  class="flex-1 text-xs bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-1 resize-none focus:outline-none focus:border-gray-400"
-                  rows="3"
-                  placeholder="Décrivez ici votre situation (contexte, acteurs, risques, échéances)…"
-                ></textarea>
-                <button type="submit" class="text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
+                <textarea id="prebrief-chat-input"
+                          class="flex-1 text-xs bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-1 resize-none focus:outline-none focus:border-gray-400"
+                          rows="3"
+                          placeholder="Décrivez ici votre situation (contexte, acteurs, risques, échéances)…"></textarea>
+                <button type="submit"
+                        class="text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
                   Envoyer
                 </button>
               </form>
             </div>
 
             <p class="text-gray-500 text-[11px] mt-3 max-w-3xl">
-              Ce module IA ne remplace pas un échange direct. La note finale Pré-brief Board est un livrable humain.
+              Ce module IA ne remplace pas un échange direct. La production de la note finale reste un livrable humain.
             </p>
           </div>
         </section>
@@ -282,265 +206,168 @@
       </div>
     </footer>
 
-    <!-- Script activation + module IA (architecture Niveau 2) -->
+    <!-- Script activation + chat (cs_id + token) -->
     <script>
       (function () {
-        const TRUNC_MARKER = "— FIN TRONQUÉE (demander la suite)";
-
         const params = new URLSearchParams(window.location.search);
-        const paid = params.get("paid");
-        const csId = params.get("cs_id") || params.get("csId") || "";
+        const csId = (params.get('cs_id') || '').trim();
+        const paidFlag = (params.get('paid') || '').trim();
 
-        const paidBlock = document.getElementById("prebrief-paid");
-        const notPaidBlock = document.getElementById("prebrief-not-paid");
+        const paidBlock = document.getElementById('prebrief-paid');
+        const notPaidBlock = document.getElementById('prebrief-not-paid');
+        const debugEl = document.getElementById('prebrief-debug');
 
-        // Affichage page (paid=1 recommandé)
-        if (paid === "1") {
-          if (paidBlock) paidBlock.classList.remove("hidden");
-        } else {
-          if (notPaidBlock) notPaidBlock.classList.remove("hidden");
+        const TOKEN_KEY = 'ghostops_prebrief_sessionToken_v1';
+
+        function showPaid() {
+          if (notPaidBlock) notPaidBlock.classList.add('hidden');
+          if (paidBlock) paidBlock.classList.remove('hidden');
         }
 
-        // Module IA
-        const form = document.getElementById("prebrief-chat-form");
-        const input = document.getElementById("prebrief-chat-input");
-        const messages = document.getElementById("prebrief-chat-messages");
-        const statusEl = document.getElementById("prebrief-status");
-        const metaEl = document.getElementById("prebrief-meta");
-        const continueBtn = document.getElementById("prebrief-continue-btn");
+        function showNotPaid(msg) {
+          if (paidBlock) paidBlock.classList.add('hidden');
+          if (notPaidBlock) notPaidBlock.classList.remove('hidden');
+          if (debugEl) debugEl.textContent = msg || '';
+        }
 
-        if (!form || !input || !messages) return;
+        // 1) Décision d'affichage
+        // - Si paid=1 : on affiche (compat legacy)
+        // - Sinon si cs_id présent : on tente une validation via API
+        // - Sinon : accès refusé
+        async function bootstrapAccess() {
+          if (paidFlag === '1') {
+            showPaid();
+            return;
+          }
 
-        const storageKey = csId ? `ghostops_prebrief_token_${csId}` : "ghostops_prebrief_token";
-        let sessionToken = "";
-        try {
-          sessionToken = (localStorage.getItem(storageKey) || "").trim();
-        } catch (_) {}
+          const existingToken = (localStorage.getItem(TOKEN_KEY) || '').trim();
+          if (existingToken) {
+            // On ne sait pas si token encore valide, mais on permet l'accès, l'API tranchera à l'usage.
+            showPaid();
+            return;
+          }
 
-        // Historique léger (user/assistant)
-        const history = [];
+          if (!csId) {
+            showNotPaid('Lien incomplet : paramètre cs_id absent.');
+            return;
+          }
+
+          // Tentative de validation "silencieuse" : on appelle l’API avec un message neutre.
+          try {
+            const r = await fetch('/api/ghostops-pre-brief-board', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                cs_id: csId,
+                message: 'Validation d’accès Pré-brief Board (initialisation).'
+              })
+            });
+
+            const data = await r.json().catch(() => ({}));
+
+            if (!r.ok) {
+              const errText = data.error || 'Paiement non vérifié (API).';
+              showNotPaid(`cs_id détecté mais accès refusé : ${errText}`);
+              return;
+            }
+
+            if (data.sessionToken) {
+              localStorage.setItem(TOKEN_KEY, data.sessionToken);
+              showPaid();
+              return;
+            }
+
+            // Si l’API renvoie reply mais pas de token, on considère que l’API n’est pas au bon format
+            showNotPaid('API Pré-brief Board : réponse reçue mais aucun sessionToken (contrat non conforme).');
+          } catch (e) {
+            showNotPaid('Erreur réseau lors de la validation du paiement. Réessayez ou contactez GhostOps.');
+          }
+        }
+
+        // 2) Chat
+        const form = document.getElementById('prebrief-chat-form');
+        const input = document.getElementById('prebrief-chat-input');
+        const messages = document.getElementById('prebrief-chat-messages');
 
         function scrollToBottom() {
+          if (!messages) return;
           messages.scrollTop = messages.scrollHeight;
         }
 
         function addMessage(sender, text) {
-          const wrap = document.createElement("div");
-          wrap.className = sender === "user" ? "text-right" : "text-left";
+          const wrapper = document.createElement('div');
+          wrapper.className = sender === 'user' ? 'mb-2 text-right' : 'mb-2 text-left';
 
-          const bubble = document.createElement("div");
-          bubble.className = sender === "user" ? "user-bubble" : "bot-bubble";
+          const bubble = document.createElement('div');
+          bubble.className = sender === 'user'
+            ? 'inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg'
+            : 'inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg';
+
           bubble.textContent = text;
-
-          wrap.appendChild(bubble);
-          messages.appendChild(wrap);
+          wrapper.appendChild(bubble);
+          messages.appendChild(wrapper);
           scrollToBottom();
-          return { wrap, bubble };
+          return wrapper;
         }
 
-        function setStatus(text) {
-          if (statusEl) statusEl.textContent = text || "";
-        }
-
-        function updateMeta(meta) {
-          if (!metaEl) return;
-          if (!meta) return;
-
-          const itersLeft = typeof meta.itersLeft === "number" ? meta.itersLeft : null;
-          const expiresAt = typeof meta.expiresAt === "number" ? meta.expiresAt : null;
-
-          const parts = [];
-          if (itersLeft !== null) parts.push(`Itérations restantes : ${itersLeft}`);
-          if (expiresAt) parts.push(`Expiration : ${new Date(expiresAt * 1000).toLocaleString("fr-FR")}`);
-
-          metaEl.textContent = parts.length ? parts.join(" · ") : "";
-        }
-
-        function syncContinueButton(lastAssistantText) {
-          const t = String(lastAssistantText || "");
-          const truncated = t.includes(TRUNC_MARKER);
-          if (continueBtn) {
-            continueBtn.classList.toggle("hidden", !truncated);
-          }
-        }
-
-        function pushHistory(role, content) {
-          const c = (content || "").toString().trim();
-          if (!c) return;
-          if (role !== "user" && role !== "assistant") return;
-
-          history.push({ role, content: c });
-
-          // Limite simple (évite payload trop gros)
-          while (history.length > 12) history.shift();
-        }
-
-        async function callApi(payload) {
-          const r = await fetch("/api/ghostops-pre-brief-board", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
-
-          let data = {};
-          try {
-            data = await r.json();
-          } catch (_) {
-            data = {};
-          }
-
-          return { ok: r.ok, status: r.status, data };
-        }
+        // Historique local minimal
+        const history = [];
 
         async function sendMessage() {
-          const userMessage = (input.value || "").trim();
+          const userMessage = (input.value || '').trim();
           if (!userMessage) return;
 
-          addMessage("user", userMessage);
-          pushHistory("user", userMessage);
+          addMessage('user', userMessage);
+          input.value = '';
 
-          input.value = "";
-          setStatus("Lecture Pré-brief Board en cours…");
+          history.push({ role: 'user', content: userMessage });
 
-          const waiting = addMessage("bot", "Analyse en cours…");
+          const waitingElem = addMessage('bot', 'Lecture Pré-brief Board en cours…');
 
           try {
-            const basePayload = {
-              message: userMessage,
-              history: history.slice(0, -1), // on envoie l'historique précédent (sans le dernier user déjà dans prompt)
-            };
+            const token = (localStorage.getItem(TOKEN_KEY) || '').trim();
+            const payload = token
+              ? { sessionToken: token, message: userMessage, history }
+              : { cs_id: csId, message: userMessage, history };
 
-            let payload;
-            if (sessionToken) {
-              payload = { ...basePayload, sessionToken };
-            } else {
-              // 1er appel : exiger cs_id si on veut un modèle Stripe->token comme N2
-              payload = { ...basePayload, cs_id: csId };
-            }
+            const response = await fetch('/api/ghostops-pre-brief-board', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
 
-            const { ok, data, status } = await callApi(payload);
+            let data = {};
+            try { data = await response.json(); } catch (_) {}
 
-            // retirer "Analyse en cours…"
-            if (waiting && waiting.wrap && waiting.wrap.parentNode) waiting.wrap.parentNode.removeChild(waiting.wrap);
+            if (waitingElem && waitingElem.parentNode) waitingElem.parentNode.removeChild(waitingElem);
 
-            if (!ok || !data || !data.reply) {
-              console.error("[prebrief] API error:", { status, data, payload });
-              const errText =
-                (data && data.error) ||
-                "Une erreur est survenue (Pré-brief Board). Veuillez réessayer.";
-              addMessage("bot", errText);
-              setStatus("");
+            if (!response.ok || !data.reply) {
+              const errText = data.error || 'Une erreur est survenue (Pré-brief Board). Veuillez réessayer.';
+              addMessage('bot', errText);
               return;
             }
 
-            // token + meta
-            if (data.sessionToken) {
-              sessionToken = String(data.sessionToken).trim();
-              try {
-                localStorage.setItem(storageKey, sessionToken);
-              } catch (_) {}
-            }
+            // Rotation / stockage token si fourni
+            if (data.sessionToken) localStorage.setItem(TOKEN_KEY, data.sessionToken);
 
-            const replyText = String(data.reply || "");
-            addMessage("bot", replyText);
-            pushHistory("assistant", replyText);
-
-            updateMeta({ itersLeft: data.itersLeft, expiresAt: data.expiresAt });
-            setStatus("");
-            syncContinueButton(replyText);
+            addMessage('bot', data.reply);
+            history.push({ role: 'assistant', content: data.reply });
           } catch (err) {
-            console.error("Erreur lors de l’appel /api/ghostops-pre-brief-board :", err);
-            if (waiting && waiting.wrap && waiting.wrap.parentNode) waiting.wrap.parentNode.removeChild(waiting.wrap);
-            addMessage("bot", "Erreur de connexion à GhostOps IA. Veuillez réessayer ou contacter GhostOps.");
-            setStatus("");
+            console.error('Erreur lors de l’appel /api/ghostops-pre-brief-board :', err);
+            if (waitingElem && waitingElem.parentNode) waitingElem.parentNode.removeChild(waitingElem);
+            addMessage('bot', 'Erreur de connexion à GhostOps IA. Veuillez réessayer ou utiliser la page contact.');
           }
         }
 
-        async function requestContinue() {
-          if (!sessionToken) {
-            addMessage("bot", "Impossible de demander la suite : sessionToken manquant. Relancez depuis votre lien de paiement.");
-            return;
-          }
-
-          const lastAssistant = [...history].reverse().find((m) => m.role === "assistant")?.content || "";
-          if (!lastAssistant) {
-            addMessage("bot", "Impossible de demander la suite : aucun contexte assistant disponible.");
-            return;
-          }
-
-          setStatus("Récupération de la suite…");
-          const waiting = addMessage("bot", "Suite en cours…");
-
-          try {
-            const payload = {
-              sessionToken,
-              continue: true,
-              last_assistant: lastAssistant,
-              history: history, // optionnel
-            };
-
-            const { ok, data, status } = await callApi(payload);
-
-            if (waiting && waiting.wrap && waiting.wrap.parentNode) waiting.wrap.parentNode.removeChild(waiting.wrap);
-
-            if (!ok || !data || !data.reply) {
-              console.error("[prebrief] CONTINUE error:", { status, data, payload });
-              const errText =
-                (data && data.error) ||
-                "Une erreur est survenue lors de la récupération de la suite. Veuillez réessayer.";
-              addMessage("bot", errText);
-              setStatus("");
-              return;
-            }
-
-            if (data.sessionToken) {
-              sessionToken = String(data.sessionToken).trim();
-              try {
-                localStorage.setItem(storageKey, sessionToken);
-              } catch (_) {}
-            }
-
-            const replyText = String(data.reply || "");
-            addMessage("bot", replyText);
-            pushHistory("assistant", replyText);
-
-            updateMeta({ itersLeft: data.itersLeft, expiresAt: data.expiresAt });
-            setStatus("");
-            syncContinueButton(replyText);
-          } catch (err) {
-            console.error("[prebrief] CONTINUE fetch error:", err);
-            if (waiting && waiting.wrap && waiting.wrap.parentNode) waiting.wrap.parentNode.removeChild(waiting.wrap);
-            addMessage("bot", "Erreur de connexion à GhostOps IA. Veuillez réessayer ultérieurement.");
-            setStatus("");
-          }
+        if (form && input && messages) {
+          form.addEventListener('submit', (e) => { e.preventDefault(); sendMessage(); });
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+          });
         }
 
-        // Events
-        form.addEventListener("submit", (e) => {
-          e.preventDefault();
-          sendMessage();
-        });
-
-        input.addEventListener("keydown", (e) => {
-          if (e.key === "Enter" && !e.shiftKey) {
-            e.preventDefault();
-            sendMessage();
-          }
-        });
-
-        if (continueBtn) {
-          continueBtn.addEventListener("click", requestContinue);
-        }
-
-        // Si on est “paid=1” mais sans cs_id et sans token : avertissement discret
-        if (paid === "1" && !csId && !sessionToken) {
-          console.warn("[prebrief] paid=1 mais cs_id absent et aucun token en storage. Le 1er appel échouera si le backend exige cs_id.");
-        }
-
-        // Petit état initial
-        if (paid === "1") {
-          if (metaEl && sessionToken) metaEl.textContent = "Session en cours : token chargé.";
-        }
+        // Go
+        bootstrapAccess();
       })();
     </script>
   </body>
