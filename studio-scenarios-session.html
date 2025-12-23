@@ -23,7 +23,10 @@
     <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
 
     <!-- Fonts & Tailwind -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = { theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } } };
@@ -43,29 +46,69 @@
         transition: opacity 0.4s ease;
       }
       @keyframes bgPulse {
-        0% { filter: brightness(1) contrast(1); }
-        100% { filter: brightness(1.05) contrast(1.05); }
+        0% {
+          filter: brightness(1) contrast(1);
+        }
+        100% {
+          filter: brightness(1.05) contrast(1.05);
+        }
       }
-      .text-shadow { text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6); }
-      html { scroll-behavior: smooth; }
-      header, main, section, footer { position: relative; z-index: 1; }
+      .text-shadow {
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      header,
+      main,
+      section,
+      footer {
+        position: relative;
+        z-index: 1;
+      }
 
-      /* Bulles lisibles */
+      /* Bulles lisibles + aération */
       .bot-bubble {
         white-space: normal;
-        line-height: 1.55;
+        line-height: 1.6;
+      }
+      .bot-bubble p {
+        margin: 0.35rem 0;
+      }
+      .bot-bubble p + p {
+        margin-top: 0.45rem;
       }
       .bot-bubble ul {
         list-style: disc;
-        padding-left: 1.2rem;
-        margin: 0.35rem 0 0.35rem 0;
+        padding-left: 1.25rem;
+        margin: 0.4rem 0 0.5rem 0;
       }
-      .bot-bubble li { margin: 0.15rem 0; }
-      .bot-bubble strong { font-weight: 700; }
-      .bot-bubble p { margin: 0.25rem 0; }
+      .bot-bubble li {
+        margin: 0.18rem 0;
+      }
+      .bot-bubble strong {
+        font-weight: 700;
+      }
+      .bot-bubble .section-title {
+        display: block;
+        margin: 0.65rem 0 0.25rem 0;
+      }
 
       .ghostops-btn {
         border: 1px solid rgba(148, 163, 184, 0.35);
+      }
+      .ghostops-chip {
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        background: rgba(15, 23, 42, 0.55);
+        backdrop-filter: blur(6px);
+      }
+      .ghostops-muted {
+        color: rgba(226, 232, 240, 0.75);
+      }
+      .disabled {
+        opacity: 0.55;
+        pointer-events: none;
+        filter: grayscale(0.15);
       }
     </style>
   </head>
@@ -73,13 +116,18 @@
   <body class="bg-gray-900 text-white font-sans leading-relaxed">
     <!-- HEADER -->
     <header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
-      <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
+      <a
+        href="/index.html"
+        class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase"
+      >
         GHOST<span class="text-gray-400">OPS</span>
       </a>
       <nav class="flex items-center gap-4 text-xs md:text-sm">
         <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
         <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
-        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
+        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white"
+          >Qui sommes-nous&nbsp;?</a
+        >
         <a
           href="/contact.html"
           class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition"
@@ -98,25 +146,31 @@
         >
           <p class="font-semibold mb-1">Paiement GhostOps Studio Scénarios confirmé.</p>
           <p>
-            Vous êtes dans l’espace IA dédié au <span class="font-semibold">Niveau&nbsp;2 – GhostOps Studio Scénarios</span>.
-            Les échanges qui suivent servent à préparer vos <span class="font-semibold">2 à 3 scénarios tactiques</span>.
+            Vous êtes dans l’espace IA dédié au
+            <span class="font-semibold">Niveau&nbsp;2 – GhostOps Studio Scénarios</span>.
+            Les échanges qui suivent servent à préparer vos
+            <span class="font-semibold">2 à 3 scénarios tactiques</span>.
           </p>
         </div>
       </section>
 
       <!-- CONTEXTE NIVEAU 2 -->
       <section class="max-w-4xl mx-auto mt-4 mb-6">
-        <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">GhostOps IA – Niveau&nbsp;2 · Studio Scénarios</p>
-        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">Espace IA – GhostOps Studio Scénarios</h1>
+        <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">
+          GhostOps IA – Niveau&nbsp;2 · Studio Scénarios
+        </p>
+        <h1 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
+          Espace IA – GhostOps Studio Scénarios
+        </h1>
         <p class="text-gray-200 text-sm md:text-base mb-3">
-          Cet espace est réservé au <span class="font-semibold">Niveau&nbsp;2 de la suite GhostOps IA</span>.
-          Il a pour objectif de transformer votre <span class="font-semibold">Diagnostic IA</span> ou votre dossier consolidé
-          en <span class="font-semibold">2 à 3 scénarios tactiques comparables</span>.
+          Cet espace est réservé au <span class="font-semibold">Niveau&nbsp;2 de la suite GhostOps IA</span>. Il a
+          pour objectif de transformer votre <span class="font-semibold">Diagnostic IA</span> ou votre dossier
+          consolidé en <span class="font-semibold">2 à 3 scénarios tactiques comparables</span>.
         </p>
         <p class="text-gray-300 text-xs md:text-sm mb-3">
           L’IA GhostOps ne remplace pas l’intervention humaine ni les arbitrages de gouvernance. Elle sert ici à
-          <span class="font-semibold">structurer les options</span>, clarifier les <span class="font-semibold">risques / gains / expositions</span>
-          et tester différentes lignes d’action.
+          <span class="font-semibold">structurer les options</span>, clarifier les
+          <span class="font-semibold">risques / gains / expositions</span> et tester différentes lignes d’action.
         </p>
         <p class="text-gray-400 text-[11px] md:text-xs">
           Évitez de saisir des noms complets ou des données directement identifiantes. Restez centré sur les fonctions, les comportements,
@@ -127,9 +181,29 @@
       <!-- CARTOUCHE DE TRAVAIL IA -->
       <section class="max-w-4xl mx-auto">
         <div class="bg-gray-900/80 border border-gray-700 rounded-2xl p-5 md:p-6">
-          <h2 class="text-lg md:text-xl font-semibold mb-3 text-white text-shadow">
-            Atelier IA – Construction de scénarios tactiques
-          </h2>
+          <div class="flex items-start justify-between gap-4">
+            <h2 class="text-lg md:text-xl font-semibold text-white text-shadow">
+              Atelier IA – Construction de scénarios tactiques
+            </h2>
+
+            <!-- Statut session -->
+            <div class="flex flex-col items-end gap-1">
+              <div
+                id="ghostops-studio-status"
+                class="ghostops-chip hidden text-[11px] md:text-xs px-3 py-2 rounded-xl text-gray-200"
+              >
+                <div class="flex items-center gap-2">
+                  <span class="ghostops-muted">Itérations :</span>
+                  <span id="ghostops-studio-iters" class="font-semibold">—</span>
+                  <span class="ghostops-muted">· Expire :</span>
+                  <span id="ghostops-studio-exp" class="font-semibold">—</span>
+                </div>
+              </div>
+              <div id="ghostops-studio-status-hint" class="hidden text-[11px] md:text-xs text-gray-400">
+                Session active (token côté client).
+              </div>
+            </div>
+          </div>
 
           <div class="mt-5">
             <!-- Zone messages -->
@@ -170,14 +244,23 @@
                 rows="3"
                 placeholder="Décrivez votre situation (contexte, acteurs, contraintes, ce que vous cherchez à sécuriser)…"
               ></textarea>
-              <button type="submit" class="mt-1 md:mt-0 md:ml-2 text-xs md:text-sm px-4 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
+              <button
+                id="ghostops-studio-send"
+                type="submit"
+                class="mt-1 md:mt-0 md:ml-2 text-xs md:text-sm px-4 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200"
+              >
                 Envoyer
               </button>
             </form>
 
-            <p class="mt-3 text-[11px] md:text-xs text-gray-500">
-              Cet espace IA prépare les scénarios. La validation finale, le cadrage des décisions et les communications sensibles restent assumés par des humains.
-            </p>
+            <div class="mt-2 flex items-center justify-between gap-3">
+              <p class="text-[11px] md:text-xs text-gray-500">
+                Cet espace IA prépare les scénarios. La validation finale, le cadrage des décisions et les communications sensibles restent assumés par des humains.
+              </p>
+              <p id="ghostops-studio-timeout-hint" class="hidden text-[11px] md:text-xs text-gray-400">
+                Astuce : si un délai survient, réessayez (ou découpez votre message).
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -199,6 +282,10 @@
     <script>
       (function () {
         const TRUNC_MARKER = "— FIN TRONQUÉE (demander la suite)";
+        const API_PATH = "/api/ghostops-studio-scenarios";
+
+        // Timeout front (évite "bloqué" côté UI si backend tarde)
+        const FRONT_TIMEOUT_MS = 35000;
 
         const params = new URLSearchParams(window.location.search);
         const csId = params.get("cs_id") || "";
@@ -206,27 +293,145 @@
         const paidBanner = document.getElementById("ghostops-studio-paid-banner");
 
         // Affiche le bandeau si payé=1 OU si cs_id présent (cas standard Stripe)
-        if ((paid === "1" || csId) && paidBanner) {
-          paidBanner.classList.remove("hidden");
-        }
+        if ((paid === "1" || csId) && paidBanner) paidBanner.classList.remove("hidden");
 
         const form = document.getElementById("ghostops-studio-form");
         const input = document.getElementById("ghostops-studio-input");
+        const btnSend = document.getElementById("ghostops-studio-send");
         const messages = document.getElementById("ghostops-studio-messages");
 
         const btnContinue = document.getElementById("ghostops-studio-continue");
         const hintContinue = document.getElementById("ghostops-studio-continue-hint");
 
-        if (!form || !input || !messages) return;
+        const statusBox = document.getElementById("ghostops-studio-status");
+        const statusHint = document.getElementById("ghostops-studio-status-hint");
+        const itersEl = document.getElementById("ghostops-studio-iters");
+        const expEl = document.getElementById("ghostops-studio-exp");
+        const timeoutHint = document.getElementById("ghostops-studio-timeout-hint");
 
+        if (!form || !input || !messages || !btnSend) return;
+
+        // -------------------------
         // État session
+        // -------------------------
+        const storageKey = csId ? `ghostops_studio_session_${csId}` : "ghostops_studio_session_no_cs";
         let sessionToken = "";
         let itersLeft = null;
-        let lastAssistantRaw = "";
+        let expiresAt = null; // unix seconds
+        let lastAssistantForContinue = ""; // sans marqueur
         let history = []; // {role:"user"|"assistant", content:"..."}
 
+        // -------------------------
+        // Helpers UI
+        // -------------------------
         function scrollToBottom() {
           messages.scrollTop = messages.scrollHeight;
+        }
+
+        function setDisabled(disabled) {
+          if (disabled) {
+            btnSend.classList.add("disabled");
+            input.classList.add("disabled");
+            input.setAttribute("disabled", "disabled");
+          } else {
+            btnSend.classList.remove("disabled");
+            input.classList.remove("disabled");
+            input.removeAttribute("disabled");
+          }
+        }
+
+        function nowSec() {
+          return Math.floor(Date.now() / 1000);
+        }
+
+        function formatParisDateTime(unixSec) {
+          if (!unixSec) return "—";
+          try {
+            const d = new Date(unixSec * 1000);
+            return new Intl.DateTimeFormat("fr-FR", {
+              timeZone: "Europe/Paris",
+              hour: "2-digit",
+              minute: "2-digit",
+              day: "2-digit",
+              month: "2-digit",
+            }).format(d);
+          } catch (_) {
+            return "—";
+          }
+        }
+
+        function updateStatusUI() {
+          const hasSession = Boolean(sessionToken) || typeof itersLeft === "number" || typeof expiresAt === "number";
+          if (!hasSession) {
+            statusBox.classList.add("hidden");
+            statusHint.classList.add("hidden");
+            return;
+          }
+
+          statusBox.classList.remove("hidden");
+          statusHint.classList.remove("hidden");
+
+          itersEl.textContent = typeof itersLeft === "number" ? String(itersLeft) : "—";
+          expEl.textContent = expiresAt ? formatParisDateTime(expiresAt) : "—";
+
+          // Blocage si expiré / iters 0
+          const expired = expiresAt && nowSec() > expiresAt;
+          const depleted = typeof itersLeft === "number" && itersLeft <= 0;
+
+          if (expired) {
+            setDisabled(true);
+            const b = addMessageBubble("bot");
+            b.textContent =
+              "Session expirée. Veuillez relancer un paiement Studio Scénarios (Niveau 2) ou contacter GhostOps.";
+          } else if (depleted) {
+            setDisabled(true);
+            const b = addMessageBubble("bot");
+            b.textContent =
+              "Limite atteinte : vos itérations ont été utilisées. Pour poursuivre, contactez GhostOps.";
+          } else {
+            setDisabled(false);
+          }
+        }
+
+        function saveSessionToStorage() {
+          try {
+            const payload = {
+              sessionToken,
+              itersLeft,
+              expiresAt,
+              history,
+              lastAssistantForContinue,
+              savedAt: Date.now(),
+            };
+            localStorage.setItem(storageKey, JSON.stringify(payload));
+          } catch (_) {}
+        }
+
+        function loadSessionFromStorage() {
+          try {
+            const raw = localStorage.getItem(storageKey);
+            if (!raw) return false;
+            const obj = JSON.parse(raw);
+            if (!obj || typeof obj !== "object") return false;
+
+            sessionToken = typeof obj.sessionToken === "string" ? obj.sessionToken : "";
+            itersLeft = typeof obj.itersLeft === "number" ? obj.itersLeft : null;
+            expiresAt = typeof obj.expiresAt === "number" ? obj.expiresAt : null;
+
+            // On recharge l’historique si présent
+            history = Array.isArray(obj.history) ? obj.history.slice(0, 50) : [];
+            lastAssistantForContinue = typeof obj.lastAssistantForContinue === "string" ? obj.lastAssistantForContinue : "";
+
+            return Boolean(sessionToken);
+          } catch (_) {
+            return false;
+          }
+        }
+
+        function clearSessionStorage() {
+          try {
+            localStorage.removeItem(storageKey);
+          } catch (_) {}
         }
 
         function escapeHtml(str) {
@@ -238,12 +443,17 @@
             .replace(/'/g, "&#039;");
         }
 
-        // Convertit un texte Markdown simple (vos contraintes) en HTML aéré
+        function stripTruncMarker(text) {
+          const t = String(text || "");
+          if (!t.includes(TRUNC_MARKER)) return { cleaned: t, truncated: false };
+          return { cleaned: t.replace(TRUNC_MARKER, "").trim(), truncated: true };
+        }
+
+        // Convertit un texte Markdown simple en HTML aéré
         function formatAiTextToHtml(raw) {
           const text = String(raw || "").replace(/\r\n/g, "\n").trim();
           if (!text) return "";
 
-          // On travaille ligne par ligne
           const lines = text.split("\n");
           let html = "";
           let inUl = false;
@@ -258,10 +468,10 @@
           for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
 
-            // Ligne vide => saut de paragraphe
+            // Ligne vide => séparation visuelle (sans multiplier les gros espaces)
             if (!line.trim()) {
               closeUl();
-              html += "<p></p>";
+              html += `<p class="mt-2"></p>`;
               continue;
             }
 
@@ -273,8 +483,6 @@
               }
               let li = line.trim().slice(2);
               li = escapeHtml(li);
-
-              // gras **...**
               li = li.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
               html += `<li>${li}</li>`;
               continue;
@@ -284,8 +492,8 @@
             const m = line.trim().match(/^\*\*(.+?)\*\*$/);
             if (m) {
               closeUl();
-              const title = escapeHtml(m[1]).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-              html += `<p><strong>${title}</strong></p>`;
+              const title = escapeHtml(m[1]);
+              html += `<p class="section-title"><strong>${title}</strong></p>`;
               continue;
             }
 
@@ -296,8 +504,7 @@
           }
 
           closeUl();
-          // Nettoyage des paragraphes vides successifs
-          html = html.replace(/<p><\/p>\s*(<p><\/p>\s*)+/g, "<p></p>");
+          html = html.replace(/(<p class="mt-2"><\/p>\s*){3,}/g, '<p class="mt-2"></p><p class="mt-2"></p>');
           return html;
         }
 
@@ -311,7 +518,6 @@
               ? "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg mb-1"
               : "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg mb-1 bot-bubble";
 
-          // On tapera du texte brut dans bubble.textContent, puis on hydratera en HTML
           wrapper.appendChild(bubble);
           messages.appendChild(wrapper);
           scrollToBottom();
@@ -328,107 +534,156 @@
           hintContinue.classList.remove("hidden");
         }
 
-        function stripTruncMarker(text) {
-          const t = String(text || "");
-          if (!t.includes(TRUNC_MARKER)) return { cleaned: t, truncated: false };
-          return { cleaned: t.replace(TRUNC_MARKER, "").trim(), truncated: true };
-        }
-
         async function typewriterText(el, fullText, speedMs) {
           el.textContent = "";
           const txt = String(fullText || "");
           for (let i = 0; i < txt.length; i++) {
             el.textContent += txt[i];
             if (i % 2 === 0) scrollToBottom();
+            // throttle “machine à écrire”
             await new Promise((r) => setTimeout(r, speedMs));
           }
           scrollToBottom();
         }
 
         async function renderBotReply(replyRaw) {
-          // Stocke la version brute côté client (utile pour "continue")
-          lastAssistantRaw = String(replyRaw || "");
+          const raw = String(replyRaw || "");
+          const { cleaned, truncated } = stripTruncMarker(raw);
 
-          const { cleaned, truncated } = stripTruncMarker(lastAssistantRaw);
+          // Contexte "continue"
+          lastAssistantForContinue = cleaned;
 
           // Effet machine à écrire sur le texte brut
           const bubble = addMessageBubble("bot");
           await typewriterText(bubble, cleaned, 8);
 
-          // Puis conversion en HTML aéré (puces, titres)
+          // Puis conversion en HTML aéré
           const html = formatAiTextToHtml(cleaned);
-          if (html) {
-            bubble.innerHTML = html;
-          }
+          if (html) bubble.innerHTML = html;
 
           // Affiche le bouton suite si tronqué
           if (truncated) showContinue();
           else hideContinue();
 
-          // Historique (on conserve la version "cleaned" sans marqueur)
+          // Historique
           history.push({ role: "assistant", content: cleaned });
+
+          // Persist
+          saveSessionToStorage();
+        }
+
+        function mergeSessionFromApi(data) {
+          if (!data || typeof data !== "object") return;
+
+          if (typeof data.sessionToken === "string" && data.sessionToken) sessionToken = data.sessionToken;
+          if (typeof data.itersLeft === "number") itersLeft = data.itersLeft;
+          if (typeof data.expiresAt === "number") expiresAt = data.expiresAt;
+
+          updateStatusUI();
+          saveSessionToStorage();
         }
 
         async function callApi(payload) {
-          const resp = await fetch("/api/ghostops-studio-scenarios", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
+          const controller = new AbortController();
+          const t = setTimeout(() => controller.abort(), FRONT_TIMEOUT_MS);
 
-          let data = {};
-          try { data = await resp.json(); } catch (_) {}
-          return { ok: resp.ok, status: resp.status, data };
+          try {
+            const resp = await fetch(API_PATH, {
+              method: "POST",
+              signal: controller.signal,
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+            });
+
+            let data = {};
+            try {
+              data = await resp.json();
+            } catch (_) {}
+
+            return { ok: resp.ok, status: resp.status, data };
+          } catch (err) {
+            if (err && err.name === "AbortError") {
+              return { ok: false, status: 0, data: { error: "Temps de réponse dépassé. Veuillez réessayer." }, timeout: true };
+            }
+            return { ok: false, status: 0, data: { error: "Erreur réseau. Veuillez réessayer." } };
+          } finally {
+            clearTimeout(t);
+          }
+        }
+
+        function pushUserToHistory(userText) {
+          history.push({ role: "user", content: userText });
+          // garde l’historique à taille raisonnable
+          if (history.length > 40) history = history.slice(history.length - 40);
         }
 
         async function sendUserMessage() {
           hideContinue();
+          timeoutHint.classList.add("hidden");
 
           const userText = (input.value || "").trim();
           if (!userText) return;
 
-          // garde-fou longueur (évite latence/timeout inutiles)
+          // Garde-fou longueur
           if (userText.length > 4000) {
             const b = addMessageBubble("bot");
             b.textContent = "Message trop long. Merci de condenser (max ~4000 caractères) ou de découper en 2 envois.";
             return;
           }
 
+          // Si pas de token et pas de cs_id => impossible d'initier la session (niveau indépendant)
+          if (!sessionToken && !csId) {
+            const b = addMessageBubble("bot");
+            b.textContent =
+              "Accès non initialisé : identifiant de paiement manquant (cs_id). Veuillez revenir depuis la page de confirmation de paiement.";
+            return;
+          }
+
           // UI + historique
           const userBubble = addMessageBubble("user");
           userBubble.textContent = userText;
-          history.push({ role: "user", content: userText });
+          pushUserToHistory(userText);
 
           input.value = "";
 
-          // message attente
+          // Attente
           const waiting = addMessageBubble("bot");
           waiting.textContent = "Lecture scénarios en cours…";
 
           try {
-            const payload =
-              sessionToken
-                ? { sessionToken, message: userText, history }
-                : { cs_id: csId, message: userText }; // 1er appel : cs_id obligatoire
+            // 1er appel : cs_id + message (optionnellement history après 1er échange)
+            const payload = sessionToken
+              ? { sessionToken, message: userText, history }
+              : { cs_id: csId, message: userText };
 
-            const { ok, data } = await callApi(payload);
+            const { ok, status, data, timeout } = await callApi(payload);
 
-            // retire "Lecture..."
+            // Retire "Lecture..."
             if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
 
-            if (!ok || !data.reply) {
+            if (!ok || !data || !data.reply) {
               const b = addMessageBubble("bot");
-              b.textContent = data.error || "Une erreur est survenue (Studio Scénarios). Veuillez réessayer.";
+
+              // Erreur 504 backend (souvent timeout OpenAI / Vercel)
+              if (status === 504 || timeout) {
+                timeoutHint.classList.remove("hidden");
+                b.textContent =
+                  (data && data.error) ||
+                  "Temps de génération dépassé. Réessayez, ou découpez votre message (ex: contexte puis acteurs puis contraintes).";
+                return;
+              }
+
+              b.textContent = (data && data.error) || "Une erreur est survenue (Studio Scénarios). Veuillez réessayer.";
               return;
             }
 
-            // met à jour session
-            if (data.sessionToken) sessionToken = data.sessionToken;
-            if (typeof data.itersLeft === "number") itersLeft = data.itersLeft;
+            // Met à jour session
+            mergeSessionFromApi(data);
 
+            // Rend la réponse
             await renderBotReply(data.reply);
           } catch (err) {
-            console.error("Erreur /api/ghostops-studio-scenarios :", err);
+            console.error("Erreur sendUserMessage :", err);
             if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
             const b = addMessageBubble("bot");
             b.textContent = "Erreur de connexion à GhostOps IA. Veuillez réessayer ou utiliser la page contact.";
@@ -436,8 +691,9 @@
         }
 
         async function requestContinue() {
-          if (!sessionToken) return;
-          if (!lastAssistantRaw) return;
+          timeoutHint.classList.add("hidden");
+
+          if (!sessionToken || !lastAssistantForContinue) return;
 
           // UI attente
           const waiting = addMessageBubble("bot");
@@ -447,25 +703,28 @@
             const payload = {
               sessionToken,
               continue: true,
-              last_assistant: lastAssistantRaw,
+              last_assistant: lastAssistantForContinue,
               history,
             };
 
-            const { ok, data } = await callApi(payload);
+            const { ok, status, data, timeout } = await callApi(payload);
 
             if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
 
-            if (!ok || !data.reply) {
+            if (!ok || !data || !data.reply) {
               const b = addMessageBubble("bot");
-              b.textContent = data.error || "Impossible de récupérer la suite. Veuillez réessayer.";
+              if (status === 504 || timeout) {
+                timeoutHint.classList.remove("hidden");
+                b.textContent = (data && data.error) || "Temps dépassé sur la suite. Réessayez.";
+                return;
+              }
+              b.textContent = (data && data.error) || "Impossible de récupérer la suite. Veuillez réessayer.";
               return;
             }
 
-            // met à jour session (rotation token)
-            if (data.sessionToken) sessionToken = data.sessionToken;
-            if (typeof data.itersLeft === "number") itersLeft = data.itersLeft;
+            // Rotation token / statut
+            mergeSessionFromApi(data);
 
-            // Important : la réponse "continue" est un nouvel assistant, on l'ajoute à l’historique
             await renderBotReply(data.reply);
           } catch (err) {
             console.error("Erreur continue :", err);
@@ -475,7 +734,9 @@
           }
         }
 
+        // -------------------------
         // Events
+        // -------------------------
         form.addEventListener("submit", function (e) {
           e.preventDefault();
           sendUserMessage();
@@ -492,12 +753,31 @@
           requestContinue();
         });
 
-        // Si pas de cs_id dans l’URL, l’espace ne peut pas initier la session (Niveau 2 indépendant)
-        if (!csId) {
+        // -------------------------
+        // Init : restauration session (si page rechargée)
+        // -------------------------
+        const restored = loadSessionFromStorage();
+        if (restored) {
+          updateStatusUI();
+        }
+
+        // Si pas de cs_id et pas de token restauré : avertissement
+        if (!csId && !sessionToken) {
           const b = addMessageBubble("bot");
           b.textContent =
             "Accès non initialisé : identifiant de paiement manquant (cs_id). Veuillez revenir depuis la page de confirmation de paiement.";
+          setDisabled(true);
+        } else {
+          // si cs_id présent mais pas de token, on laisse initier
+          setDisabled(false);
         }
+
+        // Nettoyage si expiré au chargement
+        if (expiresAt && nowSec() > expiresAt) {
+          clearSessionStorage();
+        }
+
+        updateStatusUI();
       })();
     </script>
   </body>
