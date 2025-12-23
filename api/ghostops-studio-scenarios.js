@@ -2,6 +2,11 @@
 // Réplique sécurisée du Niveau 1, indépendante : Stripe cs_id -> token signé (TTL + itérations) -> décrément serveur.
 // + Support "continue" (suite) : obtenir la suite d'une réponse tronquée SANS consommer d’itération.
 //
+// ✅ PATCH AJOUTÉ (UI itérations/TTL côté front) :
+// - Ajout champs de télémétrie “propres” et stables dans meta : itersMax, ttlSeconds, serverNow, latencyMs, timeoutMs
+// - Ajout headers no-store (évite tout cache Vercel/edge)
+// - Renvoi explicite de truncMarker (front peut l’utiliser tel quel si besoin)
+//
 // ✅ OPTIMISATIONS (stabilité + 15 itérations par défaut) :
 // - MAX_ITERS par défaut = 15 (modifiable via env)
 // - TTL par défaut = 4h (14400s) (modifiable via env)
@@ -200,7 +205,6 @@ async function verifyStripeCheckoutSession({ stripe, csId, expectedPriceId }) {
 
   let session;
   try {
-    // expand line_items pour pouvoir vérifier le Price ID si souhaité
     session = await stripe.checkout.sessions.retrieve(id, {
       expand: ["line_items.data.price"],
     });
@@ -218,7 +222,6 @@ async function verifyStripeCheckoutSession({ stripe, csId, expectedPriceId }) {
     };
   }
 
-  // Option anti-fraude : s'assurer que le paiement correspond bien au produit Niveau 2
   const priceId = cleanStr(expectedPriceId);
   if (priceId) {
     const items = session?.line_items?.data || [];
@@ -250,15 +253,7 @@ async function verifyStripeCheckoutSession({ stripe, csId, expectedPriceId }) {
 // OpenAI call (avec retry + timeout par tentative)
 // -------------------------
 function isRetryableStatus(status) {
-  // Temporaires / surcharge / passerelles
-  return (
-    status === 408 ||
-    status === 429 ||
-    status === 500 ||
-    status === 502 ||
-    status === 503 ||
-    status === 504
-  );
+  return status === 408 || status === 429 || status === 500 || status === 502 || status === 503 || status === 504;
 }
 
 async function callOpenAIWithTimeout({ apiKey, model, input, maxOut, timeoutMs }) {
@@ -301,6 +296,14 @@ async function callOpenAIWithTimeout({ apiKey, model, input, maxOut, timeoutMs }
 // Handler
 // -------------------------
 module.exports = async function handler(req, res) {
+  const startedAtMs = Date.now();
+
+  // ✅ PATCH no-cache : évite toute mise en cache côté edge/proxy
+  res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  res.setHeader("Surrogate-Control", "no-store");
+
   if (req.method !== "POST") {
     res.setHeader("Allow", ["POST"]);
     return res.status(405).json({ error: "Méthode non autorisée. Utilisez POST." });
@@ -320,7 +323,6 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  // ✅ Secret distinct pour l’indépendance du Niveau 2
   const tokenSecret = cleanStr(process.env.GHOSTOPS_STUDIO_TOKEN_SECRET);
   if (!tokenSecret) {
     return res.status(500).json({
@@ -328,15 +330,13 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  // ✅ Optionnel mais fortement recommandé : verrouiller le produit payé (anti-fraude)
   const expectedPriceId = cleanStr(process.env.GHOSTOPS_STUDIO_STRIPE_PRICE_ID);
 
   const stripe = new Stripe(stripeSecretKey);
 
   // Paramètres session (✅ défauts Niveau 2)
   const MAX_ITERS = Number(process.env.GHOSTOPS_STUDIO_MAX_ITERS || "15") || 15;
-  const TTL_SECONDS =
-    Number(process.env.GHOSTOPS_STUDIO_SESSION_TTL_SECONDS || "14400") || 14400; // 4h
+  const TTL_SECONDS = Number(process.env.GHOSTOPS_STUDIO_SESSION_TTL_SECONDS || "14400") || 14400; // 4h
 
   // Modèles
   const modelInitial =
@@ -351,8 +351,7 @@ module.exports = async function handler(req, res) {
 
   // Longueur de réponse (✅ défauts Niveau 2)
   const maxOutDefault = Number(process.env.GHOSTOPS_STUDIO_MAX_OUTPUT_TOKENS || "1600") || 1600;
-  const maxOutContinue =
-    Number(process.env.GHOSTOPS_STUDIO_MAX_OUTPUT_TOKENS_CONTINUE || "1400") || 1400;
+  const maxOutContinue = Number(process.env.GHOSTOPS_STUDIO_MAX_OUTPUT_TOKENS_CONTINUE || "1400") || 1400;
 
   // Timeout OpenAI (✅ défaut 40s)
   const OPENAI_TIMEOUT_MS = Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "40000") || 40000;
@@ -412,8 +411,7 @@ module.exports = async function handler(req, res) {
   }
   if (isContinue && !lastAssistant && history.length < 2) {
     return res.status(400).json({
-      error:
-        "Impossible de produire la suite : contexte insuffisant (last_assistant ou historique manquant).",
+      error: "Impossible de produire la suite : contexte insuffisant (last_assistant ou historique manquant).",
     });
   }
 
@@ -454,18 +452,16 @@ module.exports = async function handler(req, res) {
     if (itersLeft <= 0) {
       return res.status(403).json({
         error: "Limite atteinte : vos itérations ont été utilisées. Pour poursuivre, contactez GhostOps.",
-        meta: { itersLeft: 0, expiresAt: exp },
+        meta: { itersLeft: 0, expiresAt: exp, itersMax: MAX_ITERS, ttlSeconds: TTL_SECONDS },
       });
     }
 
     sessionCtx = { cs_id: cleanStr(p.cs_id), itersLeft, exp };
     isFollowup = true;
   } else {
-    // Pas de token : on exige cs_id et on vérifie Stripe
     if (!csId) {
       return res.status(401).json({
-        error:
-          "Accès non autorisé. Cette session nécessite un identifiant de paiement (cs_id) ou un token de session.",
+        error: "Accès non autorisé. Cette session nécessite un identifiant de paiement (cs_id) ou un token de session.",
       });
     }
 
@@ -473,8 +469,7 @@ module.exports = async function handler(req, res) {
 
     if (!check.ok) {
       return res.status(401).json({
-        error:
-          "Paiement non vérifié. Veuillez utiliser le lien de fin de paiement (avec cs_id) ou contacter GhostOps.",
+        error: "Paiement non vérifié. Veuillez utiliser le lien de fin de paiement (avec cs_id) ou contacter GhostOps.",
         debug: check,
       });
     }
@@ -578,11 +573,7 @@ Instruction :
 - Si tu atteins encore une limite : termine proprement puis ajoute "${TRUNC_MARKER}".
 `.trim();
 
-  const userPrompt = isContinue
-    ? userPromptContinue
-    : isFollowup
-      ? userPromptFollowup
-      : userPromptInitial;
+  const userPrompt = isContinue ? userPromptContinue : isFollowup ? userPromptFollowup : userPromptInitial;
 
   const model = (isContinue || isFollowup || isFollowupFromHistory) ? modelFollowup : modelInitial;
   const maxOut = isContinue ? maxOutContinue : maxOutDefault;
@@ -620,8 +611,7 @@ Instruction :
     if (!attempt.ok) {
       if (attempt.aborted || attempt.status === 504) {
         return res.status(504).json({
-          error:
-            "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre message).",
+          error: "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre message).",
           debug: {
             model,
             timeoutMs: OPENAI_TIMEOUT_MS,
@@ -629,13 +619,19 @@ Instruction :
             retried,
             fallbackMaxOut,
           },
+          meta: {
+            truncMarker: TRUNC_MARKER,
+            itersMax: MAX_ITERS,
+            ttlSeconds: TTL_SECONDS,
+            serverNow: now,
+            latencyMs: Date.now() - startedAtMs,
+          },
         });
       }
 
       const data = attempt.data || {};
       return res.status(attempt.status || 502).json({
-        error:
-          data?.error?.message || data?.message || `Erreur OpenAI (HTTP ${attempt.status || 502})`,
+        error: data?.error?.message || data?.message || `Erreur OpenAI (HTTP ${attempt.status || 502})`,
         debug: {
           model,
           openaiStatus: attempt.status || 502,
@@ -643,6 +639,13 @@ Instruction :
           openaiCode: data?.error?.code || "",
           retried,
           fallbackMaxOut,
+        },
+        meta: {
+          truncMarker: TRUNC_MARKER,
+          itersMax: MAX_ITERS,
+          ttlSeconds: TTL_SECONDS,
+          serverNow: now,
+          latencyMs: Date.now() - startedAtMs,
         },
       });
     }
@@ -654,6 +657,13 @@ Instruction :
       return res.status(502).json({
         error: "Réponse OpenAI reçue, mais texte introuvable.",
         debug: { model, retried, fallbackMaxOut },
+        meta: {
+          truncMarker: TRUNC_MARKER,
+          itersMax: MAX_ITERS,
+          ttlSeconds: TTL_SECONDS,
+          serverNow: now,
+          latencyMs: Date.now() - startedAtMs,
+        },
       });
     }
 
@@ -674,8 +684,6 @@ Instruction :
         itersLeft: newItersLeft,
         exp: sessionCtx.exp,
         v: 2,
-        // (optionnel) utile si un jour vous voulez tracer côté front
-        // itersMax: MAX_ITERS,
       },
       tokenSecret
     );
@@ -686,11 +694,13 @@ Instruction :
       itersLeft: newItersLeft,
       expiresAt: sessionCtx.exp,
       meta: {
+        truncMarker: TRUNC_MARKER, // ✅ PATCH utile front si besoin
         model,
         followup: Boolean(isContinue || isFollowup || isFollowupFromHistory),
         continue: Boolean(isContinue),
         historyUsed: history.length,
         max_output_tokens: maxOut,
+        timeoutMs: OPENAI_TIMEOUT_MS, // ✅ PATCH UI/debug
         incomplete: Boolean(apiSaysIncomplete),
         productLock: Boolean(expectedPriceId),
         retried,
@@ -698,8 +708,10 @@ Instruction :
         session: {
           createdNewSession,
           ttlSeconds: TTL_SECONDS,
-          maxIters: MAX_ITERS,
+          maxIters: MAX_ITERS, // ✅ PATCH UI (15 par défaut)
         },
+        serverNow: now, // ✅ PATCH UI
+        latencyMs: Date.now() - startedAtMs, // ✅ PATCH UI/debug
       },
     });
   } catch (err) {
@@ -707,6 +719,13 @@ Instruction :
     return res.status(500).json({
       error: "Erreur interne lors de l’appel au moteur GhostOps Studio Scénarios.",
       debug: { model, message: err?.message || String(err) },
+      meta: {
+        truncMarker: TRUNC_MARKER,
+        itersMax: MAX_ITERS,
+        ttlSeconds: TTL_SECONDS,
+        serverNow: now,
+        latencyMs: Date.now() - startedAtMs,
+      },
     });
   }
 };
