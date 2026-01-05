@@ -129,7 +129,8 @@
           </p>
 
           <p class="text-gray-300 text-sm md:text-base mb-4">
-            Après paiement, vous devez utiliser le lien complet contenant un identifiant <span class="font-semibold">cs_id</span>.
+            Après paiement, vous devez utiliser le lien complet contenant un identifiant
+            <span class="font-semibold">cs_id</span>.
           </p>
 
           <div class="flex flex-col sm:flex-row gap-3 mt-4">
@@ -156,8 +157,8 @@
         <!-- Bandeau de confirmation -->
         <div class="bg-emerald-900/40 border border-emerald-500/70 rounded-2xl p-4 mb-6">
           <p class="text-xs md:text-sm text-emerald-100">
-            Votre paiement pour le <span class="font-semibold">GhostOps Pré-brief Board</span> a été validé.
-            Cet espace vous permet de préparer et structurer votre dossier pour la note board-ready.
+            Votre paiement pour le <span class="font-semibold">GhostOps Pré-brief Board</span> a été validé. Cet espace
+            vous permet de préparer et structurer votre dossier pour la note board-ready.
           </p>
         </div>
 
@@ -172,18 +173,21 @@
           <p class="text-gray-200 text-sm md:text-base mb-3 max-w-3xl">
             Vous avez activé un <span class="font-semibold">Pré-brief Board GhostOps</span>. L’objectif de cette session
             est de rassembler les éléments décisifs et de structurer le contexte avant la production de la
-            <span class="font-semibold">note board-ready</span> destinée à votre conseil d’administration ou comité d’audit.
+            <span class="font-semibold">note board-ready</span> destinée à votre conseil d’administration ou comité
+            d’audit.
           </p>
           <p class="text-gray-300 text-sm md:text-base max-w-3xl">
             GhostOps utilise l’IA comme instrument de lecture et de simulation. La note finale reste un
-            <span class="font-semibold">livrable humain, assumé</span>, construit à partir de votre contexte, des échanges
-            et des arbitrages que vous validerez.
+            <span class="font-semibold">livrable humain, assumé</span>, construit à partir de votre contexte, des
+            échanges et des arbitrages que vous validerez.
           </p>
         </header>
 
         <!-- Télémétrie session (alignée Niveau 2) -->
         <section class="mb-6">
-          <div class="bg-gray-800/70 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+          <div
+            class="bg-gray-800/70 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3"
+          >
             <div class="text-xs md:text-sm text-gray-200">
               <span class="text-gray-400">Session :</span>
               <span id="pb-meta-iters" class="font-semibold">—</span>
@@ -226,8 +230,8 @@
               Étape&nbsp;1 – Préparer vos éléments de contexte
             </h2>
             <p class="text-gray-300 text-sm md:text-base mb-4 max-w-3xl">
-              Avant d’utiliser l’IA, il est utile de rassembler les informations qui structurent réellement votre dossier.
-              Vous pouvez vous appuyer sur la trame suivante (vous n’êtes pas obligé de tout remplir) :
+              Avant d’utiliser l’IA, il est utile de rassembler les informations qui structurent réellement votre
+              dossier. Vous pouvez vous appuyer sur la trame suivante (vous n’êtes pas obligé de tout remplir) :
             </p>
             <ul class="list-disc list-inside text-gray-300 text-sm md:text-base space-y-2 max-w-3xl">
               <li><span class="font-semibold">Périmètre concerné</span> (groupe / filiale / site / fonction…).</li>
@@ -254,8 +258,8 @@
                 <div class="bot-bubble text-gray-100">
                   <span class="font-semibold">GhostOps IA – Pré-brief Board :</span><br /><br />
                   Décrivez votre situation (périmètre, faits, acteurs, risques, échéances).<br /><br />
-                  Je produirai un pré-brief structuré : reformulation factuelle, enjeux de gouvernance, risques,
-                  options de cadrage, informations manquantes, et préparation d’un ordre du jour “board-ready”.
+                  Je produirai un pré-brief structuré : reformulation factuelle, enjeux de gouvernance, risques, options
+                  de cadrage, informations manquantes, et préparation d’un ordre du jour “board-ready”.
                 </div>
               </div>
 
@@ -364,7 +368,8 @@
           wrapper.className = sender === "user" ? "text-right" : "text-left";
 
           const bubble = document.createElement("div");
-          bubble.className = sender === "user" ? "user-bubble inline-block text-gray-100" : "bot-bubble inline-block text-gray-100";
+          bubble.className =
+            sender === "user" ? "user-bubble inline-block text-gray-100" : "bot-bubble inline-block text-gray-100";
 
           bubble.textContent = text;
 
@@ -377,7 +382,8 @@
         function setStatus(text, tone) {
           if (!statusEl) return;
           statusEl.textContent = text || "";
-          statusEl.className = "text-xs mt-3 " + (tone === "err" ? "text-red-400" : tone === "ok" ? "text-green-400" : "text-gray-300");
+          statusEl.className =
+            "text-xs mt-3 " + (tone === "err" ? "text-red-400" : tone === "ok" ? "text-green-400" : "text-gray-300");
         }
 
         function fmtExp(expUnix) {
@@ -415,6 +421,38 @@
           const t = String(replyText || "");
           const truncated = t.includes(TRUNC_MARKER) || /fin tronqu/i.test(t);
           if (btnContinue) btnContinue.disabled = !truncated;
+        }
+
+        // PATCH DEBUG (Niveau 2) : formatage erreur API détaillée
+        function formatApiError({ response, data }) {
+          const statusCode = (response && response.status) || 0;
+
+          const main =
+            (data && (data.error || data.message)) ||
+            `Erreur API Pré-brief Board (HTTP ${statusCode}).`;
+
+          const parts = [];
+
+          // debug/meta (serveur)
+          if (data && data.debug) {
+            try {
+              parts.push("debug=" + JSON.stringify(data.debug));
+            } catch (_) {}
+          }
+          if (data && data.meta) {
+            try {
+              parts.push("meta=" + JSON.stringify(data.meta));
+            } catch (_) {}
+          }
+
+          // payload (extrait), utile si serveur renvoie autre chose qu'attendu
+          try {
+            const preview = JSON.stringify(data || {});
+            if (preview && preview !== "{}") parts.push("payload=" + preview.slice(0, 1800));
+          } catch (_) {}
+
+          const extra = parts.length ? "\n\n" + parts.join("\n") : "";
+          return `${main}${extra}`;
         }
 
         // -------------------------
@@ -504,10 +542,12 @@
             // remove waiting
             if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
 
+            // ✅ PATCH : erreur détaillée (comme Niveau 2)
             if (!response.ok || !data.reply) {
-              const errText = data.error || "Une erreur est survenue (Pré-brief Board). Veuillez réessayer.";
+              const errText = formatApiError({ response, data });
               addMessage("bot", errText);
-              setStatus(errText, "err");
+              setStatus((data && (data.error || data.message)) || "Erreur API Pré-brief Board.", "err");
+              console.error("[Prebrief API error]", { statusCode: response.status, data });
               return;
             }
 
@@ -559,10 +599,12 @@
 
             if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
 
+            // ✅ PATCH : erreur détaillée (comme Niveau 2)
             if (!response.ok || !data.reply) {
-              const errText = data.error || "Impossible de produire la suite. Veuillez réessayer.";
+              const errText = formatApiError({ response, data });
               addMessage("bot", errText);
-              setStatus(errText, "err");
+              setStatus((data && (data.error || data.message)) || "Erreur API (suite).", "err");
+              console.error("[Prebrief API error][continue]", { statusCode: response.status, data });
               return;
             }
 
@@ -611,14 +653,12 @@
           btnReset.addEventListener("click", function () {
             purgeToken();
             setStatus("Token supprimé. Rechargez via le lien Stripe (cs_id) si nécessaire.", "ok");
-            // on force aussi le bouton suite à off
             if (btnContinue) btnContinue.disabled = true;
           });
         }
 
         if (btnHardRefresh) {
           btnHardRefresh.addEventListener("click", function () {
-            // hard refresh sans cache : on ajoute un paramètre "t"
             const url = new URL(window.location.href);
             url.searchParams.set("t", String(Date.now()));
             window.location.replace(url.toString());
