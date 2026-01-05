@@ -4,174 +4,429 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>Paiement GhostOps Pré-brief Board – Note board-ready confidentielle</title>
+    <title>Paiement – GhostOps Pré-brief Board – Note board-ready</title>
     <meta
       name="description"
-      content="Paiement sécurisé du GhostOps Pré-brief Board (Niveau 3) – note de gouvernance board-ready : risques, options, arbitrages, plan de stabilisation."
+      content="Paiement sécurisé GhostOps Pré-brief Board (Niveau 3) : transformation de vos éléments en une note de gouvernance board-ready (risques, options, arbitrages), exploitable en board ou comité d’audit."
     />
+
+    <meta
+      name="keywords"
+      content="GhostOps, Pré-brief Board, board-ready, comité d’audit, gouvernance, risques, options tactiques, crise RH, dirigeant exposé, note de gouvernance"
+    />
+    <meta name="author" content="GhostOps IA" />
+    <meta name="robots" content="index, follow, max-snippet:-1, max-image-preview:large, max-video-preview:-1" />
+
     <link rel="canonical" href="https://www.ghostops.tech/paiement-pre-brief-board.html" />
 
-    <!-- Tailwind CDN (OK en prototype, à remplacer plus tard) -->
+    <!-- Open Graph -->
+    <meta property="og:title" content="Paiement – GhostOps Pré-brief Board (Niveau 3)" />
+    <meta
+      property="og:description"
+      content="Paiement sécurisé du GhostOps Pré-brief Board : note de gouvernance board-ready (risques, options, arbitrages), utilisable en board ou comité d’audit."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://www.ghostops.tech/paiement-pre-brief-board.html" />
+    <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Paiement – GhostOps Pré-brief Board (Niveau 3)" />
+    <meta
+      name="twitter:description"
+      content="Paiement sécurisé : note board-ready (gouvernance, risques, options, arbitrages) – GhostOps Pré-brief Board."
+    />
+    <meta name="twitter:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
+
+    <!-- Breadcrumbs -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Accueil",
+            "item": "https://www.ghostops.tech/"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Expertise",
+            "item": "https://www.ghostops.tech/expertise.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": "Pré-brief Board",
+            "item": "https://www.ghostops.tech/pre-brief-board.html"
+          },
+          {
+            "@type": "ListItem",
+            "position": 4,
+            "name": "Paiement Pré-brief Board",
+            "item": "https://www.ghostops.tech/paiement-pre-brief-board.html"
+          }
+        ]
+      }
+    </script>
+
+    <!-- WebPage -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "url": "https://www.ghostops.tech/paiement-pre-brief-board.html",
+        "name": "Paiement – GhostOps Pré-brief Board (Niveau 3)",
+        "description": "Paiement sécurisé du GhostOps Pré-brief Board : note de gouvernance board-ready (risques, options, arbitrages) exploitable en board ou comité d’audit."
+      }
+    </script>
+
+    <!-- Fonts & Tailwind -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } }
+      };
+    </script>
 
     <style>
-      .btn-disabled { opacity: .6; cursor: not-allowed; }
+      body::before {
+        content: "";
+        background: url("/assets/background-ghostops.jpg") no-repeat center center fixed;
+        background-color: #0f172a;
+        background-size: cover;
+        animation: bgPulse 10s ease-in-out infinite alternate;
+        position: fixed;
+        inset: 0;
+        opacity: 0.25;
+        z-index: -1;
+        transition: opacity 0.4s ease;
+      }
+      @keyframes bgPulse {
+        0% {
+          filter: brightness(1) contrast(1);
+        }
+        100% {
+          filter: brightness(1.05) contrast(1.05);
+        }
+      }
+      .text-shadow {
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      header,
+      main,
+      section,
+      footer {
+        position: relative;
+        z-index: 1;
+      }
     </style>
   </head>
 
-  <body class="min-h-screen bg-black text-white">
-    <!-- (Optionnel) votre nav -->
-    <header class="px-6 py-4 border-b border-white/10">
-      <div class="max-w-5xl mx-auto flex items-center justify-between">
-        <a href="/" class="font-semibold tracking-wide">GHOST OPS</a>
-        <nav class="text-sm text-white/80 space-x-4">
-          <a href="/index.html" class="hover:text-white">Accueil</a>
-          <a href="/expertise.html" class="hover:text-white">Expertise</a>
-          <a href="/qui-sommes-nous.html" class="hover:text-white">Qui sommes-nous ?</a>
-          <a href="/contact.html" class="hover:text-white">Contact confidentiel</a>
-        </nav>
-      </div>
+  <body class="bg-gray-900 text-white font-sans leading-relaxed">
+    <!-- HEADER (identique à diagnostic-ia.html) -->
+    <header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
+      <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
+        GHOST<span class="text-gray-400">OPS</span>
+      </a>
+      <nav class="flex items-center gap-4 text-xs md:text-sm">
+        <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
+        <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
+        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
+        <a
+          href="/contact.html"
+          class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition"
+        >
+          Contact confidentiel
+        </a>
+      </nav>
     </header>
 
-    <main class="px-6 py-10">
-      <div class="max-w-3xl mx-auto">
-        <p class="text-sm text-white/70 mb-2">GhostOps IA – Niveau 3 · Pré-brief Board</p>
-        <h1 class="text-3xl font-semibold tracking-tight mb-4">
+    <main class="px-6 md:px-24 pb-24">
+      <!-- BANDEAU : paiement annulé -->
+      <section id="ghostops-canceled-banner" class="max-w-5xl mx-auto mt-4 mb-4 hidden">
+        <div class="bg-amber-900/60 border border-amber-500/60 text-amber-100 text-xs md:text-sm px-4 py-3 rounded-xl">
+          <p class="font-semibold mb-1">Paiement annulé.</p>
+          <p class="text-amber-100/90">
+            Aucun débit n’a été effectué. Vous pouvez relancer le paiement ci-dessous, ou revenir à la page
+            <a href="/pre-brief-board.html" class="underline decoration-dotted">Pré-brief Board</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- BANDEAU : erreur paiement -->
+      <section id="ghostops-error-banner" class="max-w-5xl mx-auto mt-4 mb-4 hidden">
+        <div class="bg-red-900/60 border border-red-500/60 text-red-100 text-xs md:text-sm px-4 py-3 rounded-xl">
+          <p class="font-semibold mb-1">Erreur lors de la création de la session de paiement.</p>
+          <p id="ghostops-error-text" class="text-red-100/90"></p>
+        </div>
+      </section>
+
+      <!-- HERO / INTRO -->
+      <section class="max-w-5xl mx-auto mt-4 mb-10">
+        <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">
+          GhostOps IA – Niveau&nbsp;3 · Pré-brief Board · Paiement sécurisé
+        </p>
+
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-shadow">
           Paiement sécurisé – GhostOps Pré-brief Board
         </h1>
 
-        <p class="text-white/80 leading-relaxed mb-6">
-          Vous êtes sur la page de paiement sécurisée du <a class="underline" href="/pre-brief-board.html">GhostOps Pré-brief Board</a>.
-          Ce format correspond à une note de gouvernance “board-ready”, structurée et exploitable en conseil d’administration
-          ou comité d’audit.
-        </p>
+        <!-- Badge niveau + tarif (aligné avec les niveaux 1 & 2) -->
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-gray-500 text-[11px] text-gray-200 mb-4 bg-gray-900/60">
+          <span class="uppercase tracking-[.18em] text-gray-400">Niveau&nbsp;3</span>
+          <span class="h-1 w-1 rounded-full bg-gray-500"></span>
+          <span>Forfait de référence&nbsp;: <span class="font-semibold">2&nbsp;990&nbsp;€ TTC</span></span>
+        </div>
 
-        <!-- Bandeaux dynamiques -->
-        <div id="bannerCanceled" class="hidden mb-6 rounded-2xl border border-amber-400/30 bg-amber-400/10 p-4">
-          <p class="font-medium">Paiement annulé.</p>
-          <p class="text-white/80 text-sm mt-1">
-            Aucune somme n’a été débitée. Vous pouvez relancer le paiement ou revenir à la page
-            <a class="underline" href="/pre-brief-board.html">Pré-brief Board</a>.
+        <p class="text-gray-200 text-sm md:text-base mb-3">
+          Le <span class="font-semibold">Pré-brief Board</span> est le format GhostOps IA le plus abouti&nbsp;:
+          il vise à produire une <span class="font-semibold">note de gouvernance board-ready</span>, structurée et
+          exploitable devant un board, un comité d’audit ou une direction générale.
+        </p>
+        <p class="text-gray-300 text-sm md:text-base mb-3">
+          Il ne s’agit pas d’un “document IA automatique”&nbsp;: le pré-brief est une <span class="font-semibold">production
+          co-construite</span>, à partir de vos éléments (contexte, chronologie, zones de tension, contraintes, objectifs),
+          afin de formaliser risques, options et arbitrages.
+        </p>
+        <p class="text-gray-400 text-xs md:text-sm">
+          Le paiement est un <span class="font-semibold">forfait unique à 2&nbsp;990&nbsp;€ TTC</span>, sans abonnement.
+          Aucun prélèvement n’est effectué tant que vous n’avez pas validé le paiement sur l’interface sécurisée Stripe.
+        </p>
+      </section>
+
+      <!-- CE QUE VOUS OBTENEZ -->
+      <section class="max-w-5xl mx-auto mb-12">
+        <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
+          Ce que vous obtenez avec le Pré-brief Board
+        </h2>
+
+        <div class="grid md:grid-cols-3 gap-6 text-sm">
+          <div class="bg-gray-800/80 rounded-xl p-5">
+            <h3 class="font-semibold mb-2 text-white">1. Note “board-ready”</h3>
+            <p class="text-gray-300">
+              Une note structurée (contexte, enjeux, points de rupture, risques, hypothèses, options) conçue pour
+              tenir au bon niveau de lecture, sans bruit ni narratif parasite.
+            </p>
+          </div>
+          <div class="bg-gray-800/80 rounded-xl p-5">
+            <h3 class="font-semibold mb-2 text-white">2. Options & arbitrages</h3>
+            <p class="text-gray-300">
+              Deux à trois options consolidées, avec exposition, gains attendus, lignes rouges et conditions de succès,
+              pour préparer un arbitrage en gouvernance.
+            </p>
+          </div>
+          <div class="bg-gray-800/80 rounded-xl p-5">
+            <h3 class="font-semibold mb-2 text-white">3. Trajectoire de stabilisation</h3>
+            <p class="text-gray-300">
+              Un cadrage “stabilisation”&nbsp;: ce qui doit être sécurisé, à quel horizon, et quels signaux doivent
+              déclencher un changement de posture.
+            </p>
+          </div>
+        </div>
+
+        <p class="text-gray-400 text-xs md:text-sm mt-4 max-w-3xl">
+          Le Pré-brief Board n’est pas un avis juridique et ne se substitue pas à vos conseils. Il vise à produire un
+          document gouvernance clair, assumable, et utilisable pour décider.
+        </p>
+      </section>
+
+      <!-- COMMENT ÇA SE DÉROULE -->
+      <section class="max-w-5xl mx-auto mb-12">
+        <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
+          Comment se déroule le Pré-brief Board&nbsp;?
+        </h2>
+
+        <ol class="list-decimal list-inside text-gray-300 text-sm md:text-base space-y-2 max-w-3xl mb-4">
+          <li>
+            <span class="font-semibold">1. Paiement sécurisé en ligne</span>&nbsp;:
+            vous réglez le forfait Pré-brief Board (2&nbsp;990&nbsp;€ TTC) via une page Stripe dédiée.
+          </li>
+          <li>
+            <span class="font-semibold">2. Accès à l’espace session</span>&nbsp;:
+            après paiement, vous êtes redirigé vers la page session, avec un identifiant de session (cs_id).
+          </li>
+          <li>
+            <span class="font-semibold">3. Transmission structurée de vos éléments</span>&nbsp;:
+            vous déposez votre contexte (faits, acteurs, échéances, contraintes, objectifs), sans surcharge.
+          </li>
+          <li>
+            <span class="font-semibold">4. Production de la note</span>&nbsp;:
+            consolidation en note board-ready, exploitable pour décision et arbitrage.
+          </li>
+        </ol>
+
+        <p class="text-gray-400 text-xs md:text-sm max-w-3xl">
+          Si vous disposez déjà d’un Diagnostic IA (Niveau 1) et/ou d’un Studio Scénarios (Niveau 2),
+          ils peuvent servir de base, mais le Pré-brief Board peut aussi être activé indépendamment.
+        </p>
+      </section>
+
+      <!-- BLOC PAIEMENT -->
+      <section class="max-w-5xl mx-auto mt-8">
+        <div class="bg-gray-800/80 rounded-2xl p-6 md:p-8 text-center">
+          <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">
+            Procéder au paiement sécurisé du Pré-brief Board
+          </h2>
+          <p class="text-gray-300 text-sm md:text-base mb-4">
+            Vous allez être redirigé vers Stripe (mode test), sur une page de paiement sécurisée.
+            Aucun prélèvement n’est effectué tant que vous n’avez pas validé le paiement sur Stripe.
+          </p>
+
+          <p class="text-sm md:text-base text-gray-200 mb-2">
+            Honoraire de référence Pré-brief Board&nbsp;: <span class="font-semibold">2&nbsp;990&nbsp;€ TTC</span>
+          </p>
+          <p class="text-gray-400 text-[11px] md:text-xs mb-4">
+            Paiement unique. Sans abonnement. Vous pouvez annuler à tout moment avant validation Stripe.
+          </p>
+
+          <button
+            id="ghostops-prebrief-pay-btn"
+            type="button"
+            class="inline-block px-6 py-3 border border-white rounded-md hover:bg-white hover:text-black transition font-semibold text-xs md:text-sm"
+          >
+            Procéder au paiement du Pré-brief Board
+          </button>
+
+          <div class="mt-4">
+            <a href="/pre-brief-board.html" class="text-xs text-gray-300 hover:underline">
+              Revenir à la page Pré-brief Board
+            </a>
+          </div>
+
+          <p class="mt-4 text-[11px] text-gray-400">
+            Votre paiement est traité par Stripe. Aucune information bancaire n’est stockée sur GhostOps.
           </p>
         </div>
+      </section>
 
-        <div id="bannerError" class="hidden mb-6 rounded-2xl border border-red-400/30 bg-red-400/10 p-4">
-          <p class="font-medium">Impossible de démarrer le paiement.</p>
-          <p id="bannerErrorText" class="text-white/80 text-sm mt-1"></p>
-        </div>
+      <!-- PARCOURS GHOSTOPS IA EN 3 NIVEAUX -->
+      <section class="max-w-5xl mx-auto mb-12 mt-12">
+        <h2 class="text-xl md:text-2xl font-semibold mb-4 text-shadow">
+          Parcours GhostOps IA en 3 niveaux
+        </h2>
 
-        <h2 class="text-xl font-semibold mt-8 mb-3">Ce que couvre le GhostOps Pré-brief Board</h2>
-        <ul class="list-disc pl-6 text-white/80 space-y-2">
-          <li>Une note structurée “board-ready” : contexte, enjeux, risques, options.</li>
-          <li>Un document opposable en interne (board, comité d’audit) si nécessaire.</li>
-          <li>Un aller-retour d’ajustement (dans la limite du périmètre validé).</li>
-          <li>Confidentialité totale.</li>
-        </ul>
-
-        <p class="text-white/70 mt-4">
-          Le Pré-brief Board peut s’appuyer sur un Diagnostic IA et/ou un Studio Scénarios, mais peut aussi être activé
-          à partir d’éléments internes existants.
-        </p>
-
-        <h2 class="text-xl font-semibold mt-10 mb-3">Honoraire de référence & paiement sécurisé</h2>
-        <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <div class="flex items-baseline justify-between gap-4">
+        <div class="bg-gray-800/70 rounded-2xl p-6 md:p-8 text-sm md:text-base">
+          <div class="grid md:grid-cols-3 gap-6">
             <div>
-              <p class="font-medium">GhostOps Pré-brief Board (Niveau 3)</p>
-              <p class="text-sm text-white/70">Paiement traité via Stripe. Redirection sécurisée.</p>
+              <p class="text-xs uppercase tracking-[.18em] text-gray-400 mb-1">Niveau&nbsp;1</p>
+              <h3 class="font-semibold mb-1">
+                <a href="/diagnostic-ia.html" class="hover:underline">Diagnostic IA – 90&nbsp;minutes</a>
+              </h3>
+              <p class="text-gray-300 text-sm">
+                Lecture IA structurée de votre situation, risques principaux, options de lecture.
+              </p>
             </div>
-            <div class="text-right">
-              <p class="text-2xl font-semibold">2 990 € TTC</p>
-              <p class="text-xs text-white/50">Forfait de référence</p>
+
+            <div>
+              <p class="text-xs uppercase tracking-[.18em] text-gray-400 mb-1">Niveau&nbsp;2</p>
+              <h3 class="font-semibold mb-1">
+                <a href="/studio-scenarios.html" class="hover:underline">GhostOps Studio Scénarios</a>
+              </h3>
+              <p class="text-gray-300 text-sm">
+                Construction de 2 à 3 scénarios tactiques détaillés, matrices risques / gains / exposition.
+              </p>
+            </div>
+
+            <div>
+              <p class="text-xs uppercase tracking-[.18em] text-gray-400 mb-1">Niveau&nbsp;3</p>
+              <h3 class="font-semibold mb-1">
+                <a href="/pre-brief-board.html" class="hover:underline">GhostOps Pré-brief Board</a>
+              </h3>
+              <p class="text-gray-300 text-sm">
+                Note de gouvernance “board-ready” pour un board ou un comité d’audit.
+              </p>
             </div>
           </div>
 
-          <button
-            id="payBtn"
-            class="mt-5 w-full rounded-xl bg-white text-black font-semibold py-3 hover:opacity-90 transition"
-          >
-            Procéder au paiement sécurisé du Pré-brief Board
-          </button>
-
-          <p class="text-xs text-white/60 mt-3">
-            Aucune information de carte bancaire n’est stockée sur le site GhostOps : tout est traité par Stripe.
+          <p class="mt-4 text-[11px] text-gray-400">
+            Le paiement que vous effectuez porte exclusivement sur le
+            <span class="font-semibold">Niveau&nbsp;3 – Pré-brief Board</span>.
+            Les niveaux 1 et 2 font l’objet de pages et d’honoraires distincts.
+          </p>
+          <p class="mt-1 text-[11px] text-gray-400">
+            Les trois niveaux peuvent être activés de manière indépendante. Le parcours complet 1 → 2 → 3 est recommandé
+            dans les situations les plus sensibles, mais il n’est jamais imposé.
           </p>
         </div>
-
-        <h2 class="text-xl font-semibold mt-10 mb-3">Un doute avant de valider le paiement ?</h2>
-        <p class="text-white/80 mb-4">
-          Si vous avez la moindre incertitude sur le cadrage du dossier, contactez GhostOps en amont.
-        </p>
-        <a
-          class="inline-flex items-center rounded-xl border border-white/20 px-4 py-2 hover:bg-white/5 transition"
-          href="/contact.html"
-        >
-          Poser une question avant de payer
-        </a>
-      </div>
+      </section>
     </main>
 
-    <footer class="px-6 py-8 border-t border-white/10 text-white/60 text-sm">
-      <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+    <footer class="w-full px-6 md:px-24 pb-8 mt-8 md:mt-12 text-xs text-gray-400">
+      <div class="max-w-5xl mx-auto flex flex-col md:flex-row md:items-center md:justify-between gap-2">
         <p>© GhostOps – Tous droits réservés.</p>
-        <div class="space-x-4">
-          <a class="hover:text-white" href="/index.html">Accueil</a>
-          <a class="hover:text-white" href="/expertise.html">Expertise</a>
-          <a class="hover:text-white" href="/qui-sommes-nous.html">Qui sommes-nous ?</a>
-          <a class="hover:text-white" href="/contact.html">Contact</a>
-          <a class="hover:text-white" href="/mentions-legales.html">Mentions légales & confidentialité</a>
-        </div>
+        <nav class="flex flex-wrap items-center gap-3">
+          <a href="/" class="hover:underline">Accueil</a>
+          <a href="/expertise.html" class="hover:underline">Expertise</a>
+          <a href="/qui-sommes-nous.html" class="hover:underline">Qui sommes-nous&nbsp;?</a>
+          <a href="/contact.html" class="hover:underline">Contact</a>
+          <a href="/mentions-legales.html" class="hover:underline">
+            Mentions légales &amp; confidentialité
+          </a>
+        </nav>
       </div>
     </footer>
 
+    <!-- Scripts -->
     <script>
-      // Affiche le bandeau "annulé" uniquement si canceled=1
       (function () {
         const params = new URLSearchParams(window.location.search);
+
+        // Bandeau annulation
         if (params.get("canceled") === "1") {
-          document.getElementById("bannerCanceled").classList.remove("hidden");
+          const canceledBanner = document.getElementById("ghostops-canceled-banner");
+          if (canceledBanner) canceledBanner.classList.remove("hidden");
         }
-      })();
 
-      function setError(msg) {
-        const box = document.getElementById("bannerError");
-        const txt = document.getElementById("bannerErrorText");
-        txt.textContent = msg || "Erreur inconnue.";
-        box.classList.remove("hidden");
-      }
+        const payBtn = document.getElementById("ghostops-prebrief-pay-btn");
+        const errorBanner = document.getElementById("ghostops-error-banner");
+        const errorText = document.getElementById("ghostops-error-text");
 
-      async function startCheckout() {
-        const btn = document.getElementById("payBtn");
-        btn.classList.add("btn-disabled");
-        btn.disabled = true;
+        function showError(msg) {
+          if (!errorBanner || !errorText) return;
+          errorText.textContent = msg || "Une erreur est survenue. Veuillez réessayer.";
+          errorBanner.classList.remove("hidden");
+        }
 
-        try {
-          const r = await fetch("/api/ghostops-pre-brief-board-checkout", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({}),
-          });
+        if (!payBtn) return;
 
-          const data = await r.json().catch(() => ({}));
+        payBtn.addEventListener("click", async function () {
+          // UX : éviter double-clic
+          payBtn.disabled = true;
+          payBtn.classList.add("opacity-70", "cursor-not-allowed");
 
-          if (!r.ok || !data?.url) {
-            console.error("Checkout API error:", r.status, data);
-            setError(data?.debug || data?.error || ("Erreur API (" + r.status + ")."));
-            btn.disabled = false;
-            btn.classList.remove("btn-disabled");
-            return;
+          try {
+            const response = await fetch("/api/ghostops-pre-brief-board-checkout", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({})
+            });
+
+            const data = await response.json().catch(() => ({}));
+
+            if (!response.ok || !data.url) {
+              console.error("Checkout error:", response.status, data);
+              showError(data.debug || data.error || `Erreur API (${response.status}).`);
+              payBtn.disabled = false;
+              payBtn.classList.remove("opacity-70", "cursor-not-allowed");
+              return;
+            }
+
+            window.location.href = data.url;
+          } catch (err) {
+            console.error("Erreur réseau /api/ghostops-pre-brief-board-checkout :", err);
+            showError("Erreur de connexion au module de paiement. Veuillez réessayer ultérieurement.");
+            payBtn.disabled = false;
+            payBtn.classList.remove("opacity-70", "cursor-not-allowed");
           }
-
-          window.location.href = data.url;
-        } catch (e) {
-          console.error(e);
-          setError("Erreur réseau. Veuillez réessayer.");
-          btn.disabled = false;
-          btn.classList.remove("btn-disabled");
-        }
-      }
-
-      document.getElementById("payBtn").addEventListener("click", startCheckout);
+        });
+      })();
     </script>
   </body>
 </html>
