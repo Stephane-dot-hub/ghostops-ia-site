@@ -5,14 +5,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>GhostOps Pré-brief Board – Espace de travail & activation</title>
-    <meta name="description" content="Espace de travail GhostOps Pré-brief Board, réservé aux dirigeants et boards ayant validé le paiement. Rappel du périmètre, préparation des éléments et première structuration du dossier." />
+    <meta
+      name="description"
+      content="Espace de travail GhostOps Pré-brief Board, réservé aux dirigeants et boards ayant validé le paiement. Rappel du périmètre, préparation des éléments et première structuration du dossier."
+    />
 
     <meta name="robots" content="noindex, nofollow" />
     <link rel="canonical" href="https://www.ghostops.tech/pre-brief-board-session.html" />
 
     <!-- Open Graph -->
     <meta property="og:title" content="GhostOps Pré-brief Board – Espace de travail" />
-    <meta property="og:description" content="Session Pré-brief Board GhostOps : espace de travail confidentiel pour structurer votre note board-ready après validation du paiement." />
+    <meta
+      property="og:description"
+      content="Session Pré-brief Board GhostOps : espace de travail confidentiel pour structurer votre note board-ready après validation du paiement."
+    />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.ghostops.tech/pre-brief-board-session.html" />
     <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
@@ -28,27 +34,44 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
-        theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] } } }
+        theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } }
       };
     </script>
 
     <style>
       body::before {
         content: "";
-        background: url('/assets/background-ghostops.jpg') no-repeat center center fixed;
+        background: url("/assets/background-ghostops.jpg") no-repeat center center fixed;
         background-color: #0f172a;
         background-size: cover;
         animation: bgPulse 10s ease-in-out infinite alternate;
-        position: fixed; inset: 0; opacity: 0.25; z-index: -1;
-        transition: opacity .4s ease;
+        position: fixed;
+        inset: 0;
+        opacity: 0.25;
+        z-index: -1;
+        transition: opacity 0.4s ease;
       }
       @keyframes bgPulse {
-        0% { filter: brightness(1) contrast(1); }
-        100% { filter: brightness(1.05) contrast(1.05); }
+        0% {
+          filter: brightness(1) contrast(1);
+        }
+        100% {
+          filter: brightness(1.05) contrast(1.05);
+        }
       }
-      .text-shadow { text-shadow: 1px 1px 4px rgba(0,0,0,.6); }
-      html { scroll-behavior: smooth; }
-      header, main, section, footer { position: relative; z-index: 1; }
+      .text-shadow {
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      header,
+      main,
+      section,
+      footer {
+        position: relative;
+        z-index: 1;
+      }
     </style>
   </head>
 
@@ -62,8 +85,10 @@
         <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
         <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
         <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
-        <a href="/contact.html"
-           class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition">
+        <a
+          href="/contact.html"
+          class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition"
+        >
           Contact confidentiel
         </a>
       </nav>
@@ -83,21 +108,27 @@
           </p>
 
           <p class="text-gray-300 text-sm md:text-base mb-4">
-            Après paiement, vous devez utiliser le lien complet contenant un identifiant <span class="font-semibold">cs_id</span>.
+            Après paiement, vous devez utiliser le lien complet contenant un identifiant
+            <span class="font-semibold">cs_id</span>.
           </p>
 
           <div class="flex flex-col sm:flex-row gap-3 mt-4">
-            <a href="/pre-brief-board.html"
-               class="inline-block px-5 py-2 text-xs md:text-sm border border-white rounded-md hover:bg-white hover:text-black transition text-center">
+            <a
+              href="/pre-brief-board.html"
+              class="inline-block px-5 py-2 text-xs md:text-sm border border-white rounded-md hover:bg-white hover:text-black transition text-center"
+            >
               Revenir à la page Pré-brief Board
             </a>
-            <a href="/contact.html"
-               class="inline-block px-5 py-2 text-xs md:text-sm border border-gray-400 rounded-md hover:bg-gray-100 hover:text-black transition text-center">
+            <a
+              href="/contact.html"
+              class="inline-block px-5 py-2 text-xs md:text-sm border border-gray-400 rounded-md hover:bg-gray-100 hover:text-black transition text-center"
+            >
               Contacter GhostOps
             </a>
           </div>
 
-          <p id="prebrief-debug" class="text-gray-500 text-[11px] mt-4"></p>
+          <!-- Diagnostic -->
+          <p id="prebrief-debug" class="text-gray-200/70 text-[11px] mt-4 whitespace-pre-line"></p>
         </div>
       </section>
 
@@ -174,12 +205,13 @@
               </div>
 
               <form id="prebrief-chat-form" class="border-t border-gray-800 px-3 py-2 flex items-center gap-2">
-                <textarea id="prebrief-chat-input"
-                          class="flex-1 text-xs bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-1 resize-none focus:outline-none focus:border-gray-400"
-                          rows="3"
-                          placeholder="Décrivez ici votre situation (contexte, acteurs, risques, échéances)…"></textarea>
-                <button type="submit"
-                        class="text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
+                <textarea
+                  id="prebrief-chat-input"
+                  class="flex-1 text-xs bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-1 resize-none focus:outline-none focus:border-gray-400"
+                  rows="3"
+                  placeholder="Décrivez ici votre situation (contexte, acteurs, risques, échéances)…"
+                ></textarea>
+                <button type="submit" class="text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
                   Envoyer
                 </button>
               </form>
@@ -206,88 +238,135 @@
       </div>
     </footer>
 
-    <!-- Script activation + chat (cs_id + token) -->
+    <!-- Script accès + chat -->
     <script>
       (function () {
         const params = new URLSearchParams(window.location.search);
-        const csId = (params.get('cs_id') || '').trim();
-        const paidFlag = (params.get('paid') || '').trim();
+        const csId = (params.get("cs_id") || "").trim();
+        const paidFlag = (params.get("paid") || "").trim();
 
-        const paidBlock = document.getElementById('prebrief-paid');
-        const notPaidBlock = document.getElementById('prebrief-not-paid');
-        const debugEl = document.getElementById('prebrief-debug');
+        const paidBlock = document.getElementById("prebrief-paid");
+        const notPaidBlock = document.getElementById("prebrief-not-paid");
+        const debugEl = document.getElementById("prebrief-debug");
 
-        const TOKEN_KEY = 'ghostops_prebrief_sessionToken_v1';
+        const TOKEN_KEY = "ghostops_prebrief_sessionToken_v1";
 
         function showPaid() {
-          if (notPaidBlock) notPaidBlock.classList.add('hidden');
-          if (paidBlock) paidBlock.classList.remove('hidden');
+          if (notPaidBlock) notPaidBlock.classList.add("hidden");
+          if (paidBlock) paidBlock.classList.remove("hidden");
         }
 
         function showNotPaid(msg) {
-          if (paidBlock) paidBlock.classList.add('hidden');
-          if (notPaidBlock) notPaidBlock.classList.remove('hidden');
-          if (debugEl) debugEl.textContent = msg || '';
+          if (paidBlock) paidBlock.classList.add("hidden");
+          if (notPaidBlock) notPaidBlock.classList.remove("hidden");
+          if (debugEl) debugEl.textContent = msg || "";
         }
 
-        // 1) Décision d'affichage
-        // - Si paid=1 : on affiche (compat legacy)
-        // - Sinon si cs_id présent : on tente une validation via API
-        // - Sinon : accès refusé
+        // --- NOUVEAU : vérification Stripe "source de vérité"
+        async function verifyPaymentWithStripe(cs_id) {
+          const r = await fetch("/api/ghostops-pre-brief-board-verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ cs_id })
+          });
+
+          const data = await r.json().catch(() => ({}));
+          return { r, data };
+        }
+
+        // 1) Décision d'affichage :
+        // - paid=1 (legacy) : on ouvre
+        // - sessionToken local : on ouvre (mais on tente une vérification en arrière-plan)
+        // - cs_id : on vérifie Stripe; si OK, on tente d'obtenir un token via /api/ghostops-pre-brief-board
+        // - sinon : refus
         async function bootstrapAccess() {
-          if (paidFlag === '1') {
+          if (paidFlag === "1") {
             showPaid();
             return;
           }
 
-          const existingToken = (localStorage.getItem(TOKEN_KEY) || '').trim();
+          const existingToken = (localStorage.getItem(TOKEN_KEY) || "").trim();
           if (existingToken) {
-            // On ne sait pas si token encore valide, mais on permet l'accès, l'API tranchera à l'usage.
+            // On autorise l'accès pour éviter de bloquer un client légitime,
+            // mais on affichera un refus au moment de l'usage si l'API le rejette.
             showPaid();
             return;
           }
 
           if (!csId) {
-            showNotPaid('Lien incomplet : paramètre cs_id absent.');
+            showNotPaid("Lien incomplet : paramètre cs_id absent.");
             return;
           }
 
-          // Tentative de validation "silencieuse" : on appelle l’API avec un message neutre.
+          // A) Vérification Stripe (source de vérité)
           try {
-            const r = await fetch('/api/ghostops-pre-brief-board', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                cs_id: csId,
-                message: 'Validation d’accès Pré-brief Board (initialisation).'
-              })
-            });
-
-            const data = await r.json().catch(() => ({}));
+            const { r, data } = await verifyPaymentWithStripe(csId);
 
             if (!r.ok) {
-              const errText = data.error || 'Paiement non vérifié (API).';
-              showNotPaid(`cs_id détecté mais accès refusé : ${errText}`);
+              const msg = data?.debug || data?.error || `Erreur API vérification (${r.status}).`;
+              showNotPaid(`cs_id détecté mais accès refusé : ${msg}`);
               return;
             }
 
-            if (data.sessionToken) {
-              localStorage.setItem(TOKEN_KEY, data.sessionToken);
+            if (!data?.ok) {
+              showNotPaid(`cs_id détecté mais accès refusé : ${data?.error || "Vérification impossible."}`);
+              return;
+            }
+
+            if (!data?.verified) {
+              // Diagnostic explicite : on voit status/payment_status/livemode
+              showNotPaid(
+                `cs_id détecté mais accès refusé : Paiement non vérifié (Stripe). ` +
+                  `status=${data.status}, payment_status=${data.payment_status}, livemode=${data.livemode}`
+              );
+              return;
+            }
+          } catch (e) {
+            showNotPaid("Erreur réseau lors de la vérification du paiement. Réessayez ou contactez GhostOps.");
+            return;
+          }
+
+          // B) Paiement Stripe OK -> on demande un sessionToken à l’API Pré-brief Board
+          try {
+            const r2 = await fetch("/api/ghostops-pre-brief-board", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                cs_id: csId,
+                message: "Initialisation Pré-brief Board (accès validé)."
+              })
+            });
+
+            const data2 = await r2.json().catch(() => ({}));
+
+            if (!r2.ok) {
+              const errText = data2?.error || "Accès non délivré par le module Pré-brief Board.";
+              showNotPaid(`Paiement vérifié, mais accès non initialisé : ${errText}`);
+              return;
+            }
+
+            if (data2?.sessionToken) {
+              localStorage.setItem(TOKEN_KEY, data2.sessionToken);
               showPaid();
               return;
             }
 
-            // Si l’API renvoie reply mais pas de token, on considère que l’API n’est pas au bon format
-            showNotPaid('API Pré-brief Board : réponse reçue mais aucun sessionToken (contrat non conforme).');
+            // Compat : si l’API ne renvoie pas de token, on ouvre mais on affiche un diagnostic
+            // (cela évite de bloquer si l’API fonctionne en mode "stateless")
+            showPaid();
+            showNotPaid(
+              "Paiement vérifié, accès ouvert, mais aucun sessionToken renvoyé par l’API. " +
+                "Si le chat échoue, aligner le format de réponse côté /api/ghostops-pre-brief-board."
+            );
           } catch (e) {
-            showNotPaid('Erreur réseau lors de la validation du paiement. Réessayez ou contactez GhostOps.');
+            showNotPaid("Erreur réseau lors de l’initialisation de la session. Réessayez ou contactez GhostOps.");
           }
         }
 
         // 2) Chat
-        const form = document.getElementById('prebrief-chat-form');
-        const input = document.getElementById('prebrief-chat-input');
-        const messages = document.getElementById('prebrief-chat-messages');
+        const form = document.getElementById("prebrief-chat-form");
+        const input = document.getElementById("prebrief-chat-input");
+        const messages = document.getElementById("prebrief-chat-messages");
 
         function scrollToBottom() {
           if (!messages) return;
@@ -295,13 +374,14 @@
         }
 
         function addMessage(sender, text) {
-          const wrapper = document.createElement('div');
-          wrapper.className = sender === 'user' ? 'mb-2 text-right' : 'mb-2 text-left';
+          const wrapper = document.createElement("div");
+          wrapper.className = sender === "user" ? "mb-2 text-right" : "mb-2 text-left";
 
-          const bubble = document.createElement('div');
-          bubble.className = sender === 'user'
-            ? 'inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg'
-            : 'inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg';
+          const bubble = document.createElement("div");
+          bubble.className =
+            sender === "user"
+              ? "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg"
+              : "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg";
 
           bubble.textContent = text;
           wrapper.appendChild(bubble);
@@ -310,59 +390,65 @@
           return wrapper;
         }
 
-        // Historique local minimal
         const history = [];
 
         async function sendMessage() {
-          const userMessage = (input.value || '').trim();
+          const userMessage = (input.value || "").trim();
           if (!userMessage) return;
 
-          addMessage('user', userMessage);
-          input.value = '';
+          addMessage("user", userMessage);
+          input.value = "";
 
-          history.push({ role: 'user', content: userMessage });
+          history.push({ role: "user", content: userMessage });
 
-          const waitingElem = addMessage('bot', 'Lecture Pré-brief Board en cours…');
+          const waitingElem = addMessage("bot", "Lecture Pré-brief Board en cours…");
 
           try {
-            const token = (localStorage.getItem(TOKEN_KEY) || '').trim();
+            const token = (localStorage.getItem(TOKEN_KEY) || "").trim();
             const payload = token
               ? { sessionToken: token, message: userMessage, history }
               : { cs_id: csId, message: userMessage, history };
 
-            const response = await fetch('/api/ghostops-pre-brief-board', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+            const response = await fetch("/api/ghostops-pre-brief-board", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
               body: JSON.stringify(payload)
             });
 
             let data = {};
-            try { data = await response.json(); } catch (_) {}
+            try {
+              data = await response.json();
+            } catch (_) {}
 
             if (waitingElem && waitingElem.parentNode) waitingElem.parentNode.removeChild(waitingElem);
 
             if (!response.ok || !data.reply) {
-              const errText = data.error || 'Une erreur est survenue (Pré-brief Board). Veuillez réessayer.';
-              addMessage('bot', errText);
+              const errText = data.error || "Une erreur est survenue (Pré-brief Board). Veuillez réessayer.";
+              addMessage("bot", errText);
               return;
             }
 
-            // Rotation / stockage token si fourni
             if (data.sessionToken) localStorage.setItem(TOKEN_KEY, data.sessionToken);
 
-            addMessage('bot', data.reply);
-            history.push({ role: 'assistant', content: data.reply });
+            addMessage("bot", data.reply);
+            history.push({ role: "assistant", content: data.reply });
           } catch (err) {
-            console.error('Erreur lors de l’appel /api/ghostops-pre-brief-board :', err);
+            console.error("Erreur lors de l’appel /api/ghostops-pre-brief-board :", err);
             if (waitingElem && waitingElem.parentNode) waitingElem.parentNode.removeChild(waitingElem);
-            addMessage('bot', 'Erreur de connexion à GhostOps IA. Veuillez réessayer ou utiliser la page contact.');
+            addMessage("bot", "Erreur de connexion à GhostOps IA. Veuillez réessayer ou utiliser la page contact.");
           }
         }
 
         if (form && input && messages) {
-          form.addEventListener('submit', (e) => { e.preventDefault(); sendMessage(); });
-          input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+          form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            sendMessage();
+          });
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              sendMessage();
+            }
           });
         }
 
