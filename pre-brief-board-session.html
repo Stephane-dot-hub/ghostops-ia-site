@@ -34,7 +34,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
-        theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } }
+        theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } },
       };
     </script>
 
@@ -72,6 +72,27 @@
         position: relative;
         z-index: 1;
       }
+      /* bulles style cohérent */
+      .bot-bubble {
+        background: rgba(17, 24, 39, 0.75);
+        border: 1px solid rgba(55, 65, 81, 1);
+        border-radius: 0.75rem;
+        padding: 0.75rem 0.85rem;
+        white-space: pre-wrap;
+        line-height: 1.45;
+      }
+      .user-bubble {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        border-radius: 0.75rem;
+        padding: 0.75rem 0.85rem;
+        white-space: pre-wrap;
+        line-height: 1.45;
+      }
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New",
+          monospace;
+      }
     </style>
   </head>
 
@@ -108,8 +129,7 @@
           </p>
 
           <p class="text-gray-300 text-sm md:text-base mb-4">
-            Après paiement, vous devez utiliser le lien complet contenant un identifiant
-            <span class="font-semibold">cs_id</span>.
+            Après paiement, vous devez utiliser le lien complet contenant un identifiant <span class="font-semibold">cs_id</span>.
           </p>
 
           <div class="flex flex-col sm:flex-row gap-3 mt-4">
@@ -127,8 +147,7 @@
             </a>
           </div>
 
-          <!-- Diagnostic -->
-          <p id="prebrief-debug" class="text-gray-200/70 text-[11px] mt-4 whitespace-pre-line"></p>
+          <p id="prebrief-debug" class="text-gray-500 text-[11px] mt-4"></p>
         </div>
       </section>
 
@@ -162,6 +181,44 @@
           </p>
         </header>
 
+        <!-- Télémétrie session (alignée Niveau 2) -->
+        <section class="mb-6">
+          <div class="bg-gray-800/70 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div class="text-xs md:text-sm text-gray-200">
+              <span class="text-gray-400">Session :</span>
+              <span id="pb-meta-iters" class="font-semibold">—</span>
+              <span class="text-gray-400">itérations restantes</span>
+              <span class="mx-2 text-gray-600">•</span>
+              <span class="text-gray-400">Expiration :</span>
+              <span id="pb-meta-exp" class="font-semibold">—</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <button
+                id="pb-reset"
+                type="button"
+                class="px-3 py-2 text-[11px] md:text-xs border border-gray-500 rounded-md hover:bg-gray-100 hover:text-black transition"
+              >
+                Réinitialiser l’accès (token)
+              </button>
+
+              <button
+                id="pb-hard-refresh"
+                type="button"
+                class="px-3 py-2 text-[11px] md:text-xs border border-gray-500 rounded-md hover:bg-gray-100 hover:text-black transition"
+              >
+                Recharger (sans cache)
+              </button>
+
+              <span id="pb-meta-tech" class="text-[11px] text-gray-400"></span>
+            </div>
+          </div>
+
+          <p class="text-gray-500 text-[11px] mt-2">
+            Indicateurs internes (itérations/TTL) affichés pour contrôler la stabilité de session.
+          </p>
+        </section>
+
         <!-- Étape 1 -->
         <section class="mb-8">
           <div class="bg-gray-800/80 rounded-2xl p-6 md:p-8">
@@ -192,34 +249,47 @@
               Étape&nbsp;2 – Première lecture avec GhostOps IA – Pré-brief Board
             </h2>
 
-            <div class="bg-gray-950/80 rounded-xl border border-gray-700 max-h-[360px] flex flex-col">
+            <div class="bg-gray-950/80 rounded-xl border border-gray-700 max-h-[420px] flex flex-col">
               <div id="prebrief-chat-messages" class="flex-1 px-4 py-3 space-y-3 overflow-y-auto text-xs md:text-sm">
-                <div class="text-gray-300 text-xs md:text-[13px]">
-                  <span class="font-semibold">GhostOps IA – Pré-brief Board&nbsp;:</span>
-                  <span>
-                    Décrivez votre situation (périmètre, faits, acteurs, risques, échéances).<br /><br />
-                    Je vous proposerai une lecture structurée : enjeux, risques humains / narratifs / gouvernance,
-                    et pistes de cadrage pour préparer une note board-ready.
-                  </span>
+                <div class="bot-bubble text-gray-100">
+                  <span class="font-semibold">GhostOps IA – Pré-brief Board :</span><br /><br />
+                  Décrivez votre situation (périmètre, faits, acteurs, risques, échéances).<br /><br />
+                  Je produirai un pré-brief structuré : reformulation factuelle, enjeux de gouvernance, risques,
+                  options de cadrage, informations manquantes, et préparation d’un ordre du jour “board-ready”.
                 </div>
               </div>
 
               <form id="prebrief-chat-form" class="border-t border-gray-800 px-3 py-2 flex items-center gap-2">
                 <textarea
                   id="prebrief-chat-input"
-                  class="flex-1 text-xs bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-1 resize-none focus:outline-none focus:border-gray-400"
+                  class="flex-1 text-xs bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-2 resize-none focus:outline-none focus:border-gray-400"
                   rows="3"
                   placeholder="Décrivez ici votre situation (contexte, acteurs, risques, échéances)…"
                 ></textarea>
-                <button type="submit" class="text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
-                  Envoyer
-                </button>
+
+                <div class="flex flex-col gap-2">
+                  <button type="submit" class="text-xs px-3 py-2 bg-white text-black font-semibold rounded-md hover:bg-gray-200">
+                    Envoyer
+                  </button>
+
+                  <button
+                    id="pb-continue"
+                    type="button"
+                    class="text-xs px-3 py-2 border border-gray-500 rounded-md hover:bg-gray-100 hover:text-black transition disabled:opacity-40 disabled:cursor-not-allowed"
+                    disabled
+                    title="Demander la suite d’une réponse tronquée"
+                  >
+                    Suite
+                  </button>
+                </div>
               </form>
             </div>
 
             <p class="text-gray-500 text-[11px] mt-3 max-w-3xl">
               Ce module IA ne remplace pas un échange direct. La production de la note finale reste un livrable humain.
             </p>
+
+            <p id="pb-status" class="text-xs text-gray-300 mt-3"></p>
           </div>
         </section>
       </section>
@@ -238,19 +308,41 @@
       </div>
     </footer>
 
-    <!-- Script accès + chat -->
+    <!-- Script complet aligné Niveau 2 : accès + token + continue + télémétrie -->
     <script>
       (function () {
         const params = new URLSearchParams(window.location.search);
         const csId = (params.get("cs_id") || "").trim();
         const paidFlag = (params.get("paid") || "").trim();
+        const resetFlag = (params.get("reset") || "").trim();
 
         const paidBlock = document.getElementById("prebrief-paid");
         const notPaidBlock = document.getElementById("prebrief-not-paid");
         const debugEl = document.getElementById("prebrief-debug");
 
-        const TOKEN_KEY = "ghostops_prebrief_sessionToken_v1";
+        const form = document.getElementById("prebrief-chat-form");
+        const input = document.getElementById("prebrief-chat-input");
+        const messages = document.getElementById("prebrief-chat-messages");
+        const statusEl = document.getElementById("pb-status");
 
+        const btnContinue = document.getElementById("pb-continue");
+        const btnReset = document.getElementById("pb-reset");
+        const btnHardRefresh = document.getElementById("pb-hard-refresh");
+
+        const metaIters = document.getElementById("pb-meta-iters");
+        const metaExp = document.getElementById("pb-meta-exp");
+        const metaTech = document.getElementById("pb-meta-tech");
+
+        const TOKEN_KEY = "ghostops_prebrief_sessionToken_v1";
+        const TRUNC_MARKER = "— FIN TRONQUÉE (demander la suite)";
+
+        // Historique (comme Niveau 2)
+        const history = [];
+
+        // Dernier assistant (pour continue)
+        let lastAssistantText = "";
+
+        // Helpers UI
         function showPaid() {
           if (notPaidBlock) notPaidBlock.classList.add("hidden");
           if (paidBlock) paidBlock.classList.remove("hidden");
@@ -262,112 +354,6 @@
           if (debugEl) debugEl.textContent = msg || "";
         }
 
-        // --- NOUVEAU : vérification Stripe "source de vérité"
-        async function verifyPaymentWithStripe(cs_id) {
-          const r = await fetch("/api/ghostops-pre-brief-board-verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ cs_id })
-          });
-
-          const data = await r.json().catch(() => ({}));
-          return { r, data };
-        }
-
-        // 1) Décision d'affichage :
-        // - paid=1 (legacy) : on ouvre
-        // - sessionToken local : on ouvre (mais on tente une vérification en arrière-plan)
-        // - cs_id : on vérifie Stripe; si OK, on tente d'obtenir un token via /api/ghostops-pre-brief-board
-        // - sinon : refus
-        async function bootstrapAccess() {
-          if (paidFlag === "1") {
-            showPaid();
-            return;
-          }
-
-          const existingToken = (localStorage.getItem(TOKEN_KEY) || "").trim();
-          if (existingToken) {
-            // On autorise l'accès pour éviter de bloquer un client légitime,
-            // mais on affichera un refus au moment de l'usage si l'API le rejette.
-            showPaid();
-            return;
-          }
-
-          if (!csId) {
-            showNotPaid("Lien incomplet : paramètre cs_id absent.");
-            return;
-          }
-
-          // A) Vérification Stripe (source de vérité)
-          try {
-            const { r, data } = await verifyPaymentWithStripe(csId);
-
-            if (!r.ok) {
-              const msg = data?.debug || data?.error || `Erreur API vérification (${r.status}).`;
-              showNotPaid(`cs_id détecté mais accès refusé : ${msg}`);
-              return;
-            }
-
-            if (!data?.ok) {
-              showNotPaid(`cs_id détecté mais accès refusé : ${data?.error || "Vérification impossible."}`);
-              return;
-            }
-
-            if (!data?.verified) {
-              // Diagnostic explicite : on voit status/payment_status/livemode
-              showNotPaid(
-                `cs_id détecté mais accès refusé : Paiement non vérifié (Stripe). ` +
-                  `status=${data.status}, payment_status=${data.payment_status}, livemode=${data.livemode}`
-              );
-              return;
-            }
-          } catch (e) {
-            showNotPaid("Erreur réseau lors de la vérification du paiement. Réessayez ou contactez GhostOps.");
-            return;
-          }
-
-          // B) Paiement Stripe OK -> on demande un sessionToken à l’API Pré-brief Board
-          try {
-            const r2 = await fetch("/api/ghostops-pre-brief-board", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                cs_id: csId,
-                message: "Initialisation Pré-brief Board (accès validé)."
-              })
-            });
-
-            const data2 = await r2.json().catch(() => ({}));
-
-            if (!r2.ok) {
-              const errText = data2?.error || "Accès non délivré par le module Pré-brief Board.";
-              showNotPaid(`Paiement vérifié, mais accès non initialisé : ${errText}`);
-              return;
-            }
-
-            if (data2?.sessionToken) {
-              localStorage.setItem(TOKEN_KEY, data2.sessionToken);
-              showPaid();
-              return;
-            }
-
-            // Compat : si l’API ne renvoie pas de token, on ouvre mais on affiche un diagnostic
-            // (cela évite de bloquer si l’API fonctionne en mode "stateless")
-            showPaid();
-            showNotPaid(
-              "Paiement vérifié, accès ouvert, mais aucun sessionToken renvoyé par l’API. " +
-                "Si le chat échoue, aligner le format de réponse côté /api/ghostops-pre-brief-board."
-            );
-          } catch (e) {
-            showNotPaid("Erreur réseau lors de l’initialisation de la session. Réessayez ou contactez GhostOps.");
-          }
-        }
-
-        // 2) Chat
-        const form = document.getElementById("prebrief-chat-form");
-        const input = document.getElementById("prebrief-chat-input");
-        const messages = document.getElementById("prebrief-chat-messages");
-
         function scrollToBottom() {
           if (!messages) return;
           messages.scrollTop = messages.scrollHeight;
@@ -375,24 +361,120 @@
 
         function addMessage(sender, text) {
           const wrapper = document.createElement("div");
-          wrapper.className = sender === "user" ? "mb-2 text-right" : "mb-2 text-left";
+          wrapper.className = sender === "user" ? "text-right" : "text-left";
 
           const bubble = document.createElement("div");
-          bubble.className =
-            sender === "user"
-              ? "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg"
-              : "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg";
+          bubble.className = sender === "user" ? "user-bubble inline-block text-gray-100" : "bot-bubble inline-block text-gray-100";
 
           bubble.textContent = text;
+
           wrapper.appendChild(bubble);
           messages.appendChild(wrapper);
           scrollToBottom();
-          return wrapper;
+          return bubble;
         }
 
-        const history = [];
+        function setStatus(text, tone) {
+          if (!statusEl) return;
+          statusEl.textContent = text || "";
+          statusEl.className = "text-xs mt-3 " + (tone === "err" ? "text-red-400" : tone === "ok" ? "text-green-400" : "text-gray-300");
+        }
 
-        async function sendMessage() {
+        function fmtExp(expUnix) {
+          if (!expUnix) return "—";
+          const d = new Date(expUnix * 1000);
+          try {
+            return d.toLocaleString("fr-FR", { timeZone: "Europe/Paris" });
+          } catch (_) {
+            return d.toISOString();
+          }
+        }
+
+        function updateMeta(meta) {
+          // meta: itersLeft, expiresAt, meta.serverNow, meta.latencyMs, meta.model, meta.timeoutMs
+          if (!meta) return;
+          if (typeof meta.itersLeft === "number" && metaIters) metaIters.textContent = String(meta.itersLeft);
+          if (typeof meta.expiresAt === "number" && metaExp) metaExp.textContent = fmtExp(meta.expiresAt);
+
+          const bits = [];
+          if (meta?.meta?.model) bits.push("model=" + meta.meta.model);
+          if (meta?.meta?.latencyMs != null) bits.push("lat=" + meta.meta.latencyMs + "ms");
+          if (meta?.meta?.timeoutMs != null) bits.push("to=" + meta.meta.timeoutMs + "ms");
+          if (metaTech) metaTech.textContent = bits.length ? "(" + bits.join(" · ") + ")" : "";
+        }
+
+        function tokenExists() {
+          return Boolean((localStorage.getItem(TOKEN_KEY) || "").trim());
+        }
+
+        function purgeToken() {
+          localStorage.removeItem(TOKEN_KEY);
+        }
+
+        function enableContinueIfNeeded(replyText) {
+          const t = String(replyText || "");
+          const truncated = t.includes(TRUNC_MARKER) || /fin tronqu/i.test(t);
+          if (btnContinue) btnContinue.disabled = !truncated;
+        }
+
+        // -------------------------
+        // Bootstrap accès (aligné Niveau 2)
+        // - reset=1 : purge token et reload sans reset
+        // - paid=1 : compat legacy (accès direct)
+        // - sinon : si cs_id présent => on affiche, le serveur fera l'init au 1er message
+        // - sinon : accès refusé
+        // -------------------------
+        async function bootstrapAccess() {
+          if (resetFlag === "1") {
+            purgeToken();
+            const url = new URL(window.location.href);
+            url.searchParams.delete("reset");
+            window.location.replace(url.toString());
+            return;
+          }
+
+          if (paidFlag === "1") {
+            showPaid();
+            setStatus("Accès activé (mode compat).", "ok");
+            return;
+          }
+
+          if (csId) {
+            showPaid();
+            setStatus("Accès détecté via cs_id. Initialisation au premier message…", "ok");
+            return;
+          }
+
+          // Aucun cs_id -> si token existe, on affiche, sinon refus
+          if (tokenExists()) {
+            showPaid();
+            setStatus("Session détectée (token).", "ok");
+            return;
+          }
+
+          showNotPaid("Lien incomplet : paramètre cs_id absent.");
+        }
+
+        // -------------------------
+        // Envoi message / Continue (aligné Niveau 2)
+        // Règle robuste : si cs_id existe dans l'URL, on l'envoie en priorité (ré-init)
+        // -------------------------
+        async function callApi(payload) {
+          const response = await fetch("/api/ghostops-pre-brief-board", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          let data = {};
+          try {
+            data = await response.json();
+          } catch (_) {}
+
+          return { response, data };
+        }
+
+        async function sendUserMessage() {
           const userMessage = (input.value || "").trim();
           if (!userMessage) return;
 
@@ -401,30 +483,86 @@
 
           history.push({ role: "user", content: userMessage });
 
-          const waitingElem = addMessage("bot", "Lecture Pré-brief Board en cours…");
+          setStatus("Lecture Pré-brief Board en cours…", "");
+          const waiting = addMessage("bot", "Lecture Pré-brief Board en cours…");
 
           try {
+            // Payload strict : cs_id prime
             const token = (localStorage.getItem(TOKEN_KEY) || "").trim();
-            const payload = token
-              ? { sessionToken: token, message: userMessage, history }
-              : { cs_id: csId, message: userMessage, history };
 
-            const response = await fetch("/api/ghostops-pre-brief-board", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(payload)
-            });
+            let payload;
+            if (csId) {
+              payload = { cs_id: csId, message: userMessage, history };
+            } else if (token) {
+              payload = { sessionToken: token, message: userMessage, history };
+            } else {
+              payload = { message: userMessage, history };
+            }
 
-            let data = {};
-            try {
-              data = await response.json();
-            } catch (_) {}
+            const { response, data } = await callApi(payload);
 
-            if (waitingElem && waitingElem.parentNode) waitingElem.parentNode.removeChild(waitingElem);
+            // remove waiting
+            if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
 
             if (!response.ok || !data.reply) {
               const errText = data.error || "Une erreur est survenue (Pré-brief Board). Veuillez réessayer.";
               addMessage("bot", errText);
+              setStatus(errText, "err");
+              return;
+            }
+
+            // rotation token
+            if (data.sessionToken) localStorage.setItem(TOKEN_KEY, data.sessionToken);
+
+            addMessage("bot", data.reply);
+            history.push({ role: "assistant", content: data.reply });
+
+            lastAssistantText = data.reply || lastAssistantText;
+            enableContinueIfNeeded(data.reply);
+
+            setStatus("Réponse générée.", "ok");
+            updateMeta({ itersLeft: data.itersLeft, expiresAt: data.expiresAt, meta: data.meta });
+          } catch (err) {
+            console.error("Erreur lors de l’appel /api/ghostops-pre-brief-board :", err);
+            if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
+            addMessage("bot", "Erreur de connexion à GhostOps IA. Veuillez réessayer ou utiliser la page contact.");
+            setStatus("Erreur réseau.", "err");
+          }
+        }
+
+        async function requestContinue() {
+          const token = (localStorage.getItem(TOKEN_KEY) || "").trim();
+          if (!token) {
+            addMessage("bot", "Impossible de demander la suite : token de session absent. Relancez via le lien Stripe.");
+            setStatus("Suite impossible (token absent).", "err");
+            return;
+          }
+
+          if (!lastAssistantText && history.length < 2) {
+            addMessage("bot", "Impossible de demander la suite : contexte insuffisant.");
+            setStatus("Suite impossible (contexte insuffisant).", "err");
+            return;
+          }
+
+          setStatus("Demande de suite…", "");
+          const waiting = addMessage("bot", "Suite en cours…");
+
+          try {
+            const payload = {
+              sessionToken: token,
+              continue: true,
+              last_assistant: lastAssistantText,
+              history,
+            };
+
+            const { response, data } = await callApi(payload);
+
+            if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
+
+            if (!response.ok || !data.reply) {
+              const errText = data.error || "Impossible de produire la suite. Veuillez réessayer.";
+              addMessage("bot", errText);
+              setStatus(errText, "err");
               return;
             }
 
@@ -432,23 +570,58 @@
 
             addMessage("bot", data.reply);
             history.push({ role: "assistant", content: data.reply });
+
+            lastAssistantText = (lastAssistantText ? lastAssistantText + "\n\n" : "") + data.reply;
+            enableContinueIfNeeded(data.reply);
+
+            setStatus("Suite générée.", "ok");
+            updateMeta({ itersLeft: data.itersLeft, expiresAt: data.expiresAt, meta: data.meta });
           } catch (err) {
-            console.error("Erreur lors de l’appel /api/ghostops-pre-brief-board :", err);
-            if (waitingElem && waitingElem.parentNode) waitingElem.parentNode.removeChild(waitingElem);
-            addMessage("bot", "Erreur de connexion à GhostOps IA. Veuillez réessayer ou utiliser la page contact.");
+            console.error("Erreur suite Pré-brief Board:", err);
+            if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
+            addMessage("bot", "Erreur réseau lors de la demande de suite. Veuillez réessayer.");
+            setStatus("Erreur réseau (suite).", "err");
           }
         }
 
+        // -------------------------
+        // Listeners
+        // -------------------------
         if (form && input && messages) {
-          form.addEventListener("submit", (e) => {
+          form.addEventListener("submit", function (e) {
             e.preventDefault();
-            sendMessage();
+            sendUserMessage();
           });
-          input.addEventListener("keydown", (e) => {
+
+          input.addEventListener("keydown", function (e) {
             if (e.key === "Enter" && !e.shiftKey) {
               e.preventDefault();
-              sendMessage();
+              sendUserMessage();
             }
+          });
+        }
+
+        if (btnContinue) {
+          btnContinue.addEventListener("click", function () {
+            requestContinue();
+          });
+        }
+
+        if (btnReset) {
+          btnReset.addEventListener("click", function () {
+            purgeToken();
+            setStatus("Token supprimé. Rechargez via le lien Stripe (cs_id) si nécessaire.", "ok");
+            // on force aussi le bouton suite à off
+            if (btnContinue) btnContinue.disabled = true;
+          });
+        }
+
+        if (btnHardRefresh) {
+          btnHardRefresh.addEventListener("click", function () {
+            // hard refresh sans cache : on ajoute un paramètre "t"
+            const url = new URL(window.location.href);
+            url.searchParams.set("t", String(Date.now()));
+            window.location.replace(url.toString());
           });
         }
 
