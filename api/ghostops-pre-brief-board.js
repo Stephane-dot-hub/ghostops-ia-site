@@ -2,6 +2,8 @@
 // Niveau 3 : Stripe cs_id -> token signé (TTL + itérations) -> décrément serveur.
 // + Continue (suite) sans consommer d’itération
 // + Correctif robuste : si token invalide MAIS cs_id présent => on réinitialise depuis Stripe.
+// + PATCH anti-504 : paramètres plus “courts”, timeout OpenAI borné, retry, erreurs 504/timeout mieux structurées
+// + PATCH logique follow-up : on ne bascule en mode “follow-up” QUE si token valide (sinon init = prompt initial)
 
 const Stripe = require("stripe");
 const crypto = require("crypto");
@@ -27,7 +29,11 @@ function cleanStr(v) {
 }
 
 function safeJsonParse(s) {
-  try { return JSON.parse(s); } catch { return null; }
+  try {
+    return JSON.parse(s);
+  } catch {
+    return null;
+  }
 }
 
 function extractReplyFromResponsesApi(data) {
@@ -96,7 +102,8 @@ function normalizeHistory(rawHistory) {
     }
   }
 
-  const MAX_TOTAL_CHARS = 12000;
+  // On borne l'historique total (anti-latence)
+  const MAX_TOTAL_CHARS = 10000; // PATCH (était 12000)
   let total = 0;
   const trimmed = [];
   for (let i = out.length - 1; i >= 0; i--) {
@@ -274,6 +281,7 @@ async function callOpenAIWithTimeout({ apiKey, model, input, maxOut, timeoutMs }
 module.exports = async function handler(req, res) {
   const startedAtMs = Date.now();
 
+  // ✅ no-cache
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
@@ -296,12 +304,13 @@ module.exports = async function handler(req, res) {
   }
 
   const expectedPriceId = cleanStr(process.env.GHOSTOPS_BOARD_STRIPE_PRICE_ID);
-
   const stripe = new Stripe(stripeSecretKey);
 
+  // Sessions
   const MAX_ITERS = Number(process.env.GHOSTOPS_PREBRIEF_MAX_ITERS || "15") || 15;
   const TTL_SECONDS = Number(process.env.GHOSTOPS_PREBRIEF_SESSION_TTL_SECONDS || "14400") || 14400;
 
+  // Modèles
   const modelInitial =
     cleanStr(process.env.GHOSTOPS_PREBRIEF_MODEL_INITIAL) ||
     cleanStr(process.env.GHOSTOPS_PREBRIEF_MODEL) ||
@@ -312,10 +321,12 @@ module.exports = async function handler(req, res) {
     cleanStr(process.env.GHOSTOPS_PREBRIEF_MODEL) ||
     "gpt-4.1-mini";
 
-  const maxOutDefault = Number(process.env.GHOSTOPS_PREBRIEF_MAX_OUTPUT_TOKENS || "1600") || 1600;
-  const maxOutContinue = Number(process.env.GHOSTOPS_PREBRIEF_MAX_OUTPUT_TOKENS_CONTINUE || "1400") || 1400;
+  // ✅ PATCH anti-504 : défauts plus bas (si env absent)
+  const maxOutDefault = Number(process.env.GHOSTOPS_PREBRIEF_MAX_OUTPUT_TOKENS || "1000") || 1000;
+  const maxOutContinue = Number(process.env.GHOSTOPS_PREBRIEF_MAX_OUTPUT_TOKENS_CONTINUE || "900") || 900;
 
-  const OPENAI_TIMEOUT_MS = Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "40000") || 40000;
+  // ✅ PATCH anti-504 : on borne à 35s par défaut (laisse de la marge Vercel)
+  const OPENAI_TIMEOUT_MS = Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "35000") || 35000;
 
   // --- Lecture body robuste ---
   let body = req.body && typeof req.body === "object" ? req.body : null;
@@ -367,6 +378,7 @@ module.exports = async function handler(req, res) {
   // -------------------------
   let sessionCtx = null; // { cs_id, itersLeft, exp }
   let createdNewSession = false;
+  let tokenWasValid = false; // ✅ PATCH : sert au choix prompt/modèle
 
   // A) Si token fourni, tentative de vérif
   if (incomingToken) {
@@ -377,31 +389,46 @@ module.exports = async function handler(req, res) {
       const exp = Number(p.exp || 0);
 
       if (!exp || now > exp) {
-        return res.status(401).json({
-          ok: false,
-          error: "Session expirée. Veuillez relancer depuis le lien de confirmation de paiement.",
-          debug: { reason: "expired", exp },
-        });
-      }
+        // ✅ PATCH : si cs_id présent, on peut réinit (plutôt que bloquer)
+        if (csId) {
+          const check = await verifyStripeCheckoutSession({ stripe, csId, expectedPriceId });
+          if (!check.ok) {
+            return res.status(401).json({
+              ok: false,
+              error: "Session expirée et paiement non vérifié. Relancez via le lien de fin de paiement (cs_id).",
+              debug: { token: { reason: "expired", exp }, stripe: check },
+            });
+          }
+          sessionCtx = { cs_id: check.session.id, itersLeft: MAX_ITERS, exp: now + TTL_SECONDS };
+          createdNewSession = true;
+        } else {
+          return res.status(401).json({
+            ok: false,
+            error: "Session expirée. Veuillez relancer depuis le lien de confirmation de paiement.",
+            debug: { reason: "expired", exp },
+          });
+        }
+      } else {
+        const itersLeft = Number(p.itersLeft);
+        if (!Number.isFinite(itersLeft) || itersLeft < 0) {
+          return res.status(401).json({
+            ok: false,
+            error: "Session invalide. Veuillez relancer depuis le lien de confirmation de paiement.",
+            debug: { reason: "bad_iters" },
+          });
+        }
 
-      const itersLeft = Number(p.itersLeft);
-      if (!Number.isFinite(itersLeft) || itersLeft < 0) {
-        return res.status(401).json({
-          ok: false,
-          error: "Session invalide. Veuillez relancer depuis le lien de confirmation de paiement.",
-          debug: { reason: "bad_iters" },
-        });
-      }
+        if (itersLeft <= 0) {
+          return res.status(403).json({
+            ok: false,
+            error: "Limite atteinte : vos itérations ont été utilisées. Pour poursuivre, contactez GhostOps.",
+            meta: { itersLeft: 0, expiresAt: exp, itersMax: MAX_ITERS, ttlSeconds: TTL_SECONDS },
+          });
+        }
 
-      if (itersLeft <= 0) {
-        return res.status(403).json({
-          ok: false,
-          error: "Limite atteinte : vos itérations ont été utilisées. Pour poursuivre, contactez GhostOps.",
-          meta: { itersLeft: 0, expiresAt: exp, itersMax: MAX_ITERS, ttlSeconds: TTL_SECONDS },
-        });
+        sessionCtx = { cs_id: cleanStr(p.cs_id), itersLeft, exp };
+        tokenWasValid = true; // ✅ PATCH
       }
-
-      sessionCtx = { cs_id: cleanStr(p.cs_id), itersLeft, exp };
     } else {
       // ✅ Correctif majeur : si token invalide MAIS cs_id présent, on réinitialise depuis Stripe.
       if (csId) {
@@ -489,6 +516,7 @@ Structure obligatoire (titres exacts) :
 
 Contraintes :
 - Chaque section : 3 à 8 puces concrètes.
+- Réponses denses mais concises (éviter les paragraphes longs).
 - Si limite : terminer proprement puis ajouter "${TRUNC_MARKER}".
 
 Format :
@@ -510,6 +538,7 @@ C) Prochaines questions / pièces à obtenir (priorisées)
 
 Contraintes :
 - Pas de conseil juridique formel, pas de stratégie contentieuse détaillée.
+- Réponse concise (3 à 7 puces par bloc).
 - Si limite : terminer proprement puis "${TRUNC_MARKER}".
 
 Format :
@@ -532,9 +561,13 @@ Instruction :
 - Si tu atteins encore une limite : termine proprement puis "${TRUNC_MARKER}".
 `.trim();
 
-  const userPrompt = isContinue ? userPromptContinue : (incomingToken || isFollowupFromHistory ? userPromptFollowup : userPromptInitial);
+  // ✅ PATCH : on ne bascule pas en follow-up juste parce qu’un token est “présent”.
+  // Follow-up si token valide OU historique contient assistant (et qu’on n’a pas créé une session neuve).
+  const isFollowup = Boolean((tokenWasValid || isFollowupFromHistory) && !createdNewSession);
 
-  const model = (isContinue || incomingToken || isFollowupFromHistory) ? modelFollowup : modelInitial;
+  const userPrompt = isContinue ? userPromptContinue : isFollowup ? userPromptFollowup : userPromptInitial;
+
+  const model = (isContinue || isFollowup) ? modelFollowup : modelInitial;
   const maxOut = isContinue ? maxOutContinue : maxOutDefault;
 
   // -------------------------
@@ -543,29 +576,59 @@ Instruction :
   try {
     const input = buildInputs({ systemPrompt, userPrompt, history });
 
+    // Tentative 1
     let attempt = await callOpenAIWithTimeout({
-      apiKey, model, input, maxOut, timeoutMs: OPENAI_TIMEOUT_MS,
+      apiKey,
+      model,
+      input,
+      maxOut,
+      timeoutMs: OPENAI_TIMEOUT_MS,
     });
 
+    // Retry (fallback)
     let retried = false;
     let fallbackMaxOut = null;
 
     if (!attempt.ok && isRetryableStatus(attempt.status)) {
       retried = true;
-      fallbackMaxOut = Math.max(700, Math.floor(maxOut * 0.65));
+      fallbackMaxOut = Math.max(650, Math.floor(maxOut * 0.65));
+
       attempt = await callOpenAIWithTimeout({
-        apiKey, model, input, maxOut: fallbackMaxOut, timeoutMs: OPENAI_TIMEOUT_MS,
+        apiKey,
+        model,
+        input,
+        maxOut: fallbackMaxOut,
+        timeoutMs: OPENAI_TIMEOUT_MS,
       });
     }
 
     if (!attempt.ok) {
       const data = attempt.data || {};
-      const msg = data?.error?.message || data?.message || `Erreur OpenAI (HTTP ${attempt.status || 502})`;
+      const msg =
+        data?.error?.message ||
+        data?.message ||
+        (attempt.aborted || attempt.status === 504
+          ? "Temps de génération dépassé. Veuillez réessayer (ou réduire la longueur de votre message)."
+          : `Erreur OpenAI (HTTP ${attempt.status || 502})`);
 
       return res.status(attempt.status || 502).json({
         ok: false,
         error: msg,
-        debug: { model, openaiStatus: attempt.status, retried, fallbackMaxOut },
+        debug: {
+          model,
+          openaiStatus: attempt.status || 502,
+          aborted: Boolean(attempt.aborted),
+          networkError: Boolean(attempt.networkError),
+          retried,
+          fallbackMaxOut,
+        },
+        meta: {
+          truncMarker: TRUNC_MARKER,
+          timeoutMs: OPENAI_TIMEOUT_MS,
+          max_output_tokens: maxOut,
+          serverNow: now,
+          latencyMs: Date.now() - startedAtMs,
+        },
       });
     }
 
@@ -573,7 +636,12 @@ Instruction :
     let reply = extractReplyFromResponsesApi(data);
 
     if (!reply) {
-      return res.status(502).json({ ok: false, error: "Réponse OpenAI reçue, mais texte introuvable.", debug: { model } });
+      return res.status(502).json({
+        ok: false,
+        error: "Réponse OpenAI reçue, mais texte introuvable.",
+        debug: { model, retried, fallbackMaxOut },
+        meta: { serverNow: now, latencyMs: Date.now() - startedAtMs },
+      });
     }
 
     const apiSaysIncomplete = data?.status === "incomplete" || Boolean(data?.incomplete_details);
@@ -585,7 +653,7 @@ Instruction :
       : Math.max(0, Number(sessionCtx.itersLeft) - 1);
 
     const newToken = signToken(
-      { cs_id: sessionCtx.cs_id, itersLeft: newItersLeft, exp: sessionCtx.exp, v: 1 },
+      { cs_id: sessionCtx.cs_id, itersLeft: newItersLeft, exp: sessionCtx.exp, v: 2 },
       tokenSecret
     );
 
@@ -598,10 +666,13 @@ Instruction :
       meta: {
         truncMarker: TRUNC_MARKER,
         model,
+        followup: Boolean(isFollowup),
         continue: Boolean(isContinue),
         historyUsed: history.length,
         max_output_tokens: maxOut,
         timeoutMs: OPENAI_TIMEOUT_MS,
+        incomplete: Boolean(apiSaysIncomplete),
+        productLock: Boolean(expectedPriceId),
         retried,
         fallbackMaxOut,
         session: { createdNewSession, ttlSeconds: TTL_SECONDS, maxIters: MAX_ITERS },
@@ -615,6 +686,7 @@ Instruction :
       ok: false,
       error: "Erreur interne lors de l’appel au moteur GhostOps Pré-brief Board.",
       debug: { message: err?.message || String(err) },
+      meta: { serverNow: now, latencyMs: Date.now() - startedAtMs },
     });
   }
 };
