@@ -1,5 +1,8 @@
 {
   "functions": {
+    "api/ghostops-pre-brief-board.js": {
+      "maxDuration": 60
+    },
     "api/ghostops-studio-scenarios.js": {
       "maxDuration": 60
     },
