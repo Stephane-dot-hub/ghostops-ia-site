@@ -1,1 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GhostOps — Connexion</title>
+    <meta name="robots" content="noindex, nofollow" />
+    <style>
+      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; background: #0b0f19; color: #e6e8ee; }
+      .wrap { max-width: 520px; margin: 8vh auto; padding: 24px; }
+      .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); border-radius: 14px; padding: 22px; }
+      h1 { font-size: 20px; margin: 0 0 10px; }
+      p { margin: 0 0 16px; opacity: 0.9; line-height: 1.5; }
+      label { display: block; font-size: 13px; margin: 10px 0 6px; opacity: 0.9; }
+      input { width: 100%; padding: 12px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.35); color: #fff; outline: none; }
+      button { width: 100%; margin-top: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
+      button:disabled { opacity: 0.5; cursor: not-allowed; }
+      .msg { margin-top: 12px; font-size: 13px; opacity: 0.95; }
+      .ok { color: #7CFFB2; }
+      .err { color: #FF7C7C; }
+      .muted { opacity: 0.8; font-size: 12px; margin-top: 10px; }
+      .link { color: #cdd6ff; }
+    </style>
+  </head>
 
+  <body>
+    <div class="wrap">
+      <div class="card">
+        <h1>Connexion GhostOps</h1>
+        <p>
+          Saisissez votre e-mail. Vous recevrez un lien de connexion sécurisé.
+        </p>
+
+        <form id="loginForm">
+          <label for="email">E-mail</label>
+          <input id="email" name="email" type="email" placeholder="vous@domaine.com" autocomplete="email" required />
+          <button id="btn" type="submit">Recevoir le lien de connexion</button>
+          <div id="msg" class="msg"></div>
+        </form>
+
+        <div class="muted">
+          En cas de non-réception : vérifiez les indésirables ou retentez après 30 secondes.
+        </div>
+      </div>
+    </div>
+
+    <script type="module">
+      import { supabase } from "./js/config.js";
+
+      const form = document.getElementById("loginForm");
+      const emailEl = document.getElementById("email");
+      const btn = document.getElementById("btn");
+      const msg = document.getElementById("msg");
+
+      function setMsg(text, type) {
+        msg.textContent = text || "";
+        msg.className = "msg " + (type || "");
+      }
+
+      function normalizeEmail(v) {
+        return (v || "").trim().toLowerCase();
+      }
+
+      // Si déjà connecté, on redirige
+      (async () => {
+        try {
+          const { data } = await supabase.auth.getSession();
+          if (data?.session) {
+            // Choisissez votre page “espace”
+            window.location.href = "./espace.html";
+          }
+        } catch {
+          // Silence volontaire
+        }
+      })();
+
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        setMsg("", "");
+
+        const email = normalizeEmail(emailEl.value);
+        if (!email) {
+          setMsg("Veuillez renseigner un e-mail valide.", "err");
+          return;
+        }
+
+        btn.disabled = true;
+        btn.textContent = "Envoi en cours…";
+
+        try {
+          // URL de retour : même domaine + page callback
+          const redirectTo = `${window.location.origin}/auth-callback.html`;
+
+          const { error } = await supabase.auth.signInWithOtp({
+            email,
+            options: {
+              emailRedirectTo: redirectTo,
+            },
+          });
+
+          if (error) throw error;
+
+          setMsg("Lien envoyé. Ouvrez votre e-mail et cliquez sur “Se connecter”.", "ok");
+        } catch (err) {
+          setMsg(`Erreur : ${err?.message || "échec de l’envoi du lien."}`, "err");
+        } finally {
+          btn.disabled = false;
+          btn.textContent = "Recevoir le lien de connexion";
+        }
+      });
+    </script>
+  </body>
+</html>
