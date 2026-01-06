@@ -27,13 +27,18 @@
     <div class="wrap">
       <div class="card">
         <h1>Connexion GhostOps</h1>
-        <p>
-          Saisissez votre e-mail. Vous recevrez un lien de connexion sécurisé.
-        </p>
+        <p>Saisissez votre e-mail. Vous recevrez un lien de connexion sécurisé.</p>
 
         <form id="loginForm">
           <label for="email">E-mail</label>
-          <input id="email" name="email" type="email" placeholder="vous@domaine.com" autocomplete="email" required />
+          <input
+            id="email"
+            name="email"
+            type="email"
+            placeholder="vous@domaine.com"
+            autocomplete="email"
+            required
+          />
           <button id="btn" type="submit">Recevoir le lien de connexion</button>
           <div id="msg" class="msg"></div>
         </form>
@@ -44,71 +49,97 @@
       </div>
     </div>
 
-    <script type="module">
-      import { supabase } from "./config.js";
+    <!-- 1) SDK Supabase (navigateur) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 2) Votre config browser-only : doit créer window.ghostopsSupabase -->
+    <script src="/config.js"></script>
 
+    <!-- 3) Logique login -->
+    <script>
+      (function () {
+        const supabase = window.ghostopsSupabase;
 
-      const form = document.getElementById("loginForm");
-      const emailEl = document.getElementById("email");
-      const btn = document.getElementById("btn");
-      const msg = document.getElementById("msg");
+        const form = document.getElementById("loginForm");
+        const emailEl = document.getElementById("email");
+        const btn = document.getElementById("btn");
+        const msg = document.getElementById("msg");
 
-      function setMsg(text, type) {
-        msg.textContent = text || "";
-        msg.className = "msg " + (type || "");
-      }
-
-      function normalizeEmail(v) {
-        return (v || "").trim().toLowerCase();
-      }
-
-      // Si déjà connecté, on redirige
-      (async () => {
-        try {
-          const { data } = await supabase.auth.getSession();
-          if (data?.session) {
-            // Choisissez votre page “espace”
-            window.location.href = "./espace.html";
-          }
-        } catch {
-          // Silence volontaire
+        function setMsg(text, type) {
+          msg.textContent = text || "";
+          msg.className = "msg " + (type || "");
         }
-      })();
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
-        setMsg("", "");
+        function normalizeEmail(v) {
+          return (v || "").trim().toLowerCase();
+        }
 
-        const email = normalizeEmail(emailEl.value);
-        if (!email) {
-          setMsg("Veuillez renseigner un e-mail valide.", "err");
+        function getReturnTo() {
+          const u = new URL(window.location.href);
+          const rt = u.searchParams.get("returnTo");
+          if (!rt) return null;
+
+          // Sécurité : uniquement des chemins internes
+          if (rt.startsWith("http")) return null;
+          if (!rt.startsWith("/")) return "/" + rt;
+          return rt;
+        }
+
+        // Sanity check : config.js + SDK chargés
+        if (!supabase?.auth) {
+          setMsg("Erreur: Supabase non initialisé. Vérifiez /config.js (version navigateur) et le chargement du SDK.", "err");
           return;
         }
 
-        btn.disabled = true;
-        btn.textContent = "Envoi en cours…";
+        // Si déjà connecté, on redirige
+        (async () => {
+          try {
+            const { data } = await supabase.auth.getSession();
+            if (data?.session) {
+              window.location.href = "./espace.html"; // à adapter si besoin
+            }
+          } catch {
+            // silence
+          }
+        })();
 
-        try {
-          // URL de retour : même domaine + page callback
-          const redirectTo = `${window.location.origin}/auth-callback.html`;
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          setMsg("", "");
 
-          const { error } = await supabase.auth.signInWithOtp({
-            email,
-            options: {
-              emailRedirectTo: redirectTo,
-            },
-          });
+          const email = normalizeEmail(emailEl.value);
+          if (!email) {
+            setMsg("Veuillez renseigner un e-mail valide.", "err");
+            return;
+          }
 
-          if (error) throw error;
+          // Si on a ?returnTo=..., on le garde pour le callback
+          const returnTo = getReturnTo();
+          if (returnTo) localStorage.setItem("ghostops_return_to", returnTo);
 
-          setMsg("Lien envoyé. Ouvrez votre e-mail et cliquez sur “Se connecter”.", "ok");
-        } catch (err) {
-          setMsg(`Erreur : ${err?.message || "échec de l’envoi du lien."}`, "err");
-        } finally {
-          btn.disabled = false;
-          btn.textContent = "Recevoir le lien de connexion";
-        }
-      });
+          btn.disabled = true;
+          btn.textContent = "Envoi en cours…";
+
+          try {
+            const redirectTo = `${window.location.origin}/auth-callback.html`;
+
+            const { error } = await supabase.auth.signInWithOtp({
+              email,
+              options: {
+                emailRedirectTo: redirectTo,
+              },
+            });
+
+            if (error) throw error;
+
+            setMsg("Lien envoyé. Ouvrez votre e-mail et cliquez sur “Se connecter”.", "ok");
+          } catch (err) {
+            setMsg(`Erreur : ${err?.message || "échec de l’envoi du lien."}`, "err");
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Recevoir le lien de connexion";
+          }
+        });
+      })();
     </script>
   </body>
 </html>
