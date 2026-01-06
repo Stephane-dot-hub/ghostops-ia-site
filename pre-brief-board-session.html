@@ -171,14 +171,23 @@
           </p>
         </header>
 
-        <!-- Télémétrie -->
+        <!-- Télémétrie (alignée N2 : iters restantes + max + TTL + expiration) -->
         <section class="mb-6">
           <div class="bg-gray-800/70 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div class="text-xs md:text-sm text-gray-200">
               <span class="text-gray-400">Session :</span>
               <span id="pb-meta-iters" class="font-semibold">—</span>
-              <span class="text-gray-400">itérations restantes</span>
+              <span class="text-gray-400">/</span>
+              <span id="pb-meta-itersmax" class="font-semibold">—</span>
+              <span class="text-gray-400">itérations</span>
+
               <span class="mx-2 text-gray-600">•</span>
+
+              <span class="text-gray-400">TTL :</span>
+              <span id="pb-meta-ttl" class="font-semibold">—</span>
+
+              <span class="mx-2 text-gray-600">•</span>
+
               <span class="text-gray-400">Expiration :</span>
               <span id="pb-meta-exp" class="font-semibold">—</span>
             </div>
@@ -310,6 +319,8 @@
         const btnHardRefresh = document.getElementById("pb-hard-refresh");
 
         const metaIters = document.getElementById("pb-meta-iters");
+        const metaItersMax = document.getElementById("pb-meta-itersmax");
+        const metaTtl = document.getElementById("pb-meta-ttl");
         const metaExp = document.getElementById("pb-meta-exp");
         const metaTech = document.getElementById("pb-meta-tech");
 
@@ -335,7 +346,6 @@
         }
 
         function linkify(s) {
-          // transforme URLs en liens cliquables
           return s.replace(
             /\bhttps?:\/\/[^\s<]+/gi,
             (m) => `<a href="${m}" target="_blank" rel="noopener noreferrer">${m}</a>`
@@ -346,11 +356,7 @@
           const raw = String(text || "").trim();
           if (!raw) return "";
 
-          // On part du texte échappé
           const safe = escapeHtml(raw);
-
-          // Convertit les titres "**...**" en <strong>... </strong> sur ligne dédiée
-          // et les listes "- " en <ul><li>
           const lines = safe.split(/\r?\n/);
 
           let html = "";
@@ -366,14 +372,12 @@
           for (let i = 0; i < lines.length; i++) {
             let line = lines[i];
 
-            // ligne vide
             if (!line.trim()) {
               closeList();
               html += "<p></p>";
               continue;
             }
 
-            // titres **X**
             const titleMatch = line.match(/^\*\*(.+?)\*\*\s*$/);
             if (titleMatch) {
               closeList();
@@ -381,7 +385,6 @@
               continue;
             }
 
-            // puces "- "
             if (line.trim().startsWith("- ")) {
               if (!inList) {
                 html += "<ul>";
@@ -392,24 +395,18 @@
               continue;
             }
 
-            // normal paragraph
             closeList();
             html += `<p>${line}</p>`;
           }
 
           closeList();
-
-          // liens
           html = linkify(html);
-
-          // Nettoyage : <p></p> inutiles
           html = html.replace(/<p><\/p>/g, "<br/>");
-
           return html;
         }
 
         // -----------------------------
-        // Typewriter (texte -> hydratation HTML à la fin)
+        // Typewriter (texte -> hydratation HTML)
         // -----------------------------
         async function typewriterInto(el, finalText, speedMs) {
           const text = String(finalText || "");
@@ -418,7 +415,6 @@
             el.textContent += text[i];
             if (i % 2 === 0) await new Promise((r) => setTimeout(r, speedMs));
           }
-          // Hydratation HTML aérée (après frappe)
           el.innerHTML = formatAiTextToHtml(text);
         }
 
@@ -459,11 +455,27 @@
           }
         }
 
+        function fmtDuration(seconds) {
+          const s = Math.max(0, Number(seconds || 0));
+          const h = Math.floor(s / 3600);
+          const m = Math.floor((s % 3600) / 60);
+          const r = s % 60;
+          if (h > 0) return `${h}h ${m}m`;
+          if (m > 0) return `${m}m ${r}s`;
+          return `${r}s`;
+        }
+
         function updateMetaFromApi(data) {
-          // data: itersLeft, expiresAt, meta{ model, latencyMs, timeoutMs, truncMarker }
           if (!data) return;
+
           if (typeof data.itersLeft === "number" && metaIters) metaIters.textContent = String(data.itersLeft);
           if (typeof data.expiresAt === "number" && metaExp) metaExp.textContent = fmtExp(data.expiresAt);
+
+          const maxIters = data?.meta?.session?.maxIters;
+          if (maxIters != null && metaItersMax) metaItersMax.textContent = String(maxIters);
+
+          const ttlSeconds = data?.meta?.session?.ttlSeconds;
+          if (ttlSeconds != null && metaTtl) metaTtl.textContent = fmtDuration(ttlSeconds);
 
           const bits = [];
           if (data?.meta?.model) bits.push("model=" + data.meta.model);
@@ -581,7 +593,6 @@
           try {
             const token = (localStorage.getItem(TOKEN_KEY) || "").trim();
 
-            // cs_id prime (réinit safe)
             let payload;
             if (csId) payload = { cs_id: csId, message: userMessage, history };
             else if (token) payload = { sessionToken: token, message: userMessage, history };
@@ -597,10 +608,8 @@
               return;
             }
 
-            // token rotation
             if (data.sessionToken) localStorage.setItem(TOKEN_KEY, data.sessionToken);
 
-            // Typewriter + hydration
             await typewriterInto(botBubble, data.reply, 8);
 
             history.push({ role: "assistant", content: data.reply });
