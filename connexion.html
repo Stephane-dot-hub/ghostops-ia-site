@@ -73,29 +73,41 @@
           return (v || "").trim().toLowerCase();
         }
 
-        function getReturnTo() {
+        // ✅ On standardise : on utilise ?next=... (et on conserve la compatibilité ?returnTo=...)
+        function getNextPath() {
           const u = new URL(window.location.href);
-          const rt = u.searchParams.get("returnTo");
-          if (!rt) return null;
+          const next = u.searchParams.get("next") || u.searchParams.get("returnTo") || "";
+          if (!next) return null;
 
           // Sécurité : uniquement des chemins internes
-          if (rt.startsWith("http")) return null;
-          if (!rt.startsWith("/")) return "/" + rt;
-          return rt;
+          if (next.startsWith("http")) return null;
+          if (!next.startsWith("/")) return "/" + next;
+          return next;
+        }
+
+        function buildEmailRedirectTo(nextPath) {
+          // ✅ transporte le next vers auth-callback
+          const base = `${window.location.origin}/auth-callback.html`;
+          if (!nextPath) return base;
+          return `${base}?next=${encodeURIComponent(nextPath)}`;
         }
 
         // Sanity check : config.js + SDK chargés
         if (!supabase?.auth) {
-          setMsg("Erreur: Supabase non initialisé. Vérifiez /config.js (version navigateur) et le chargement du SDK.", "err");
+          setMsg(
+            "Erreur: Supabase non initialisé. Vérifiez /config.js (version navigateur) et le chargement du SDK.",
+            "err"
+          );
           return;
         }
 
-        // Si déjà connecté, on redirige
+        // ✅ Si déjà connecté : redirection vers next si présent, sinon accueil (PAS espace.html)
         (async () => {
           try {
             const { data } = await supabase.auth.getSession();
             if (data?.session) {
-              window.location.href = "./espace.html"; // à adapter si besoin
+              const nextPath = getNextPath();
+              window.location.href = nextPath || "/index.html";
             }
           } catch {
             // silence
@@ -112,20 +124,17 @@
             return;
           }
 
-          // Si on a ?returnTo=..., on le garde pour le callback
-          const returnTo = getReturnTo();
-          if (returnTo) localStorage.setItem("ghostops_return_to", returnTo);
+          const nextPath = getNextPath();
+          const emailRedirectTo = buildEmailRedirectTo(nextPath);
 
           btn.disabled = true;
           btn.textContent = "Envoi en cours…";
 
           try {
-            const redirectTo = `${window.location.origin}/auth-callback.html`;
-
             const { error } = await supabase.auth.signInWithOtp({
               email,
               options: {
-                emailRedirectTo: redirectTo,
+                emailRedirectTo,
               },
             });
 
