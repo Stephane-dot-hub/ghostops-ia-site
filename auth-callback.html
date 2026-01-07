@@ -56,8 +56,8 @@
       }
     </style>
 
-    <!-- 1) Charger supabase-js (UMD) puis 2) votre config.js -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <!-- 1) SDK Supabase (navigateur) + 2) config.js (doit créer window.ghostopsSupabase) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/config.js"></script>
   </head>
 
@@ -74,71 +74,132 @@
     </div>
 
     <script>
-      const msg = document.getElementById("msg");
-      function setMsg(text, cls) {
-        msg.textContent = text || "";
-        msg.className = "msg " + (cls || "");
-      }
-
-      function getHashParams() {
-        // Retire le '#' puis parse comme une querystring
-        const h = window.location.hash?.startsWith("#") ? window.location.hash.slice(1) : "";
-        return new URLSearchParams(h);
-      }
-
-      async function waitForSupabaseClient(timeoutMs = 4000) {
-        const start = Date.now();
-        while (Date.now() - start < timeoutMs) {
-          if (window.ghostopsSupabase?.auth) return window.ghostopsSupabase;
-          await new Promise((r) => setTimeout(r, 50));
+      (function () {
+        const msg = document.getElementById("msg");
+        function setMsg(text, cls) {
+          msg.textContent = text || "";
+          msg.className = "msg " + (cls || "");
         }
-        return null;
-      }
 
-      (async () => {
-        try {
-          const supabase = await waitForSupabaseClient();
-          if (!supabase) {
-            throw new Error("Client Supabase indisponible (config.js non chargé).");
+        function sleep(ms) {
+          return new Promise((r) => setTimeout(r, ms));
+        }
+
+        async function waitForSupabaseClient(timeoutMs = 6000) {
+          const start = Date.now();
+          while (Date.now() - start < timeoutMs) {
+            if (window.ghostopsSupabase?.auth) return window.ghostopsSupabase;
+            await sleep(50);
           }
+          return null;
+        }
 
-          const params = getHashParams();
-          const access_token = params.get("access_token");
-          const refresh_token = params.get("refresh_token");
-          const error_description = params.get("error_description");
-          const error = params.get("error");
+        // ✅ Sécurité : n'autoriser que des chemins internes
+        function sanitizeInternalPath(p, fallback) {
+          const fb = fallback || "/index.html";
+          const v = String(p || "").trim();
+          if (!v) return fb;
+          if (v.startsWith("http://") || v.startsWith("https://")) return fb;
+          if (!v.startsWith("/")) return "/" + v;
+          return v;
+        }
 
-          if (error || error_description) {
-            throw new Error(decodeURIComponent(error_description || error));
+        function getQueryParam(name) {
+          const u = new URL(window.location.href);
+          return u.searchParams.get(name);
+        }
+
+        function getHashParams() {
+          const h = window.location.hash?.startsWith("#") ? window.location.hash.slice(1) : "";
+          return new URLSearchParams(h);
+        }
+
+        // ✅ Nettoyage URL (retire tokens + code)
+        function cleanUrlKeepNext(nextPath) {
+          const base = "/auth-callback.html";
+          if (nextPath) {
+            history.replaceState(null, "", `${base}?next=${encodeURIComponent(nextPath)}`);
+          } else {
+            history.replaceState(null, "", base);
           }
+        }
 
-          if (!access_token || !refresh_token) {
-            // Cas fréquent : l'utilisateur ouvre auth-callback sans token
+        (async () => {
+          try {
+            const supabase = await waitForSupabaseClient();
+            if (!supabase) {
+              throw new Error("Client Supabase indisponible (config.js non chargé).");
+            }
+
+            // ✅ cible finale
+            const nextRaw = getQueryParam("next");
+            const next = sanitizeInternalPath(nextRaw, "/index.html");
+
+            // Supabase peut revenir :
+            // - soit en PKCE : ?code=...
+            // - soit en implicit : #access_token=...&refresh_token=...
+            const url = new URL(window.location.href);
+            const code = url.searchParams.get("code");
+
+            const hash = getHashParams();
+            const access_token = hash.get("access_token");
+            const refresh_token = hash.get("refresh_token");
+
+            // Gestion erreurs éventuelles dans le hash
+            const error = hash.get("error");
+            const error_description = hash.get("error_description");
+            if (error || error_description) {
+              throw new Error(decodeURIComponent(error_description || error));
+            }
+
+            if (code) {
+              // ✅ PKCE : échange du code contre une session
+              const { data, error: exErr } = await supabase.auth.exchangeCodeForSession(code);
+              if (exErr) throw exErr;
+
+              cleanUrlKeepNext(next);
+              setMsg("Connexion validée. Redirection…", "ok");
+
+              // petite latence anti-race condition
+              setTimeout(() => {
+                window.location.replace(next);
+              }, 250);
+
+              return;
+            }
+
+            if (access_token && refresh_token) {
+              // ✅ Implicit : setSession avec tokens
+              const { error: setErr } = await supabase.auth.setSession({
+                access_token,
+                refresh_token,
+              });
+              if (setErr) throw setErr;
+
+              cleanUrlKeepNext(next);
+              setMsg("Connexion validée. Redirection…", "ok");
+
+              setTimeout(() => {
+                window.location.replace(next);
+              }, 250);
+
+              return;
+            }
+
+            // ✅ Dernier filet : si déjà connecté (session existante) on redirige
+            const { data } = await supabase.auth.getSession();
+            if (data?.session) {
+              cleanUrlKeepNext(next);
+              setMsg("Session déjà active. Redirection…", "ok");
+              setTimeout(() => window.location.replace(next), 200);
+              return;
+            }
+
             throw new Error("Lien invalide ou expiré. Veuillez relancer une connexion.");
+          } catch (e) {
+            setMsg("Erreur : " + (e?.message || "Impossible de finaliser la connexion."), "err");
           }
-
-          // Crée la session à partir des tokens du hash
-          const { data, error: setErr } = await supabase.auth.setSession({
-            access_token,
-            refresh_token,
-          });
-
-          if (setErr) throw setErr;
-
-          // Nettoyage URL (retire le hash avec tokens)
-          history.replaceState(null, "", "/auth-callback.html");
-
-          // Redirection cible (à adapter)
-          const target = "/espace.html";
-          setMsg("Connexion validée. Redirection…", "ok");
-
-          // Petite latence pour éviter certains cas de race condition
-          setTimeout(() => {
-            window.location.href = target;
-          }, 350);
-        } catch (e) {
-          setMsg("Erreur : " + (e?.message || "Impossible de finaliser la connexion."), "err");
-        }
+        })();
       })();
     </script>
   </body>
