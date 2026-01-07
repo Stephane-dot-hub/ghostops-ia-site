@@ -44,6 +44,10 @@
       };
     </script>
 
+    <!-- ✅ Supabase (navigateur) + config.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/config.js"></script>
+
     <style>
       body::before {
         content: "";
@@ -128,7 +132,7 @@
             Vérification de votre accès…
           </h1>
           <p class="text-gray-200 text-sm md:text-base mb-3">
-            Nous validons votre session de paiement afin d’ouvrir l’espace Diagnostic IA.
+            Nous validons votre authentification et votre droit d’accès au module Diagnostic IA.
           </p>
           <p class="text-gray-400 text-xs md:text-sm">
             Si la vérification échoue, vous serez redirigé vers l’écran d’accès réservé.
@@ -143,9 +147,9 @@
             Accès réservé – GhostOps Diagnostic IA
           </h1>
           <p class="text-gray-200 text-sm md:text-base mb-3">
-            Cette page est réservée aux dirigeants, boards ou directions ayant validé un
-            <span class="font-semibold">Diagnostic IA GhostOps – 90&nbsp;minutes</span> via le module de
-            paiement sécurisé.
+            Cette page est réservée aux dirigeants, boards ou directions disposant d’un
+            <span class="font-semibold">droit actif</span> pour le format
+            <span class="font-semibold">Diagnostic IA GhostOps – 90&nbsp;minutes</span>.
           </p>
           <p class="text-gray-300 text-sm md:text-base mb-4">
             Si vous pensez être arrivé ici par erreur, vous pouvez revenir à la page de présentation du
@@ -159,15 +163,15 @@
               Revenir à la page Diagnostic IA
             </a>
             <a
-              href="/contact.html"
+              href="/connexion.html"
               class="inline-block px-5 py-2 text-xs md:text-sm border border-gray-400 rounded-md hover:bg-gray-100 hover:text-black transition text-center"
             >
-              Contacter GhostOps
+              Se connecter
             </a>
           </div>
           <p class="text-gray-500 text-[11px] mt-4">
-            Si vous venez de procéder au paiement, vérifiez que vous utilisez bien le lien complet fourni
-            en fin de parcours de paiement. En cas de doute, envoyez-nous un message via la page contact.
+            Si vous venez de procéder au paiement, il est possible que l’activation du droit soit encore en cours.
+            Contactez-nous via la page contact si nécessaire.
           </p>
         </div>
       </section>
@@ -381,16 +385,110 @@
       </div>
     </footer>
 
-    <!-- Script : validation Stripe (cs_id) + session token + module IA -->
+    <!-- Script : garde Supabase (auth + droit) + module IA -->
     <script>
-      (function () {
-        const params = new URLSearchParams(window.location.search);
-        const csId = params.get("cs_id"); // Stripe Checkout Session ID
+      (async function () {
+        // -------------------------------------------
+        // ✅ Garde d'accès (prioritaire)
+        // - Auth obligatoire (Supabase)
+        // - Droit actif obligatoire (table droits)
+        // - Redirection sinon (connexion.html / diagnostic-ia.html)
+        // -------------------------------------------
+        const PRODUCT_KEY = "diagnostic"; // valeurs standardisées : diagnostic / studio / prebrief
 
         const validatingBlock = document.getElementById("diagnostic-validating");
         const paidBlock = document.getElementById("diagnostic-paid");
         const notPaidBlock = document.getElementById("diagnostic-not-paid");
         const expiredBlock = document.getElementById("diagnostic-expired");
+
+        function show(el) {
+          if (el) el.classList.remove("hidden");
+        }
+        function hide(el) {
+          if (el) el.classList.add("hidden");
+        }
+
+        function currentNextUrl() {
+          // conserve le chemin + query
+          return window.location.pathname + window.location.search;
+        }
+
+        function goConnexion() {
+          const next = encodeURIComponent(currentNextUrl());
+          window.location.href = `/connexion.html?next=${next}`;
+        }
+
+        function goProductPage(reason) {
+          const next = encodeURIComponent(currentNextUrl());
+          const r = reason ? `&reason=${encodeURIComponent(reason)}` : "";
+          window.location.href = `/diagnostic-ia.html?next=${next}${r}`;
+        }
+
+        // Affiche "vérification"
+        hide(paidBlock);
+        hide(notPaidBlock);
+        hide(expiredBlock);
+        show(validatingBlock);
+
+        // Vérifier Supabase client
+        const supabase = window.ghostopsSupabase;
+        if (!supabase || !supabase.auth) {
+          // config.js non chargé / Supabase indisponible
+          hide(validatingBlock);
+          show(notPaidBlock);
+          return;
+        }
+
+        // 1) Session obligatoire
+        const { data: sessData, error: sessErr } = await supabase.auth.getSession();
+        if (sessErr) {
+          // erreur d'accès à la session => renvoyer vers connexion
+          goConnexion();
+          return;
+        }
+
+        const session = sessData?.session;
+        const user = session?.user;
+
+        if (!user) {
+          // pas connecté => connexion
+          goConnexion();
+          return;
+        }
+
+        // 2) Droit actif obligatoire
+        // Table "droits" attendue : id_utilisateur, niveau_produit, statut
+        const { data: rightRow, error: rightErr } = await supabase
+          .from("droits")
+          .select("statut, niveau_produit")
+          .eq("id_utilisateur", user.id)
+          .eq("niveau_produit", PRODUCT_KEY)
+          .eq("statut", "active")
+          .maybeSingle();
+
+        if (rightErr) {
+          // si erreur supabase => fallback vers page produit
+          goProductPage("right_check_error");
+          return;
+        }
+
+        if (!rightRow) {
+          // pas de droit => page produit
+          goProductPage("no_right");
+          return;
+        }
+
+        // ✅ Accès autorisé : on peut afficher l'espace
+        hide(validatingBlock);
+        show(paidBlock);
+
+        // -------------------------------------------
+        // Module IA (votre code existant, inchangé au fond)
+        // - cs_id conservé comme fallback d'initialisation serveur
+        // - La sécurité d'accès est désormais assurée par Supabase (au-dessus)
+        // -------------------------------------------
+        const params = new URLSearchParams(window.location.search);
+        const csId = params.get("cs_id"); // Stripe Checkout Session ID (fallback)
 
         const iterCountEl = document.getElementById("diag-iter-count");
         const iterBadgeEl = document.getElementById("diag-iter-badge");
@@ -408,7 +506,7 @@
         const MAX_ITERS = 5;
         const TRUNC_MARKER = "— FIN TRONQUÉE (demander la suite)";
 
-        // Token GhostOps (obtenu après validation Stripe)
+        // Token GhostOps (obtenu côté serveur pour la session IA)
         let sessionToken = "";
         let itersLeft = MAX_ITERS;
         let expiresAtMs = 0;
@@ -421,13 +519,6 @@
         let lastAssistantReply = "";
         let lastWasTruncated = false;
         let isTyping = false;
-
-        function show(el) {
-          if (el) el.classList.remove("hidden");
-        }
-        function hide(el) {
-          if (el) el.classList.add("hidden");
-        }
 
         function hideContinue() {
           lastWasTruncated = false;
@@ -490,7 +581,6 @@
               clearInterval(countdownTimer);
               countdownTimer = null;
               setLockedUI(true);
-              hide(validatingBlock);
               hide(paidBlock);
               hide(notPaidBlock);
               show(expiredBlock);
@@ -504,37 +594,13 @@
           setLockedUI(true);
           hideContinue();
           if (message) addBotMessageInstant(message);
-          hide(validatingBlock);
           hide(paidBlock);
           hide(notPaidBlock);
           show(expiredBlock);
         }
 
-        async function openPaidUIOrFallback() {
-          hide(notPaidBlock);
-          hide(expiredBlock);
-          show(validatingBlock);
-
-          if (!csId) {
-            hide(validatingBlock);
-            show(notPaidBlock);
-            return;
-          }
-
-          hide(validatingBlock);
-          show(paidBlock);
-          renderIters();
-          if (expiryEl) expiryEl.textContent = "—";
-        }
-
         // -----------------------------
-        // ✅ (1) + (2) : rendu aéré
-        // - conserve typewriter
-        // - support titres / listes / sauts de ligne
-        //
-        // ✅ MODIF importante vs votre version :
-        // - le typewriter tape du TEXTE (pas du HTML) pour éviter les balises coupées
-        // - ensuite on "hydrate" en HTML formaté
+        // Rendu aéré bot (typewriter -> hydrate HTML)
         // -----------------------------
         function escapeHtml(s) {
           return String(s || "")
@@ -668,12 +734,11 @@
 
           function step() {
             if (index < text.length) {
-              bubble.textContent = text.slice(0, index + 1); // ✅ on tape du TEXTE
+              bubble.textContent = text.slice(0, index + 1);
               index += 1;
               scrollToBottom();
               setTimeout(step, 10);
             } else {
-              // ✅ une fois terminé : on convertit en HTML aéré
               bubble.classList.remove("whitespace-pre-wrap");
               bubble.classList.add("whitespace-normal");
               bubble.innerHTML = formatAiTextToHtml(text);
@@ -729,8 +794,10 @@
             payload.last_assistant = lastAssistantReply || "";
           }
 
+          // Fallback : si votre backend ne sait pas encore lier Supabase -> token,
+          // on conserve cs_id (si présent) ou sessionToken (si déjà établi).
           if (!sessionToken) {
-            payload.cs_id = csId;
+            if (csId) payload.cs_id = csId;
           } else {
             payload.sessionToken = sessionToken;
           }
@@ -944,7 +1011,9 @@
           });
         }
 
-        openPaidUIOrFallback();
+        // UI initiale
+        renderIters();
+        if (expiryEl) expiryEl.textContent = "—";
       })();
     </script>
   </body>
