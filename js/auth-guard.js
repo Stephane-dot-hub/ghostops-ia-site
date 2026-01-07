@@ -1,13 +1,13 @@
-/* GhostOps — Auth Guard centralisé (v3 : durci + anti-loop + mapping tolérant)
+/* GhostOps — Auth Guard centralisé (v4 : anti-loop renforcé + chemins stables + whitelists)
    Objectifs :
-   - Décision claire (OK/KO) + signal à la page via event "ghostops:auth"
-   - Tolérer Supabase pas encore prêt (config.js chargé après)
+   - Décision claire (OK/KO) + event "ghostops:auth"
+   - Tolérer Supabase pas prêt (config.js chargé après)
    - Gérer “magic link ouvert dans un autre navigateur” (session absente)
-   - Éviter les boucles (connexion -> index -> connexion, etc.)
-   - Raisons stables (reason codes) pour redirections/logs
+   - Éviter les boucles (connexion <-> index / produit / session)
+   - Raisons stables (reason codes)
 
    Dépendances :
-   - window.GHOSTOPS_NIVEAU_PRODUIT = "diagnostic" | "studio" | "studio-scenarios" | "pre-brief" | "prebrief"
+   - window.GHOSTOPS_NIVEAU_PRODUIT = "diagnostic" | "studio-scenarios" | "pre-brief"
    - window.ghostopsSupabase créé par /config.js
 
    Table droits (attendu) :
@@ -25,10 +25,13 @@
   const PATH = window.location.pathname || "";
   const SEARCH = window.location.search || "";
 
+  // Pages “spéciales” : ne jamais y rediriger en boucle
+  const IS_CONNEXION = /\/connexion\.html$/i.test(PATH);
+
+  // ---- Logs ----
   function log(...args) {
     if (DEBUG) console.log("[GhostOps AuthGuard]", ...args);
   }
-
   function warn(...args) {
     console.warn("[GhostOps AuthGuard]", ...args);
   }
@@ -59,22 +62,29 @@
   const niveauProduit = normalizeNiveau(RAW_NIVEAU);
 
   // -----------------------------
-  // Anti-loop : si redirections trop fréquentes, stop
+  // Anti-loop : bloque si redirections vers la même cible trop vite
+  // + évite d’enchaîner “connexion -> connexion” ou “produit -> produit”
   // -----------------------------
+  const LOOP_KEY = "ghostops_auth_loop_v2";
+
   function bumpRedirectCounter(target) {
     try {
-      const key = "ghostops_auth_redirects";
-      const raw = localStorage.getItem(key);
-      const obj = raw ? JSON.parse(raw) : { c: 0, t: 0, last: "" };
+      const raw = localStorage.getItem(LOOP_KEY);
+      const obj = raw ? JSON.parse(raw) : { c: 0, t: 0, last: "", lastFrom: "" };
+
       const elapsed = NOW - (obj.t || 0);
+      const sameTarget = String(obj.last || "") === String(target || "");
+      const sameWindow = elapsed < 15000;
 
       const next = {
-        c: elapsed < 15000 ? Number(obj.c || 0) + 1 : 1,
+        // si même cible dans la fenêtre, on incrémente fort
+        c: sameWindow ? (sameTarget ? Number(obj.c || 0) + 1 : 1) : 1,
         t: NOW,
         last: String(target || ""),
+        lastFrom: PATH,
       };
 
-      localStorage.setItem(key, JSON.stringify(next));
+      localStorage.setItem(LOOP_KEY, JSON.stringify(next));
       return next.c;
     } catch (_) {
       return 0;
@@ -83,7 +93,8 @@
 
   function allowRedirect(target) {
     const count = bumpRedirectCounter(target);
-    if (count >= 4) {
+    if (count >= 3) {
+      // plus strict : 3 redirs identiques en <15s => stop
       emit(false, "redirect_loop_guard", { target, count });
       warn("Loop guard activé :", { target, count });
       return false;
@@ -95,9 +106,21 @@
     return encodeURIComponent(PATH + SEARCH);
   }
 
+  // -----------------------------
+  // Cibles
+  // -----------------------------
+  function productPageFor(np) {
+    const map = {
+      diagnostic: "/diagnostic-ia.html",
+      "studio-scenarios": "/studio-scenarios.html",
+      "pre-brief": "/pre-brief-board.html",
+    };
+    return map[np] || "/index.html";
+  }
+
   function goConnexion(reason, extra) {
-    // Évite de re-rediriger si on est déjà sur la page de connexion
-    if (PATH.endsWith("/connexion.html")) {
+    // Si déjà sur /connexion.html, NE PAS rediriger : c’est la cause n°1 des boucles.
+    if (IS_CONNEXION) {
       emit(false, reason || "already_on_connexion", { ...(extra || {}), already: true });
       log("Déjà sur /connexion.html — pas de redirection supplémentaire.");
       return;
@@ -118,14 +141,14 @@
   }
 
   function goProduit(reason) {
-    // Map “niveau_produit” => pages publiques
-    const map = {
-      diagnostic: "/diagnostic-ia.html",
-      "studio-scenarios": "/studio-scenarios.html",
-      "pre-brief": "/pre-brief-board.html",
-    };
+    const target = productPageFor(niveauProduit);
+    // Si on est déjà sur la page produit cible, ne pas rediriger (évite produit->produit)
+    if (PATH === target) {
+      emit(false, reason || "already_on_product", { niveauProduit, target, already: true });
+      log("Déjà sur la page produit — pas de redirection supplémentaire.");
+      return;
+    }
 
-    const target = map[niveauProduit] || "/index.html";
     const params = new URLSearchParams();
     if (reason) params.set("reason", reason);
     if (DEBUG) params.set("debug", "1");
@@ -175,25 +198,22 @@
   let session = null;
 
   try {
-    // getSession
     const { data: sessData, error: sessErr } = await supabase.auth.getSession();
     session = sessData?.session || null;
     if (sessErr) log("getSession error:", sessErr);
 
-    // fallback : getUser (parfois plus robuste selon configs)
+    // fallback getUser
     if (!session?.user?.id && typeof supabase.auth.getUser === "function") {
       try {
         const { data: uData, error: uErr } = await supabase.auth.getUser();
         if (uErr) log("getUser error:", uErr);
-        if (uData?.user?.id) {
-          session = session || { user: uData.user };
-        }
+        if (uData?.user?.id) session = session || { user: uData.user };
       } catch (e) {
         log("getUser exception:", e);
       }
     }
 
-    // refresh silencieux si dispo (utile si tokens présents mais session pas hydratée)
+    // refresh silencieux si dispo
     if (!session?.user?.id && typeof supabase.auth.refreshSession === "function") {
       try {
         const { data: refData, error: refErr } = await supabase.auth.refreshSession();
@@ -221,7 +241,7 @@
   // -----------------------------
   let droit = null;
 
-  // Mapping tolérant : si table utilise "studio" au lieu de "studio-scenarios" (ou inverse)
+  // Mapping tolérant (au cas où des anciennes valeurs existent)
   const niveauCandidates =
     niveauProduit === "studio-scenarios"
       ? ["studio-scenarios", "studio"]
@@ -230,7 +250,6 @@
         : [niveauProduit];
 
   try {
-    // On essaie plusieurs candidats (sans multi-query lourde)
     let lastError = null;
 
     for (const np of niveauCandidates) {
@@ -246,8 +265,6 @@
 
       if (error) {
         lastError = error;
-        // On ne continue pas si c’est une vraie erreur SQL/permission ; mais en pratique,
-        // Supabase renvoie une erreur dès la 1ère query si RLS/permissions KO.
         warn("Erreur check droits (np=" + np + "):", error);
         break;
       }
