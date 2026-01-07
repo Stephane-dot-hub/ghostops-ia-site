@@ -52,15 +52,29 @@
         transition: opacity 0.4s ease;
       }
       @keyframes bgPulse {
-        0% { filter: brightness(1) contrast(1); }
-        100% { filter: brightness(1.05) contrast(1.05); }
+        0% {
+          filter: brightness(1) contrast(1);
+        }
+        100% {
+          filter: brightness(1.05) contrast(1.05);
+        }
       }
-      .text-shadow { text-shadow: 1px 1px 4px rgba(0,0,0,.6); }
-      html { scroll-behavior: smooth; }
-      header, main, section, footer { position: relative; z-index: 1; }
+      .text-shadow {
+        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      header,
+      main,
+      section,
+      footer {
+        position: relative;
+        z-index: 1;
+      }
 
       /* bulles */
-      .bot-bubble{
+      .bot-bubble {
         background: rgba(17, 24, 39, 0.75);
         border: 1px solid rgba(55, 65, 81, 1);
         border-radius: 0.9rem;
@@ -68,23 +82,45 @@
         white-space: normal;
         line-height: 1.55;
       }
-      .user-bubble{
-        background: rgba(255,255,255,0.10);
-        border: 1px solid rgba(148,163,184,0.35);
+      .user-bubble {
+        background: rgba(255, 255, 255, 0.10);
+        border: 1px solid rgba(148, 163, 184, 0.35);
         border-radius: 0.9rem;
         padding: 0.85rem 0.9rem;
         white-space: pre-wrap;
         line-height: 1.55;
       }
-      .bot-bubble a { text-decoration: underline; }
-      .bot-bubble ul { margin: 0.4rem 0 0.6rem 1.1rem; list-style: disc; }
-      .bot-bubble li { margin: 0.18rem 0; }
-      .bot-bubble p { margin: 0.35rem 0; }
-
+      .bot-bubble a {
+        text-decoration: underline;
+        text-decoration-style: dotted;
+      }
+      .bot-bubble ul {
+        margin: 0.4rem 0 0.6rem 1.1rem;
+        list-style: disc;
+      }
+      .bot-bubble li {
+        margin: 0.18rem 0;
+      }
+      .bot-bubble p {
+        margin: 0.35rem 0;
+      }
       .mono {
         font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
       }
+
+      /* Focus visible */
+      :focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.7);
+        outline-offset: 2px;
+      }
     </style>
+
+    <!-- Auth Guard (Niveau 3) -->
+    <script>
+      window.GHOSTOPS_NIVEAU_PRODUIT = "pre-brief";
+    </script>
+    <script src="/config.js"></script>
+    <script src="/auth-guard.js"></script>
   </head>
 
   <body class="bg-gray-900 text-white font-sans leading-relaxed">
@@ -107,12 +143,10 @@
     </header>
 
     <main class="px-6 md:px-24 pb-24">
-      <!-- BLOC SI PAIEMENT NON DÉTECTÉ -->
+      <!-- BLOC SI PAIEMENT NON DÉTECTÉ / ACCÈS REFUSÉ -->
       <section id="prebrief-not-paid" class="hidden max-w-3xl mx-auto mt-10 mb-10">
         <div class="bg-red-900/40 border border-red-500/70 rounded-2xl p-6 md:p-8">
-          <h1 class="text-2xl md:text-3xl font-bold mb-3 text-white text-shadow">
-            Accès réservé – GhostOps Pré-brief Board
-          </h1>
+          <h1 class="text-2xl md:text-3xl font-bold mb-3 text-white text-shadow">Accès réservé – GhostOps Pré-brief Board</h1>
 
           <p class="text-gray-200 text-sm md:text-base mb-3">
             Cette page est réservée aux dirigeants, boards ou directions ayant validé un
@@ -120,7 +154,7 @@
           </p>
 
           <p class="text-gray-300 text-sm md:text-base mb-4">
-            Après paiement, vous devez utiliser le lien complet contenant un identifiant <span class="font-semibold">cs_id</span>.
+            Après paiement, utilisez le lien complet contenant un identifiant <span class="font-semibold">cs_id</span>.
           </p>
 
           <div class="flex flex-col sm:flex-row gap-3 mt-4">
@@ -147,23 +181,18 @@
         <!-- Bandeau -->
         <div class="bg-emerald-900/40 border border-emerald-500/70 rounded-2xl p-4 mb-6">
           <p class="text-xs md:text-sm text-emerald-100">
-            Votre paiement pour le <span class="font-semibold">GhostOps Pré-brief Board</span> a été validé.
+            Votre accès au <span class="font-semibold">GhostOps Pré-brief Board</span> est actif.
             Cet espace vous permet de préparer et structurer votre dossier pour la note board-ready.
           </p>
         </div>
 
         <!-- Intro -->
         <header class="mb-8">
-          <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">
-            GhostOps IA · Pré-brief Board – Espace de travail
-          </p>
-          <h1 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">
-            Session Pré-brief Board – préparation de la note board-ready
-          </h1>
+          <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">GhostOps IA · Pré-brief Board – Espace de travail</p>
+          <h1 class="text-2xl md:text-3xl font-bold mb-4 text-white text-shadow">Session Pré-brief Board – préparation de la note board-ready</h1>
           <p class="text-gray-200 text-sm md:text-base mb-3 max-w-3xl">
-            Vous avez activé un <span class="font-semibold">Pré-brief Board GhostOps</span>. L’objectif de cette session
-            est de rassembler les éléments décisifs et de structurer le contexte avant la production de la
-            <span class="font-semibold">note board-ready</span>.
+            Vous avez activé un <span class="font-semibold">Pré-brief Board GhostOps</span>. L’objectif de cette session est de rassembler les
+            éléments décisifs et de structurer le contexte avant la production de la <span class="font-semibold">note board-ready</span>.
           </p>
           <p class="text-gray-300 text-sm md:text-base max-w-3xl">
             GhostOps utilise l’IA comme instrument de lecture et de simulation. La note finale reste un
@@ -171,7 +200,7 @@
           </p>
         </header>
 
-        <!-- Télémétrie (alignée N2 : iters restantes + max + TTL + expiration) -->
+        <!-- Télémétrie -->
         <section class="mb-6">
           <div class="bg-gray-800/70 rounded-2xl p-4 md:p-5 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
             <div class="text-xs md:text-sm text-gray-200">
@@ -213,17 +242,13 @@
             </div>
           </div>
 
-          <p class="text-gray-500 text-[11px] mt-2">
-            Indicateurs internes (itérations/TTL) affichés pour contrôler la stabilité de session.
-          </p>
+          <p class="text-gray-500 text-[11px] mt-2">Indicateurs internes (itérations/TTL) affichés pour contrôler la stabilité de session.</p>
         </section>
 
         <!-- Étape 1 -->
         <section class="mb-8">
           <div class="bg-gray-800/80 rounded-2xl p-6 md:p-8">
-            <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">
-              Étape&nbsp;1 – Préparer vos éléments de contexte
-            </h2>
+            <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">Étape&nbsp;1 – Préparer vos éléments de contexte</h2>
             <ul class="list-disc list-inside text-gray-300 text-sm md:text-base space-y-2 max-w-3xl">
               <li><span class="font-semibold">Périmètre</span> (groupe / filiale / site / fonctions).</li>
               <li><span class="font-semibold">Faits</span> : décisions, tensions, éléments datés.</li>
@@ -231,18 +256,14 @@
               <li><span class="font-semibold">Risques</span> : humains, conformité, réputation, exécution.</li>
               <li><span class="font-semibold">Échéances</span> : comité, board, jalons.</li>
             </ul>
-            <p class="text-gray-400 text-xs md:text-sm mt-4 max-w-3xl">
-              Vous pouvez saisir ces éléments directement dans le module IA ci-dessous.
-            </p>
+            <p class="text-gray-400 text-xs md:text-sm mt-4 max-w-3xl">Vous pouvez saisir ces éléments directement dans le module IA ci-dessous.</p>
           </div>
         </section>
 
         <!-- Chat -->
         <section>
           <div class="bg-gray-900/80 border border-gray-700 rounded-2xl p-6 md:p-8">
-            <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">
-              Étape&nbsp;2 – Pré-brief Board avec GhostOps IA
-            </h2>
+            <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">Étape&nbsp;2 – Pré-brief Board avec GhostOps IA</h2>
 
             <div class="bg-gray-950/80 rounded-xl border border-gray-700 max-h-[460px] flex flex-col">
               <div id="prebrief-chat-messages" class="flex-1 px-4 py-3 space-y-3 overflow-y-auto text-xs md:text-sm">
@@ -254,6 +275,7 @@
                   id="prebrief-chat-input"
                   class="flex-1 text-xs bg-gray-900 text-gray-100 border border-gray-700 rounded-md px-2 py-2 resize-none focus:outline-none focus:border-gray-400"
                   rows="3"
+                  maxlength="6000"
                   placeholder="Décrivez ici votre situation (contexte, acteurs, risques, échéances)…"
                 ></textarea>
 
@@ -300,11 +322,17 @@
 
     <script>
       (function () {
+        // -----------------------------
+        // Params
+        // -----------------------------
         const params = new URLSearchParams(window.location.search);
         const csId = (params.get("cs_id") || "").trim();
-        const paidFlag = (params.get("paid") || "").trim();
+        const paidFlag = (params.get("paid") || "").trim(); // compat/debug uniquement
         const resetFlag = (params.get("reset") || "").trim();
 
+        // -----------------------------
+        // DOM
+        // -----------------------------
         const paidBlock = document.getElementById("prebrief-paid");
         const notPaidBlock = document.getElementById("prebrief-not-paid");
         const debugEl = document.getElementById("prebrief-debug");
@@ -326,6 +354,9 @@
 
         const welcomeEl = document.getElementById("pb-welcome");
 
+        // -----------------------------
+        // Storage / State
+        // -----------------------------
         const TOKEN_KEY = "ghostops_prebrief_sessionToken_v1";
 
         // Historique (comme N2)
@@ -333,8 +364,11 @@
         let lastAssistantText = "";
         let truncMarkerFromApi = "— FIN TRONQUÉE (demander la suite)";
 
+        // Anti double-submit
+        let busy = false;
+
         // -----------------------------
-        // Texte -> HTML aéré (sans casser)
+        // Helpers : text -> HTML aéré
         // -----------------------------
         function escapeHtml(s) {
           return String(s || "")
@@ -346,10 +380,9 @@
         }
 
         function linkify(s) {
-          return s.replace(
-            /\bhttps?:\/\/[^\s<]+/gi,
-            (m) => `<a href="${m}" target="_blank" rel="noopener noreferrer">${m}</a>`
-          );
+          return s.replace(/\bhttps?:\/\/[^\s<]+/gi, (m) => {
+            return `<a href="${m}" target="_blank" rel="noopener noreferrer">${m}</a>`;
+          });
         }
 
         function formatAiTextToHtml(text) {
@@ -370,7 +403,7 @@
           }
 
           for (let i = 0; i < lines.length; i++) {
-            let line = lines[i];
+            const line = lines[i];
 
             if (!line.trim()) {
               closeList();
@@ -496,10 +529,7 @@
 
         function enableContinueIfNeeded(replyText) {
           const t = String(replyText || "");
-          const truncated =
-            (truncMarkerFromApi && t.includes(truncMarkerFromApi)) ||
-            /fin tronqu/i.test(t);
-
+          const truncated = (truncMarkerFromApi && t.includes(truncMarkerFromApi)) || /fin tronqu/i.test(t);
           if (btnContinue) btnContinue.disabled = !truncated;
         }
 
@@ -526,10 +556,20 @@
           return bubble;
         }
 
+        function setBusy(on) {
+          busy = !!on;
+          if (form) {
+            const btn = form.querySelector('button[type="submit"]');
+            if (btn) btn.disabled = busy;
+          }
+          if (btnContinue) btnContinue.disabled = busy ? true : btnContinue.disabled;
+        }
+
         // -------------------------
         // Bootstrap accès
         // -------------------------
         async function bootstrapAccess() {
+          // reset=1 : purge token + nettoyage URL
           if (resetFlag === "1") {
             purgeToken();
             const url = new URL(window.location.href);
@@ -538,47 +578,64 @@
             return;
           }
 
+          // paid=1 : compat/debug (non recommandé en prod)
           if (paidFlag === "1") {
             showPaid();
             setStatus("Accès activé (mode compat).", "ok");
             return;
           }
 
+          // cs_id : cas standard post-Stripe
           if (csId) {
             showPaid();
             setStatus("Accès détecté via cs_id. Initialisation au premier message…", "ok");
             return;
           }
 
+          // token : reprise de session (même navigateur)
           if (tokenExists()) {
             showPaid();
             setStatus("Session détectée (token).", "ok");
             return;
           }
 
-          showNotPaid("Lien incomplet : paramètre cs_id absent.");
+          // sinon, refus
+          showNotPaid("Lien incomplet : paramètre cs_id absent. (Ou session ouverte dans un autre navigateur.)");
         }
 
         // -------------------------
-        // API call
+        // API call (no-store + timeout)
         // -------------------------
         async function callApi(payload) {
-          const response = await fetch("/api/ghostops-pre-brief-board", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-          });
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 45000);
 
-          let data = {};
-          try { data = await response.json(); } catch (_) {}
+          try {
+            const response = await fetch("/api/ghostops-pre-brief-board", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify(payload),
+              cache: "no-store",
+              signal: controller.signal,
+            });
 
-          return { response, data };
+            let data = {};
+            try {
+              data = await response.json();
+            } catch (_) {}
+
+            return { response, data };
+          } finally {
+            clearTimeout(timeout);
+          }
         }
 
         // -------------------------
         // Send message
         // -------------------------
         async function sendUserMessage() {
+          if (busy) return;
+
           const userMessage = (input.value || "").trim();
           if (!userMessage) return;
 
@@ -589,6 +646,8 @@
 
           setStatus("Lecture Pré-brief Board en cours…", "");
           const botBubble = addBotMessageContainer();
+
+          setBusy(true);
 
           try {
             const token = (localStorage.getItem(TOKEN_KEY) || "").trim();
@@ -601,7 +660,7 @@
             const { response, data } = await callApi(payload);
 
             if (!response.ok || !data.reply) {
-              const errText = data.error || `Erreur API Pré-brief Board (HTTP ${response.status}).`;
+              const errText = data?.error || `Erreur API Pré-brief Board (HTTP ${response.status}).`;
               botBubble.textContent = errText;
               setStatus(errText, "err");
               if (btnContinue) btnContinue.disabled = true;
@@ -621,9 +680,15 @@
             setStatus("Réponse générée.", "ok");
           } catch (err) {
             console.error("Erreur /api/ghostops-pre-brief-board :", err);
-            botBubble.textContent = "Erreur de connexion à GhostOps IA. Veuillez réessayer ou utiliser la page contact.";
+            const msg =
+              err && err.name === "AbortError"
+                ? "Délai dépassé (timeout). Veuillez réessayer."
+                : "Erreur de connexion à GhostOps IA. Veuillez réessayer ou utiliser la page contact.";
+            botBubble.textContent = msg;
             setStatus("Erreur réseau.", "err");
             if (btnContinue) btnContinue.disabled = true;
+          } finally {
+            setBusy(false);
           }
         }
 
@@ -631,6 +696,8 @@
         // Continue
         // -------------------------
         async function requestContinue() {
+          if (busy) return;
+
           const token = (localStorage.getItem(TOKEN_KEY) || "").trim();
           if (!token) {
             const b = addBotMessageContainer();
@@ -649,6 +716,8 @@
           setStatus("Demande de suite…", "");
           const botBubble = addBotMessageContainer();
 
+          setBusy(true);
+
           try {
             const payload = {
               sessionToken: token,
@@ -660,7 +729,7 @@
             const { response, data } = await callApi(payload);
 
             if (!response.ok || !data.reply) {
-              const errText = data.error || `Erreur API Pré-brief Board (HTTP ${response.status}).`;
+              const errText = data?.error || `Erreur API Pré-brief Board (HTTP ${response.status}).`;
               botBubble.textContent = errText;
               setStatus(errText, "err");
               return;
@@ -679,19 +748,25 @@
             setStatus("Suite générée.", "ok");
           } catch (err) {
             console.error("Erreur suite Pré-brief Board:", err);
-            botBubble.textContent = "Erreur réseau lors de la demande de suite. Veuillez réessayer.";
+            botBubble.textContent =
+              err && err.name === "AbortError"
+                ? "Délai dépassé (timeout). Veuillez réessayer."
+                : "Erreur réseau lors de la demande de suite. Veuillez réessayer.";
             setStatus("Erreur réseau (suite).", "err");
+          } finally {
+            setBusy(false);
           }
         }
 
         // -------------------------
-        // Welcome message (propre)
+        // Welcome message
         // -------------------------
         function renderWelcome() {
           const txt =
             "GhostOps IA – Pré-brief Board :\n\n" +
-            "Décrivez votre situation (périmètre, faits, acteurs, risques, échéances).\n\n" +
-            "Je produirai un pré-brief structuré : reformulation factuelle, enjeux de gouvernance, risques, options de cadrage, informations manquantes, et préparation d’un ordre du jour “board-ready”.";
+            "- Décrivez votre situation (périmètre, faits, acteurs, risques, échéances).\n" +
+            "- Je produirai un pré-brief structuré : reformulation factuelle, enjeux de gouvernance, risques, options de cadrage, informations manquantes.\n" +
+            "- Objectif : préparer une note et un ordre du jour exploitables en séance (board / comité d’audit).";
           if (welcomeEl) welcomeEl.innerHTML = formatAiTextToHtml(txt);
         }
 
@@ -733,6 +808,21 @@
             window.location.replace(url.toString());
           });
         }
+
+        // -------------------------
+        // Auth Guard integration: écoute l’événement (si présent)
+        // -------------------------
+        // auth-guard.js émet "ghostops:auth" avec un détail { ok, reason, ... }
+        window.addEventListener("ghostops:auth", function (ev) {
+          try {
+            const detail = ev?.detail || {};
+            if (detail.ok) return;
+
+            // Si KO : on affiche notre bloc "Accès réservé" avec un motif
+            const reason = detail.reason || "no_right";
+            showNotPaid("Accès refusé (" + reason + "). Vérifiez votre compte et vos droits, ou repassez par le lien de paiement.");
+          } catch (_) {}
+        });
 
         // Go
         renderWelcome();
