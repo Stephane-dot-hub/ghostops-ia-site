@@ -48,6 +48,12 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/config.js"></script>
 
+    <!-- ✅ Auth guard centralisé (droits) -->
+    <script>
+      window.GHOSTOPS_NIVEAU_PRODUIT = "diagnostic";
+    </script>
+    <script src="/js/auth-guard.js"></script>
+
     <style>
       body::before {
         content: "";
@@ -385,17 +391,9 @@
       </div>
     </footer>
 
-    <!-- Script : garde Supabase (auth + droit) + module IA -->
+    <!-- Script : UX + module IA (sans re-vérifier les droits ici ; géré par auth-guard.js) -->
     <script>
       (async function () {
-        // -------------------------------------------
-        // ✅ Garde d'accès (prioritaire)
-        // - Auth obligatoire (Supabase)
-        // - Droit actif obligatoire (table droits)
-        // - Redirection sinon (connexion.html / diagnostic-ia.html)
-        // -------------------------------------------
-        const PRODUCT_KEY = "diagnostic"; // valeurs standardisées : diagnostic / studio / prebrief
-
         const validatingBlock = document.getElementById("diagnostic-validating");
         const paidBlock = document.getElementById("diagnostic-paid");
         const notPaidBlock = document.getElementById("diagnostic-not-paid");
@@ -408,84 +406,22 @@
           if (el) el.classList.add("hidden");
         }
 
-        function currentNextUrl() {
-          // conserve le chemin + query
-          return window.location.pathname + window.location.search;
-        }
-
-        function goConnexion() {
-          const next = encodeURIComponent(currentNextUrl());
-          window.location.href = `/connexion.html?next=${next}`;
-        }
-
-        function goProductPage(reason) {
-          const next = encodeURIComponent(currentNextUrl());
-          const r = reason ? `&reason=${encodeURIComponent(reason)}` : "";
-          window.location.href = `/diagnostic-ia.html?next=${next}${r}`;
-        }
-
-        // Affiche "vérification"
+        // Par défaut, on affiche "vérification" immédiatement.
+        // Le guard (auth-guard.js) redirige si non autorisé.
         hide(paidBlock);
         hide(notPaidBlock);
         hide(expiredBlock);
         show(validatingBlock);
 
-        // Vérifier Supabase client
-        const supabase = window.ghostopsSupabase;
-        if (!supabase || !supabase.auth) {
-          // config.js non chargé / Supabase indisponible
+        // Petite temporisation pour éviter un flash blanc si le guard autorise (UX)
+        // Si le guard redirige, cette suite ne sera jamais visible.
+        setTimeout(() => {
           hide(validatingBlock);
-          show(notPaidBlock);
-          return;
-        }
-
-        // 1) Session obligatoire
-        const { data: sessData, error: sessErr } = await supabase.auth.getSession();
-        if (sessErr) {
-          // erreur d'accès à la session => renvoyer vers connexion
-          goConnexion();
-          return;
-        }
-
-        const session = sessData?.session;
-        const user = session?.user;
-
-        if (!user) {
-          // pas connecté => connexion
-          goConnexion();
-          return;
-        }
-
-        // 2) Droit actif obligatoire
-        // Table "droits" attendue : id_utilisateur, niveau_produit, statut
-        const { data: rightRow, error: rightErr } = await supabase
-          .from("droits")
-          .select("statut, niveau_produit")
-          .eq("id_utilisateur", user.id)
-          .eq("niveau_produit", PRODUCT_KEY)
-          .eq("statut", "active")
-          .maybeSingle();
-
-        if (rightErr) {
-          // si erreur supabase => fallback vers page produit
-          goProductPage("right_check_error");
-          return;
-        }
-
-        if (!rightRow) {
-          // pas de droit => page produit
-          goProductPage("no_right");
-          return;
-        }
-
-        // ✅ Accès autorisé : on peut afficher l'espace
-        hide(validatingBlock);
-        show(paidBlock);
+          show(paidBlock);
+        }, 150);
 
         // -------------------------------------------
-        // Module IA (votre code existant, inchangé au fond)
-        // - cs_id conservé comme fallback d'initialisation serveur
-        // - La sécurité d'accès est désormais assurée par Supabase (au-dessus)
+        // Module IA (code existant conservé)
         // -------------------------------------------
         const params = new URLSearchParams(window.location.search);
         const csId = params.get("cs_id"); // Stripe Checkout Session ID (fallback)
@@ -520,20 +456,20 @@
         let lastWasTruncated = false;
         let isTyping = false;
 
+        function showContinue() {
+          if (continueBar) continueBar.classList.remove("hidden");
+        }
         function hideContinue() {
           lastWasTruncated = false;
-          hide(continueBar);
+          if (continueBar) continueBar.classList.add("hidden");
           if (continueBtn) continueBtn.disabled = false;
         }
 
         function maybeShowContinueFromText(text) {
           const t = String(text || "");
           lastWasTruncated = t.includes(TRUNC_MARKER);
-          if (lastWasTruncated && continueBar) {
-            show(continueBar);
-          } else {
-            hideContinue();
-          }
+          if (lastWasTruncated) showContinue();
+          else hideContinue();
         }
 
         function scrollToBottom() {
