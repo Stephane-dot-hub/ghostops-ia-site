@@ -1,39 +1,36 @@
-
 /* GhostOps — Auth Guard centralisé */
-
 (async function ghostopsAuthGuard() {
-  // --- CONFIG ---
-  const SUPABASE_URL = window.SUPABASE_URL;
-  const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
-
-  // À définir dans chaque page AVANT ce script :
+  // 0) Niveau produit obligatoire, défini dans chaque page avant ce script
   // window.GHOSTOPS_NIVEAU_PRODUIT = "diagnostic" | "studio" | "pre-brief"
   const niveauProduit = window.GHOSTOPS_NIVEAU_PRODUIT;
 
   if (!niveauProduit) {
-    console.error("GhostOps Auth Guard — niveau_produit non défini");
+    console.error("GhostOps Auth Guard — niveau_produit non défini (window.GHOSTOPS_NIVEAU_PRODUIT)");
     return;
   }
 
-  const supabase = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_ANON_KEY
-  );
+  // 1) Utiliser le client Supabase centralisé (créé dans config.js)
+  const supabase = window.ghostopsSupabase;
+  if (!supabase || !supabase.auth) {
+    console.error("GhostOps Auth Guard — window.ghostopsSupabase introuvable (config.js non chargé ?)");
+    return;
+  }
 
-  // --- 1. Vérification session ---
-  const { data: { session }, error: sessionError } =
-    await supabase.auth.getSession();
+  // 2) Session obligatoire
+  const { data: sessData, error: sessErr } = await supabase.auth.getSession();
+  const session = sessData?.session;
 
-  if (sessionError || !session) {
-    const next = encodeURIComponent(window.location.pathname);
+  if (sessErr || !session?.user) {
+    const next = encodeURIComponent(window.location.pathname + window.location.search);
     window.location.href = `/connexion.html?next=${next}`;
     return;
   }
 
   const userId = session.user.id;
 
-  // --- 2. Vérification droits ---
-  const { data: droit, error: droitError } = await supabase
+  // 3) Vérification droits (selon votre table réelle)
+  // D’après vos infos : user_id, niveau_produit, statut, revoked_at
+  const { data: droit, error: droitErr } = await supabase
     .from("droits")
     .select("id")
     .eq("user_id", userId)
@@ -42,15 +39,20 @@
     .is("revoked_at", null)
     .maybeSingle();
 
-  if (droitError || !droit) {
-    const params = new URLSearchParams({
-      reason: "right_check_error"
-    });
-    window.location.href = `/diagnostic-ia.html?${params.toString()}`;
+  if (droitErr || !droit) {
+    const params = new URLSearchParams({ reason: "right_check_error" });
+
+    // Redirection vers la page produit correspondante
+    const map = {
+      diagnostic: "/diagnostic-ia.html",
+      studio: "/studio-scenarios.html",
+      "pre-brief": "/pre-brief-board.html",
+    };
+    const target = map[niveauProduit] || "/index.html";
+
+    window.location.href = `${target}?${params.toString()}`;
     return;
   }
 
-  // --- 3. Accès autorisé ---
   console.log("GhostOps Auth Guard — accès autorisé :", niveauProduit);
 })();
-
