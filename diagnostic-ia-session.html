@@ -48,10 +48,67 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/config.js"></script>
 
-    <!-- ✅ Auth guard centralisé (droits) -->
+    <!-- ✅ Niveau produit (doit être défini AVANT activation + auth-guard) -->
     <script>
       window.GHOSTOPS_NIVEAU_PRODUIT = "diagnostic";
     </script>
+
+    <!-- ✅ Activation du droit (Option B) : uniquement si cs_id présent, puis nettoyage URL -->
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const csId = (params.get("cs_id") || "").trim();
+        const niveauProduit = window.GHOSTOPS_NIVEAU_PRODUIT; // "diagnostic" | "studio" | "pre-brief"
+
+        if (!csId) return;
+
+        async function activateRight() {
+          const supabase = window.ghostopsSupabase;
+          if (!supabase?.auth) throw new Error("Supabase non prêt");
+
+          const { data } = await supabase.auth.getSession();
+          const accessToken = data?.session?.access_token;
+          if (!accessToken) throw new Error("Session Supabase absente");
+
+          const r = await fetch("/api/ghostops-activate-right", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + accessToken,
+            },
+            body: JSON.stringify({ cs_id: csId, niveau_produit: niveauProduit }),
+          });
+
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok || !j.ok) {
+            throw new Error(j.error || "Activation impossible");
+          }
+
+          // Nettoyage URL : on retire cs_id
+          const url = new URL(window.location.href);
+          url.searchParams.delete("cs_id");
+          url.searchParams.set("activated", "1");
+          window.location.replace(url.toString());
+        }
+
+        window.addEventListener("ghostops:auth", function (e) {
+          const detail = e?.detail || {};
+          if (detail.reason !== "activation_required") return;
+
+          // On tente l’activation une seule fois (anti boucle)
+          const onceKey = "ghostops_activation_once_" + niveauProduit + "_" + csId;
+          if (sessionStorage.getItem(onceKey) === "1") return;
+          sessionStorage.setItem(onceKey, "1");
+
+          activateRight().catch((err) => {
+            console.error("[GhostOps activate-right] error:", err);
+            // Optionnel : vous pouvez afficher un message UI ici si nécessaire.
+          });
+        });
+      })();
+    </script>
+
+    <!-- ✅ Auth guard centralisé (droits) -->
     <script src="/js/auth-guard.js"></script>
 
     <style>
