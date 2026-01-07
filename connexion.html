@@ -19,7 +19,9 @@
       .ok { color: #7CFFB2; }
       .err { color: #FF7C7C; }
       .muted { opacity: 0.8; font-size: 12px; margin-top: 10px; }
-      .link { color: #cdd6ff; }
+      .link { color: #cdd6ff; cursor: pointer; text-decoration: underline; }
+      .row { display:flex; gap:10px; margin-top: 10px; }
+      .row button { width:auto; flex:1; }
     </style>
   </head>
 
@@ -43,8 +45,18 @@
           <div id="msg" class="msg"></div>
         </form>
 
+        <div class="row">
+          <button id="btnForce" type="button" title="Ouvre la page en mode test sans redirection automatique">
+            Mode test (force)
+          </button>
+          <button id="btnLogout" type="button" title="Déconnexion Supabase + purge storage">
+            Se déconnecter
+          </button>
+        </div>
+
         <div class="muted">
-          En cas de non-réception : vérifiez les indésirables ou retentez après 30 secondes.
+          En cas de non-réception : vérifiez les indésirables ou retentez après 30 secondes.<br/>
+          Astuce : <span class="link" id="copyNext">copier le next</span> pour vérifier la cible.
         </div>
       </div>
     </div>
@@ -54,7 +66,6 @@
     <!-- 2) Votre config browser-only : doit créer window.ghostopsSupabase -->
     <script src="/config.js"></script>
 
-    <!-- 3) Logique login -->
     <script>
       (function () {
         const supabase = window.ghostopsSupabase;
@@ -63,6 +74,10 @@
         const emailEl = document.getElementById("email");
         const btn = document.getElementById("btn");
         const msg = document.getElementById("msg");
+
+        const btnLogout = document.getElementById("btnLogout");
+        const btnForce = document.getElementById("btnForce");
+        const copyNext = document.getElementById("copyNext");
 
         function setMsg(text, type) {
           msg.textContent = text || "";
@@ -73,23 +88,30 @@
           return (v || "").trim().toLowerCase();
         }
 
-        // ✅ On standardise : on utilise ?next=... (et on conserve la compatibilité ?returnTo=...)
-        function getNextPath() {
-          const u = new URL(window.location.href);
-          const next = u.searchParams.get("next") || u.searchParams.get("returnTo") || "";
-          if (!next) return null;
-
-          // Sécurité : uniquement des chemins internes
-          if (next.startsWith("http")) return null;
-          if (!next.startsWith("/")) return "/" + next;
-          return next;
+        function sanitizeInternalPath(p, fallback) {
+          const fb = fallback || null;
+          const v = String(p || "").trim();
+          if (!v) return fb;
+          if (v.startsWith("http://") || v.startsWith("https://")) return fb;
+          if (!v.startsWith("/")) return "/" + v;
+          return v;
         }
 
-        function buildEmailRedirectTo(nextPath) {
-          // ✅ transporte le next vers auth-callback
-          const base = `${window.location.origin}/auth-callback.html`;
-          if (!nextPath) return base;
-          return `${base}?next=${encodeURIComponent(nextPath)}`;
+        function getParams() {
+          const u = new URL(window.location.href);
+          return {
+            next: sanitizeInternalPath(u.searchParams.get("next"), null),
+            force: u.searchParams.get("force") === "1",
+          };
+        }
+
+        function getStoredNext() {
+          return sanitizeInternalPath(localStorage.getItem("ghostops_return_to"), null);
+        }
+
+        function setStoredNext(next) {
+          if (next) localStorage.setItem("ghostops_return_to", next);
+          else localStorage.removeItem("ghostops_return_to");
         }
 
         // Sanity check : config.js + SDK chargés
@@ -101,13 +123,54 @@
           return;
         }
 
-        // ✅ Si déjà connecté : redirection vers next si présent, sinon accueil (PAS espace.html)
+        // Bouton "mode test"
+        btnForce.addEventListener("click", () => {
+          const { next } = getParams();
+          const url = new URL(window.location.href);
+          url.searchParams.set("force", "1");
+          if (next) url.searchParams.set("next", next);
+          window.location.href = url.toString();
+        });
+
+        // Bouton logout + purge storage
+        btnLogout.addEventListener("click", async () => {
+          try { await supabase.auth.signOut(); } catch {}
+          try { localStorage.clear(); sessionStorage.clear(); } catch {}
+          setMsg("Déconnexion effectuée. Vous pouvez relancer la connexion proprement.", "ok");
+        });
+
+        // Copier le next
+        copyNext.addEventListener("click", async () => {
+          const { next } = getParams();
+          const val = next || getStoredNext() || "";
+          try {
+            await navigator.clipboard.writeText(val);
+            setMsg("Next copié : " + (val || "(vide)"), "ok");
+          } catch {
+            setMsg("Impossible de copier. Next : " + (val || "(vide)"), "err");
+          }
+        });
+
+        // ✅ Si on a un next dans l'URL, on le mémorise
+        const { next, force } = getParams();
+        if (next) setStoredNext(next);
+
+        // ✅ SI déjà connecté : on redirige vers next (pas vers /espace.html), sauf si force=1
         (async () => {
           try {
             const { data } = await supabase.auth.getSession();
             if (data?.session) {
-              const nextPath = getNextPath();
-              window.location.href = nextPath || "/index.html";
+              const target = next || getStoredNext();
+              if (!force && target) {
+                window.location.replace(target);
+                return;
+              }
+              if (!force && !target) {
+                // Pas de cible, on reste sur la page connexion (comportement neutre)
+                setMsg("Vous êtes déjà connecté. Aucun next fourni : page laissée ouverte.", "ok");
+              } else if (force) {
+                setMsg("Mode test activé (force=1). Aucune redirection automatique.", "ok");
+              }
             }
           } catch {
             // silence
@@ -124,18 +187,19 @@
             return;
           }
 
-          const nextPath = getNextPath();
-          const emailRedirectTo = buildEmailRedirectTo(nextPath);
-
           btn.disabled = true;
           btn.textContent = "Envoi en cours…";
 
           try {
+            // ✅ On passe next dans l’emailRedirectTo pour que auth-callback le récupère
+            const stored = getStoredNext();
+            const finalNext = next || stored || "/index.html";
+
+            const redirectTo = `${window.location.origin}/auth-callback.html?next=${encodeURIComponent(finalNext)}`;
+
             const { error } = await supabase.auth.signInWithOtp({
               email,
-              options: {
-                emailRedirectTo,
-              },
+              options: { emailRedirectTo: redirectTo },
             });
 
             if (error) throw error;
