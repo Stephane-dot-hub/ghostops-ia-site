@@ -1,4 +1,4 @@
-<script>
+
 /* GhostOps — Auth Guard centralisé */
 
 (async function ghostopsAuthGuard() {
@@ -53,4 +53,4 @@
   // --- 3. Accès autorisé ---
   console.log("GhostOps Auth Guard — accès autorisé :", niveauProduit);
 })();
-</script>
+
