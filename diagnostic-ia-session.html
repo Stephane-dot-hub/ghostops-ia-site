@@ -413,12 +413,45 @@
         hide(expiredBlock);
         show(validatingBlock);
 
-        // Petite temporisation pour éviter un flash blanc si le guard autorise (UX)
-        // Si le guard redirige, cette suite ne sera jamais visible.
-        setTimeout(() => {
+        // ✅ IMPORTANT :
+        // On n'affiche PAS "paid" sur un simple timeout.
+        // On attend explicitement que le guard signale "authorized".
+        // Sinon vous aurez des flashes UX + des parcours incohérents.
+        let authTimeout = null;
+
+        function markAuthorizedAndShow() {
+          if (authTimeout) {
+            clearTimeout(authTimeout);
+            authTimeout = null;
+          }
           hide(validatingBlock);
           show(paidBlock);
-        }, 150);
+        }
+
+        function markNotPaidAndShow() {
+          if (authTimeout) {
+            clearTimeout(authTimeout);
+            authTimeout = null;
+          }
+          hide(validatingBlock);
+          hide(paidBlock);
+          show(notPaidBlock);
+        }
+
+        // Le guard doit déclencher cet event :
+        // window.dispatchEvent(new CustomEvent("ghostops:auth", { detail: { ok: true|false, reason } }))
+        window.addEventListener("ghostops:auth", (e) => {
+          const ok = !!e?.detail?.ok;
+          if (ok) markAuthorizedAndShow();
+          else markNotPaidAndShow();
+        });
+
+        // Fallback sécurité : si le guard ne répond pas (erreur JS / réseau),
+        // on évite de laisser la page bloquée sur "Vérification…" indéfiniment.
+        authTimeout = setTimeout(() => {
+          // Si pas d'event => on affiche l'écran "accès réservé" (le guard a peut-être échoué)
+          markNotPaidAndShow();
+        }, 2000);
 
         // -------------------------------------------
         // Module IA (code existant conservé)
@@ -729,6 +762,17 @@
             payload.continue = true;
             payload.last_assistant = lastAssistantReply || "";
           }
+
+          // ✅ Enrichissement: envoyer le token Supabase (JWT) au backend si dispo
+          // Cela permet au backend de vérifier l'utilisateur et ses droits.
+          try {
+            const sb = window.ghostopsSupabase;
+            if (sb?.auth?.getSession) {
+              const { data: s } = await sb.auth.getSession();
+              const accessToken = s?.session?.access_token;
+              if (accessToken) payload.supabaseAccessToken = accessToken;
+            }
+          } catch (_) {}
 
           // Fallback : si votre backend ne sait pas encore lier Supabase -> token,
           // on conserve cs_id (si présent) ou sessionToken (si déjà établi).
