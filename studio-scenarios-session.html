@@ -29,6 +29,75 @@
       tailwind.config = { theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } } };
     </script>
 
+    <!-- ✅ Supabase (navigateur) + config.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/config.js"></script>
+
+    <!-- ✅ Niveau produit (doit être défini AVANT activation + auth-guard) -->
+    <script>
+      // IMPORTANT: on normalise côté auth-guard ("studio" => "studio-scenarios")
+      window.GHOSTOPS_NIVEAU_PRODUIT = "studio";
+    </script>
+
+    <!-- ✅ Activation du droit (Option B) : uniquement si cs_id présent, puis nettoyage URL -->
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+        const csId = (params.get("cs_id") || "").trim();
+        const niveauProduit = window.GHOSTOPS_NIVEAU_PRODUIT; // "diagnostic" | "studio" | "pre-brief"
+
+        if (!csId) return;
+
+        async function activateRight() {
+          const supabase = window.ghostopsSupabase;
+          if (!supabase?.auth) throw new Error("Supabase non prêt");
+
+          const { data } = await supabase.auth.getSession();
+          const accessToken = data?.session?.access_token;
+          if (!accessToken) throw new Error("Session Supabase absente");
+
+          const r = await fetch("/api/ghostops-activate-right", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + accessToken,
+            },
+            body: JSON.stringify({ cs_id: csId, niveau_produit: niveauProduit }),
+          });
+
+          const j = await r.json().catch(() => ({}));
+          if (!r.ok || !j.ok) {
+            throw new Error(j.error || "Activation impossible");
+          }
+
+          // Nettoyage URL : on retire cs_id
+          const url = new URL(window.location.href);
+          url.searchParams.delete("cs_id");
+          url.searchParams.set("activated", "1");
+          window.location.replace(url.toString());
+        }
+
+        window.addEventListener("ghostops:auth", function (e) {
+          const detail = e?.detail || {};
+          if (detail.reason !== "activation_required") return;
+
+          // On tente l’activation une seule fois (anti boucle)
+          const onceKey = "ghostops_activation_once_" + niveauProduit + "_" + csId;
+          if (sessionStorage.getItem(onceKey) === "1") return;
+          sessionStorage.setItem(onceKey, "1");
+
+          activateRight().catch((err) => {
+            console.error("[GhostOps activate-right] error:", err);
+            // Optionnel : afficher un message UI ici si nécessaire
+          });
+        });
+      })();
+    </script>
+
+    <!-- ✅ Auth guard centralisé (droits) -->
+    <!-- IMPORTANT: chemin cohérent avec diagnostic (/js/auth-guard.js) -->
+    <script src="/js/auth-guard.js"></script>
+
     <style>
       body::before {
         content: "";
@@ -230,15 +299,6 @@
         </nav>
       </div>
     </footer>
-
-    <!-- ✅ Auth : Supabase + config + guard -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/config.js"></script>
-    <script>
-      // Obligatoire pour auth-guard.js
-      window.GHOSTOPS_NIVEAU_PRODUIT = "studio";
-    </script>
-    <script src="/auth-guard.js"></script>
 
     <!-- ✅ Logique session Studio Scénarios -->
     <script>
@@ -483,7 +543,6 @@
             lastAssistantForContinue =
               typeof obj.lastAssistantForContinue === "string" ? obj.lastAssistantForContinue : "";
 
-            // On considère "restauré" même si le token est vide (ex: statut visible), mais on ne débloque pas pour autant.
             return Boolean(sessionToken || itersLeft !== null || expiresAt !== null);
           } catch (_) {
             return false;
@@ -577,7 +636,10 @@
             return;
           }
 
-          // Si pas de token et pas de cs_id : impossible d'initier
+          // ✅ Accès via droits : si pas de token et pas de cs_id, on peut quand même laisser vivre
+          // MAIS votre backend doit gérer Supabase JWT pour créer/valider une session.
+          // Ici : on accepte aussi l'init via sessionToken/cs_id (comme avant).
+          // Si rien : on bloque.
           if (!sessionToken && !csId) {
             const b = addMessageBubble("bot");
             b.textContent =
@@ -595,10 +657,19 @@
           waiting.textContent = "Lecture scénarios en cours…";
 
           try {
-            // Si token : on envoie history ; sinon : init via cs_id
             const payload = sessionToken
               ? { sessionToken, message: userText, history }
               : { cs_id: csId, message: userText };
+
+            // ✅ Enrichissement : joindre le JWT Supabase si dispo (pour backends qui valident via auth)
+            try {
+              const sb = window.ghostopsSupabase;
+              if (sb?.auth?.getSession) {
+                const { data: s } = await sb.auth.getSession();
+                const accessToken = s?.session?.access_token;
+                if (accessToken) payload.supabaseAccessToken = accessToken;
+              }
+            } catch (_) {}
 
             const { ok, status, data, timeout } = await callApi(payload);
 
@@ -642,6 +713,16 @@
               last_assistant: lastAssistantForContinue,
               history,
             };
+
+            // ✅ Joindre Supabase JWT si dispo
+            try {
+              const sb = window.ghostopsSupabase;
+              if (sb?.auth?.getSession) {
+                const { data: s } = await sb.auth.getSession();
+                const accessToken = s?.session?.access_token;
+                if (accessToken) payload.supabaseAccessToken = accessToken;
+              }
+            } catch (_) {}
 
             const { ok, status, data, timeout } = await callApi(payload);
 
@@ -714,7 +795,7 @@
           setDisabled(false);
         }
 
-        // Si restauré, on met le statut à jour (sans rejouer l’historique dans l’UI)
+        // Si restauré, on met le statut à jour
         if (restored) updateStatusUI();
         else updateStatusUI();
       })();
