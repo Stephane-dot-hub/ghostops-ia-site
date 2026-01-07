@@ -6,22 +6,89 @@
     <title>GhostOps — Connexion</title>
     <meta name="robots" content="noindex, nofollow" />
     <style>
-      body { font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; margin: 0; background: #0b0f19; color: #e6e8ee; }
-      .wrap { max-width: 520px; margin: 8vh auto; padding: 24px; }
-      .card { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.10); border-radius: 14px; padding: 22px; }
-      h1 { font-size: 20px; margin: 0 0 10px; }
-      p { margin: 0 0 16px; opacity: 0.9; line-height: 1.5; }
-      label { display: block; font-size: 13px; margin: 10px 0 6px; opacity: 0.9; }
-      input { width: 100%; padding: 12px 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.18); background: rgba(0,0,0,0.35); color: #fff; outline: none; }
-      button { width: 100%; margin-top: 12px; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.18); background: rgba(255,255,255,0.12); color: #fff; cursor: pointer; }
-      button:disabled { opacity: 0.5; cursor: not-allowed; }
-      .msg { margin-top: 12px; font-size: 13px; opacity: 0.95; }
-      .ok { color: #7CFFB2; }
-      .err { color: #FF7C7C; }
-      .muted { opacity: 0.8; font-size: 12px; margin-top: 10px; }
-      .link { color: #cdd6ff; cursor: pointer; text-decoration: underline; }
-      .row { display:flex; gap:10px; margin-top: 10px; }
-      .row button { width:auto; flex:1; }
+      body {
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial;
+        margin: 0;
+        background: #0b0f19;
+        color: #e6e8ee;
+      }
+      .wrap {
+        max-width: 520px;
+        margin: 8vh auto;
+        padding: 24px;
+      }
+      .card {
+        background: rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 14px;
+        padding: 22px;
+      }
+      h1 {
+        font-size: 20px;
+        margin: 0 0 10px;
+      }
+      p {
+        margin: 0 0 16px;
+        opacity: 0.9;
+        line-height: 1.5;
+      }
+      label {
+        display: block;
+        font-size: 13px;
+        margin: 10px 0 6px;
+        opacity: 0.9;
+      }
+      input {
+        width: 100%;
+        padding: 12px 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(0, 0, 0, 0.35);
+        color: #fff;
+        outline: none;
+      }
+      button {
+        width: 100%;
+        margin-top: 12px;
+        padding: 12px 14px;
+        border-radius: 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        background: rgba(255, 255, 255, 0.12);
+        color: #fff;
+        cursor: pointer;
+      }
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .msg {
+        margin-top: 12px;
+        font-size: 13px;
+        opacity: 0.95;
+      }
+      .ok {
+        color: #7cffb2;
+      }
+      .err {
+        color: #ff7c7c;
+      }
+      .muted {
+        opacity: 0.8;
+        font-size: 12px;
+        margin-top: 10px;
+      }
+      .smalllink {
+        margin-top: 10px;
+        font-size: 12px;
+        opacity: 0.85;
+      }
+      .smalllink a {
+        color: #cdd6ff;
+        text-decoration: underline;
+      }
+      .hidden {
+        display: none;
+      }
     </style>
   </head>
 
@@ -45,18 +112,13 @@
           <div id="msg" class="msg"></div>
         </form>
 
-        <div class="row">
-          <button id="btnForce" type="button" title="Ouvre la page en mode test sans redirection automatique">
-            Mode test (force)
-          </button>
-          <button id="btnLogout" type="button" title="Déconnexion Supabase + purge storage">
-            Se déconnecter
-          </button>
+        <!-- Lien discret : visible uniquement si déjà connecté -->
+        <div class="smalllink">
+          <a href="#" id="logoutLink" class="hidden">Se déconnecter</a>
         </div>
 
         <div class="muted">
-          En cas de non-réception : vérifiez les indésirables ou retentez après 30 secondes.<br/>
-          Astuce : <span class="link" id="copyNext">copier le next</span> pour vérifier la cible.
+          En cas de non-réception : vérifiez les indésirables ou retentez après 30 secondes.
         </div>
       </div>
     </div>
@@ -66,6 +128,7 @@
     <!-- 2) Votre config browser-only : doit créer window.ghostopsSupabase -->
     <script src="/config.js"></script>
 
+    <!-- 3) Logique login -->
     <script>
       (function () {
         const supabase = window.ghostopsSupabase;
@@ -74,10 +137,7 @@
         const emailEl = document.getElementById("email");
         const btn = document.getElementById("btn");
         const msg = document.getElementById("msg");
-
-        const btnLogout = document.getElementById("btnLogout");
-        const btnForce = document.getElementById("btnForce");
-        const copyNext = document.getElementById("copyNext");
+        const logoutLink = document.getElementById("logoutLink");
 
         function setMsg(text, type) {
           msg.textContent = text || "";
@@ -89,20 +149,17 @@
         }
 
         function sanitizeInternalPath(p, fallback) {
-          const fb = fallback || null;
+          const fb = fallback ?? null;
           const v = String(p || "").trim();
           if (!v) return fb;
-          if (v.startsWith("http://") || v.startsWith("https://")) return fb;
+          if (v.startsWith("http://") || v.startsWith("https://")) return fb; // sécurité
           if (!v.startsWith("/")) return "/" + v;
           return v;
         }
 
-        function getParams() {
+        function getNextFromUrl() {
           const u = new URL(window.location.href);
-          return {
-            next: sanitizeInternalPath(u.searchParams.get("next"), null),
-            force: u.searchParams.get("force") === "1",
-          };
+          return sanitizeInternalPath(u.searchParams.get("next"), null);
         }
 
         function getStoredNext() {
@@ -123,59 +180,41 @@
           return;
         }
 
-        // Bouton "mode test"
-        btnForce.addEventListener("click", () => {
-          const { next } = getParams();
-          const url = new URL(window.location.href);
-          url.searchParams.set("force", "1");
-          if (next) url.searchParams.set("next", next);
-          window.location.href = url.toString();
-        });
-
-        // Bouton logout + purge storage
-        btnLogout.addEventListener("click", async () => {
-          try { await supabase.auth.signOut(); } catch {}
-          try { localStorage.clear(); sessionStorage.clear(); } catch {}
-          setMsg("Déconnexion effectuée. Vous pouvez relancer la connexion proprement.", "ok");
-        });
-
-        // Copier le next
-        copyNext.addEventListener("click", async () => {
-          const { next } = getParams();
-          const val = next || getStoredNext() || "";
-          try {
-            await navigator.clipboard.writeText(val);
-            setMsg("Next copié : " + (val || "(vide)"), "ok");
-          } catch {
-            setMsg("Impossible de copier. Next : " + (val || "(vide)"), "err");
-          }
-        });
-
-        // ✅ Si on a un next dans l'URL, on le mémorise
-        const { next, force } = getParams();
+        // Mémorise le next si présent
+        const next = getNextFromUrl();
         if (next) setStoredNext(next);
 
-        // ✅ SI déjà connecté : on redirige vers next (pas vers /espace.html), sauf si force=1
+        // Si déjà connecté : redirige vers next (si fourni), sinon laisse la page + affiche “Se déconnecter”
         (async () => {
           try {
             const { data } = await supabase.auth.getSession();
             if (data?.session) {
               const target = next || getStoredNext();
-              if (!force && target) {
+              if (target) {
                 window.location.replace(target);
                 return;
               }
-              if (!force && !target) {
-                // Pas de cible, on reste sur la page connexion (comportement neutre)
-                setMsg("Vous êtes déjà connecté. Aucun next fourni : page laissée ouverte.", "ok");
-              } else if (force) {
-                setMsg("Mode test activé (force=1). Aucune redirection automatique.", "ok");
-              }
+              logoutLink.classList.remove("hidden");
+              setMsg("Vous êtes déjà connecté.", "ok");
             }
           } catch {
             // silence
           }
         })();
+
+        // Déconnexion (discrète)
+        logoutLink.addEventListener("click", async (e) => {
+          e.preventDefault();
+          try {
+            await supabase.auth.signOut();
+          } catch {}
+          try {
+            localStorage.clear();
+            sessionStorage.clear();
+          } catch {}
+          logoutLink.classList.add("hidden");
+          setMsg("Déconnexion effectuée. Vous pouvez vous reconnecter.", "ok");
+        });
 
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
@@ -191,15 +230,19 @@
           btn.textContent = "Envoi en cours…";
 
           try {
-            // ✅ On passe next dans l’emailRedirectTo pour que auth-callback le récupère
             const stored = getStoredNext();
             const finalNext = next || stored || "/index.html";
 
-            const redirectTo = `${window.location.origin}/auth-callback.html?next=${encodeURIComponent(finalNext)}`;
+            // On transmet next au callback, pour rediriger ensuite vers la bonne page
+            const redirectTo = `${window.location.origin}/auth-callback.html?next=${encodeURIComponent(
+              finalNext
+            )}`;
 
             const { error } = await supabase.auth.signInWithOtp({
               email,
-              options: { emailRedirectTo: redirectTo },
+              options: {
+                emailRedirectTo: redirectTo,
+              },
             });
 
             if (error) throw error;
