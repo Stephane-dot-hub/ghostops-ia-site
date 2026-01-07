@@ -1,11 +1,22 @@
 // /api/ghostops-pre-brief-board.js
-// Niveau 3 : Stripe cs_id -> token signé (TTL + itérations) -> décrément serveur.
+// Niveau 3 : Accès par Stripe cs_id OU par droits Supabase (Bearer) -> token signé (TTL + itérations) -> décrément serveur.
 // + Continue (suite) sans consommer d’itération
 // + Correctif robuste : si token invalide MAIS cs_id présent => on réinitialise depuis Stripe.
+// + Correctif robuste : si token invalide MAIS Bearer Supabase présent => on réinitialise depuis droits Supabase.
 // + Durcissement anti-504 : max_output_tokens plus bas + retry + timeouts + meta stable.
+// + Compatible avec auth-guard côté front (Authorization: Bearer <supabase access token>).
 
 const Stripe = require("stripe");
 const crypto = require("crypto");
+
+// Supabase (optionnel : si lib absente, on garde le flux Stripe)
+let createSupabaseClient = null;
+try {
+  // eslint-disable-next-line import/no-extraneous-dependencies
+  ({ createClient: createSupabaseClient } = require("@supabase/supabase-js"));
+} catch (_) {
+  createSupabaseClient = null;
+}
 
 // -------------------------
 // Utils lecture body
@@ -162,9 +173,13 @@ function verifyToken(token, secret) {
   const [payload, sig] = parts;
   const expected = b64urlEncode(hmacSha256(secret, payload));
 
-  const sigBuf = Buffer.from(sig);
-  const expBuf = Buffer.from(expected);
-  if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+  try {
+    const sigBuf = Buffer.from(sig);
+    const expBuf = Buffer.from(expected);
+    if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
+      return { ok: false, reason: "bad_signature" };
+    }
+  } catch {
     return { ok: false, reason: "bad_signature" };
   }
 
@@ -187,9 +202,7 @@ async function verifyStripeCheckoutSession({ stripe, csId, expectedPriceId }) {
 
   let session;
   try {
-    session = await stripe.checkout.sessions.retrieve(id, {
-      expand: ["line_items.data.price"],
-    });
+    session = await stripe.checkout.sessions.retrieve(id, { expand: ["line_items.data.price"] });
   } catch (e) {
     return { ok: false, reason: "stripe_retrieve_failed", message: e?.message || String(e) };
   }
@@ -229,6 +242,101 @@ async function verifyStripeCheckoutSession({ stripe, csId, expectedPriceId }) {
       customer_email: session.customer_details?.email || null,
     },
   };
+}
+
+// -------------------------
+// Supabase auth + droits (optionnel)
+// -------------------------
+async function resolveSupabaseUserAndRights({ bearer, productKey }) {
+  // Si supabase-js indisponible, on ne fait rien.
+  if (!createSupabaseClient) return { ok: false, reason: "supabase_js_missing" };
+
+  const supabaseUrl = cleanStr(process.env.SUPABASE_URL);
+  const serviceRole = cleanStr(process.env.SUPABASE_SERVICE_ROLE_KEY);
+
+  if (!supabaseUrl || !serviceRole) {
+    return { ok: false, reason: "supabase_env_missing" };
+  }
+
+  if (!bearer) return { ok: false, reason: "missing_bearer" };
+
+  const supabase = createSupabaseClient(supabaseUrl, serviceRole, {
+    auth: { persistSession: false, autoRefreshToken: false },
+  });
+
+  // 1) user via access token
+  let user = null;
+  try {
+    const { data, error } = await supabase.auth.getUser(bearer);
+    if (error || !data?.user) {
+      return { ok: false, reason: "supabase_getUser_failed", message: error?.message || "no_user" };
+    }
+    user = data.user;
+  } catch (e) {
+    return { ok: false, reason: "supabase_getUser_exception", message: e?.message || String(e) };
+  }
+
+  // 2) droits
+  const table = cleanStr(process.env.GHOSTOPS_RIGHTS_TABLE) || "droits";
+  const uid = user.id;
+
+  try {
+    // On récupère une ligne (ou plusieurs) et on interprète de manière tolérante.
+    const { data: rows, error } = await supabase
+      .from(table)
+      .select("*")
+      .eq("user_id", uid)
+      .limit(10);
+
+    if (error) {
+      return { ok: false, reason: "rights_query_failed", message: error.message, userId: uid };
+    }
+
+    const list = Array.isArray(rows) ? rows : [];
+    if (!list.length) return { ok: false, reason: "no_rights_row", userId: uid };
+
+    // Interprétation robuste : on accepte plusieurs schémas
+    // A) colonnes booléennes par produit (ex: pre_brief_board / prebrief / level3 / board)
+    // B) ligne "product" + "active" / "enabled"
+    // C) liste "rights" (array) ou "products" (array)
+    const key = String(productKey || "").toLowerCase();
+
+    const ok = list.some((r) => {
+      const row = r || {};
+
+      // Schéma B
+      const product = String(row.product || row.produit || row.sku || "").toLowerCase();
+      const active = row.active ?? row.enabled ?? row.is_active ?? row.isEnabled;
+      if (product && (product === key || product.includes(key)) && (active === true || active === 1 || active === "true")) {
+        return true;
+      }
+
+      // Schéma C
+      const rightsArr = Array.isArray(row.rights) ? row.rights : Array.isArray(row.products) ? row.products : null;
+      if (rightsArr && rightsArr.map(String).map((x) => x.toLowerCase()).includes(key)) return true;
+
+      // Schéma A (bool)
+      const boolCandidates = [
+        row.pre_brief_board,
+        row.prebrief_board,
+        row.prebrief,
+        row.pre_brief,
+        row.board,
+        row.level3,
+        row.niveau3,
+        row.prebrief_level3,
+      ];
+      if (boolCandidates.some((v) => v === true || v === 1 || v === "true")) return true;
+
+      return false;
+    });
+
+    if (!ok) return { ok: false, reason: "no_right_for_product", userId: uid };
+
+    return { ok: true, user, userId: uid };
+  } catch (e) {
+    return { ok: false, reason: "rights_exception", message: e?.message || String(e), userId: uid };
+  }
 }
 
 // -------------------------
@@ -317,13 +425,13 @@ module.exports = async function handler(req, res) {
 
   const expectedPriceId = cleanStr(process.env.GHOSTOPS_BOARD_STRIPE_PRICE_ID);
 
-  const stripe = new Stripe(stripeSecretKey);
+  const stripe = new Stripe(stripeSecretKey, { apiVersion: "2023-10-16" });
 
   // Paramètres session
   const MAX_ITERS = Number(process.env.GHOSTOPS_PREBRIEF_MAX_ITERS || "15") || 15;
   const TTL_SECONDS = Number(process.env.GHOSTOPS_PREBRIEF_SESSION_TTL_SECONDS || "14400") || 14400;
 
-  // Modèles : mettez le même que Niveau 2 si vous voulez (env)
+  // Modèles
   const modelInitial =
     cleanStr(process.env.GHOSTOPS_PREBRIEF_MODEL_INITIAL) ||
     cleanStr(process.env.GHOSTOPS_PREBRIEF_MODEL) ||
@@ -334,11 +442,11 @@ module.exports = async function handler(req, res) {
     cleanStr(process.env.GHOSTOPS_PREBRIEF_MODEL) ||
     "gpt-4.1-mini";
 
-  // ⚠️ Anti-504 : valeurs plus prudentes par défaut
+  // Anti-504
   const maxOutDefault = Number(process.env.GHOSTOPS_PREBRIEF_MAX_OUTPUT_TOKENS || "1100") || 1100;
   const maxOutContinue = Number(process.env.GHOSTOPS_PREBRIEF_MAX_OUTPUT_TOKENS_CONTINUE || "900") || 900;
 
-  // Timeout OpenAI : si Vercel maxDuration=60, vous pouvez monter à 55s
+  // Timeout OpenAI
   const OPENAI_TIMEOUT_MS = Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "55000") || 55000;
 
   // --- Lecture body robuste ---
@@ -363,7 +471,8 @@ module.exports = async function handler(req, res) {
   const isFollowupFromHistory = hasAssistantInHistory(history);
 
   const csId = cleanStr(body.cs_id || body.csId);
-  const incomingToken = cleanStr(body.sessionToken || body.token) || cleanStr(getBearerToken(req));
+  const bearer = cleanStr(getBearerToken(req));
+  const incomingToken = cleanStr(body.sessionToken || body.token) || ""; // token GhostOps (pas le bearer Supabase)
   const lastAssistant = clampText(cleanStr(body.last_assistant || body.lastAssistant), 8000);
 
   if (!effectiveMessage && !isContinue) {
@@ -389,10 +498,13 @@ module.exports = async function handler(req, res) {
   // -------------------------
   // 1) Vérifier / initialiser session
   // -------------------------
-  let sessionCtx = null; // { cs_id, itersLeft, exp }
+  // sessionCtx = { cs_id, itersLeft, exp, uid? }
+  let sessionCtx = null;
   let createdNewSession = false;
+  let authMode = "stripe"; // stripe | supabase
+  let uid = ""; // si supabase
 
-  // A) Si token fourni, tentative de vérif
+  // A) Si token GhostOps fourni, tentative de vérif
   if (incomingToken) {
     const v = verifyToken(incomingToken, tokenSecret);
 
@@ -425,7 +537,21 @@ module.exports = async function handler(req, res) {
         });
       }
 
-      sessionCtx = { cs_id: cleanStr(p.cs_id), itersLeft, exp };
+      // Optionnel : si token contient uid, on la conserve (et on peut contrôler si bearer présent)
+      uid = cleanStr(p.uid || "");
+      if (uid && bearer) {
+        const sb = await resolveSupabaseUserAndRights({ bearer, productKey: "pre-brief-board" });
+        if (sb.ok && sb.userId && sb.userId !== uid) {
+          return res.status(401).json({
+            ok: false,
+            error: "Session invalide (utilisateur différent). Veuillez relancer depuis votre compte.",
+            debug: { reason: "uid_mismatch" },
+          });
+        }
+      }
+
+      sessionCtx = { cs_id: cleanStr(p.cs_id), itersLeft, exp, uid: uid || undefined };
+      authMode = uid ? "supabase" : "stripe";
     } else {
       // ✅ token invalide + cs_id présent => ré-init Stripe
       if (csId) {
@@ -439,6 +565,21 @@ module.exports = async function handler(req, res) {
         }
         sessionCtx = { cs_id: check.session.id, itersLeft: MAX_ITERS, exp: now + TTL_SECONDS };
         createdNewSession = true;
+        authMode = "stripe";
+      } else if (bearer) {
+        // ✅ token invalide + bearer présent => ré-init via droits Supabase
+        const sb = await resolveSupabaseUserAndRights({ bearer, productKey: "pre-brief-board" });
+        if (!sb.ok) {
+          return res.status(401).json({
+            ok: false,
+            error: "Accès non autorisé. Veuillez vous connecter et vérifier vos droits, ou repasser par le lien de paiement.",
+            debug: sb,
+          });
+        }
+        uid = sb.userId;
+        sessionCtx = { cs_id: `sb_${uid}`, itersLeft: MAX_ITERS, exp: now + TTL_SECONDS, uid };
+        createdNewSession = true;
+        authMode = "supabase";
       } else {
         return res.status(401).json({
           ok: false,
@@ -449,26 +590,51 @@ module.exports = async function handler(req, res) {
     }
   }
 
-  // B) Pas de token (ou token non fourni) : init depuis cs_id
+  // B) Pas de token GhostOps : init depuis cs_id, sinon via droits Supabase (Bearer)
   if (!sessionCtx) {
-    if (!csId) {
+    if (csId) {
+      const check = await verifyStripeCheckoutSession({ stripe, csId, expectedPriceId });
+      if (!check.ok) {
+        return res.status(401).json({
+          ok: false,
+          error: "Paiement non vérifié. Veuillez utiliser le lien de fin de paiement (avec cs_id).",
+          debug: check,
+        });
+      }
+
+      sessionCtx = { cs_id: check.session.id, itersLeft: MAX_ITERS, exp: now + TTL_SECONDS };
+      createdNewSession = true;
+      authMode = "stripe";
+    } else if (bearer) {
+      const sb = await resolveSupabaseUserAndRights({ bearer, productKey: "pre-brief-board" });
+      if (!sb.ok) {
+        return res.status(401).json({
+          ok: false,
+          error: "Accès non autorisé. Veuillez vous connecter et vérifier vos droits, ou repasser par le lien de paiement.",
+          debug: sb,
+        });
+      }
+      uid = sb.userId;
+      sessionCtx = { cs_id: `sb_${uid}`, itersLeft: MAX_ITERS, exp: now + TTL_SECONDS, uid };
+      createdNewSession = true;
+      authMode = "supabase";
+    } else {
       return res.status(401).json({
         ok: false,
-        error: "Accès non autorisé. Cette session nécessite un identifiant de paiement (cs_id) ou un token.",
+        error: "Accès non autorisé. Cette session nécessite un identifiant de paiement (cs_id) ou une connexion (Bearer) avec droits.",
       });
     }
+  }
 
-    const check = await verifyStripeCheckoutSession({ stripe, csId, expectedPriceId });
-    if (!check.ok) {
-      return res.status(401).json({
-        ok: false,
-        error: "Paiement non vérifié. Veuillez utiliser le lien de fin de paiement (avec cs_id).",
-        debug: check,
-      });
-    }
-
-    sessionCtx = { cs_id: check.session.id, itersLeft: MAX_ITERS, exp: now + TTL_SECONDS };
-    createdNewSession = true;
+  // Garde-fou itérations
+  if (sessionCtx.itersLeft <= 0) {
+    return res.status(403).json({
+      ok: false,
+      error: "Limite atteinte : vos itérations ont été utilisées. Pour poursuivre, contactez GhostOps.",
+      itersLeft: 0,
+      expiresAt: sessionCtx.exp,
+      meta: { itersMax: MAX_ITERS, ttlSeconds: TTL_SECONDS, session: { authMode } },
+    });
   }
 
   // -------------------------
@@ -480,7 +646,7 @@ Tu es "GhostOps IA – Pré-brief Board" (Niveau 3). Objectif : préparer une no
 Règles :
 - Réponds en français, ton formel, professionnel, sobre.
 - Pas de conseil juridique formel, pas de stratégie contentieuse détaillée.
-- Aucune manœuvre illégale, représailles, contournement de règles ou incitation à nuire.
+- Aucune manœuvre illégale, représailles, contournement de règles, ni incitation à nuire.
 - Tu aides à structurer : faits, enjeux, risques, options de cadrage, questions à clarifier.
 
 Mise en forme obligatoire :
@@ -558,7 +724,7 @@ Instruction :
   const isFollowup = Boolean(incomingToken || isFollowupFromHistory);
   const userPrompt = isContinue ? userPromptContinue : isFollowup ? userPromptFollowup : userPromptInitial;
 
-  const model = (isContinue || isFollowup) ? modelFollowup : modelInitial;
+  const model = isContinue || isFollowup ? modelFollowup : modelInitial;
   const maxOut = isContinue ? maxOutContinue : maxOutDefault;
 
   // -------------------------
@@ -613,6 +779,7 @@ Instruction :
             timeoutMs: OPENAI_TIMEOUT_MS,
             serverNow: now,
             latencyMs: Date.now() - startedAtMs,
+            session: { authMode },
           },
         });
       }
@@ -637,6 +804,7 @@ Instruction :
           timeoutMs: OPENAI_TIMEOUT_MS,
           serverNow: now,
           latencyMs: Date.now() - startedAtMs,
+          session: { authMode },
         },
       });
     }
@@ -657,6 +825,7 @@ Instruction :
           timeoutMs: OPENAI_TIMEOUT_MS,
           serverNow: now,
           latencyMs: Date.now() - startedAtMs,
+          session: { authMode },
         },
       });
     }
@@ -669,11 +838,11 @@ Instruction :
       ? Math.max(0, Number(sessionCtx.itersLeft))
       : Math.max(0, Number(sessionCtx.itersLeft) - 1);
 
-    // Rotation token
-    const newToken = signToken(
-      { cs_id: sessionCtx.cs_id, itersLeft: newItersLeft, exp: sessionCtx.exp, v: 2 },
-      tokenSecret
-    );
+    // Rotation token (inclut uid si auth Supabase)
+    const payload = { cs_id: sessionCtx.cs_id, itersLeft: newItersLeft, exp: sessionCtx.exp, v: 3 };
+    if (sessionCtx.uid) payload.uid = sessionCtx.uid;
+
+    const newToken = signToken(payload, tokenSecret);
 
     return res.status(200).json({
       ok: true,
@@ -693,7 +862,7 @@ Instruction :
         productLock: Boolean(expectedPriceId),
         retried,
         fallbackMaxOut,
-        session: { createdNewSession, ttlSeconds: TTL_SECONDS, maxIters: MAX_ITERS },
+        session: { createdNewSession, ttlSeconds: TTL_SECONDS, maxIters: MAX_ITERS, authMode },
         serverNow: now,
         latencyMs: Date.now() - startedAtMs,
       },
