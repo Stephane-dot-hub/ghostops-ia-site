@@ -23,10 +23,7 @@
     <meta property="og:image" content="https://www.ghostops.tech/assets/ghostops-opengraph.jpg" />
 
     <!-- Fonts & Tailwind -->
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = { theme: { extend: { fontFamily: { sans: ["Inter", "sans-serif"] } } } };
@@ -46,88 +43,43 @@
         transition: opacity 0.4s ease;
       }
       @keyframes bgPulse {
-        0% {
-          filter: brightness(1) contrast(1);
-        }
-        100% {
-          filter: brightness(1.05) contrast(1.05);
-        }
+        0% { filter: brightness(1) contrast(1); }
+        100% { filter: brightness(1.05) contrast(1.05); }
       }
-      .text-shadow {
-        text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6);
-      }
-      html {
-        scroll-behavior: smooth;
-      }
-      header,
-      main,
-      section,
-      footer {
-        position: relative;
-        z-index: 1;
-      }
+      .text-shadow { text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.6); }
+      html { scroll-behavior: smooth; }
+      header, main, section, footer { position: relative; z-index: 1; }
 
       /* Bulles lisibles + aération */
-      .bot-bubble {
-        white-space: normal;
-        line-height: 1.6;
-      }
-      .bot-bubble p {
-        margin: 0.35rem 0;
-      }
-      .bot-bubble p + p {
-        margin-top: 0.45rem;
-      }
-      .bot-bubble ul {
-        list-style: disc;
-        padding-left: 1.25rem;
-        margin: 0.4rem 0 0.5rem 0;
-      }
-      .bot-bubble li {
-        margin: 0.18rem 0;
-      }
-      .bot-bubble strong {
-        font-weight: 700;
-      }
-      .bot-bubble .section-title {
-        display: block;
-        margin: 0.65rem 0 0.25rem 0;
-      }
+      .bot-bubble { white-space: normal; line-height: 1.6; }
+      .bot-bubble p { margin: 0.35rem 0; }
+      .bot-bubble p + p { margin-top: 0.45rem; }
+      .bot-bubble ul { list-style: disc; padding-left: 1.25rem; margin: 0.4rem 0 0.5rem 0; }
+      .bot-bubble li { margin: 0.18rem 0; }
+      .bot-bubble strong { font-weight: 700; }
+      .bot-bubble .section-title { display: block; margin: 0.65rem 0 0.25rem 0; }
 
-      .ghostops-btn {
-        border: 1px solid rgba(148, 163, 184, 0.35);
-      }
+      .ghostops-btn { border: 1px solid rgba(148, 163, 184, 0.35); }
       .ghostops-chip {
         border: 1px solid rgba(148, 163, 184, 0.25);
         background: rgba(15, 23, 42, 0.55);
         backdrop-filter: blur(6px);
       }
-      .ghostops-muted {
-        color: rgba(226, 232, 240, 0.75);
-      }
-      .disabled {
-        opacity: 0.55;
-        pointer-events: none;
-        filter: grayscale(0.15);
-      }
+      .ghostops-muted { color: rgba(226, 232, 240, 0.75); }
+      .disabled { opacity: 0.55; pointer-events: none; filter: grayscale(0.15); }
     </style>
   </head>
 
   <body class="bg-gray-900 text-white font-sans leading-relaxed">
     <!-- HEADER -->
     <header class="w-full px-6 md:px-16 py-4 flex items-center justify-between">
-      <a
-        href="/index.html"
-        class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase"
-      >
+      <a href="/index.html" class="text-sm font-semibold tracking-[.25em] text-gray-200 hover:text-white uppercase">
         GHOST<span class="text-gray-400">OPS</span>
       </a>
       <nav class="flex items-center gap-4 text-xs md:text-sm">
         <a href="/index.html" class="text-gray-300 hover:text-white">Accueil</a>
         <a href="/expertise.html" class="text-gray-300 hover:text-white">Expertise</a>
-        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white"
-          >Qui sommes-nous&nbsp;?</a
-        >
+        <a href="/qui-sommes-nous.html" class="text-gray-300 hover:text-white">Qui sommes-nous&nbsp;?</a>
         <a
           href="/contact.html"
           class="px-3 py-1 border border-gray-400 rounded-full hover:bg-gray-100 hover:text-black transition"
@@ -279,12 +231,20 @@
       </div>
     </footer>
 
+    <!-- ✅ Auth : Supabase + config + guard -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="/config.js"></script>
+    <script>
+      // Obligatoire pour auth-guard.js
+      window.GHOSTOPS_NIVEAU_PRODUIT = "studio";
+    </script>
+    <script src="/auth-guard.js"></script>
+
+    <!-- ✅ Logique session Studio Scénarios -->
     <script>
       (function () {
         const TRUNC_MARKER = "— FIN TRONQUÉE (demander la suite)";
         const API_PATH = "/api/ghostops-studio-scenarios";
-
-        // Timeout front (évite "bloqué" côté UI si backend tarde)
         const FRONT_TIMEOUT_MS = 35000;
 
         const params = new URLSearchParams(window.location.search);
@@ -292,7 +252,6 @@
         const paid = params.get("paid");
         const paidBanner = document.getElementById("ghostops-studio-paid-banner");
 
-        // Affiche le bandeau si payé=1 OU si cs_id présent (cas standard Stripe)
         if ((paid === "1" || csId) && paidBanner) paidBanner.classList.remove("hidden");
 
         const form = document.getElementById("ghostops-studio-form");
@@ -318,7 +277,7 @@
         let sessionToken = "";
         let itersLeft = null;
         let expiresAt = null; // unix seconds
-        let lastAssistantForContinue = ""; // sans marqueur
+        let lastAssistantForContinue = "";
         let history = []; // {role:"user"|"assistant", content:"..."}
 
         // -------------------------
@@ -360,6 +319,115 @@
           }
         }
 
+        function addMessageBubble(sender) {
+          const wrapper = document.createElement("div");
+          wrapper.className = sender === "user" ? "text-right" : "text-left";
+
+          const bubble = document.createElement("div");
+          bubble.className =
+            sender === "user"
+              ? "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg mb-1"
+              : "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg mb-1 bot-bubble";
+
+          wrapper.appendChild(bubble);
+          messages.appendChild(wrapper);
+          scrollToBottom();
+          return bubble;
+        }
+
+        function hideContinue() {
+          btnContinue.classList.add("hidden");
+          hintContinue.classList.add("hidden");
+        }
+
+        function showContinue() {
+          btnContinue.classList.remove("hidden");
+          hintContinue.classList.remove("hidden");
+        }
+
+        function escapeHtml(str) {
+          return String(str || "")
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+        }
+
+        function stripTruncMarker(text) {
+          const t = String(text || "");
+          if (!t.includes(TRUNC_MARKER)) return { cleaned: t, truncated: false };
+          return { cleaned: t.replace(TRUNC_MARKER, "").trim(), truncated: true };
+        }
+
+        // Convertit un texte "Markdown simple" en HTML aéré
+        function formatAiTextToHtml(raw) {
+          const text = String(raw || "").replace(/\r\n/g, "\n").trim();
+          if (!text) return "";
+
+          const lines = text.split("\n");
+          let html = "";
+          let inUl = false;
+
+          const closeUl = () => {
+            if (inUl) {
+              html += "</ul>";
+              inUl = false;
+            }
+          };
+
+          for (let i = 0; i < lines.length; i++) {
+            const line = lines[i];
+
+            if (!line.trim()) {
+              closeUl();
+              html += `<p class="mt-2"></p>`;
+              continue;
+            }
+
+            // Puce "- "
+            if (line.trim().startsWith("- ")) {
+              if (!inUl) {
+                html += "<ul>";
+                inUl = true;
+              }
+              let li = line.trim().slice(2);
+              li = escapeHtml(li);
+              li = li.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+              html += `<li>${li}</li>`;
+              continue;
+            }
+
+            // Titres en gras sur une ligne "**...**"
+            const m = line.trim().match(/^\*\*(.+?)\*\*$/);
+            if (m) {
+              closeUl();
+              const title = escapeHtml(m[1]);
+              html += `<p class="section-title"><strong>${title}</strong></p>`;
+              continue;
+            }
+
+            closeUl();
+            let p = escapeHtml(line).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
+            html += `<p>${p}</p>`;
+          }
+
+          closeUl();
+          html = html.replace(/(<p class="mt-2"><\/p>\s*){3,}/g, '<p class="mt-2"></p><p class="mt-2"></p>');
+          return html;
+        }
+
+        async function typewriterText(el, fullText, speedMs) {
+          el.textContent = "";
+          const txt = String(fullText || "");
+          for (let i = 0; i < txt.length; i++) {
+            el.textContent += txt[i];
+            if (i % 2 === 0) scrollToBottom();
+            await new Promise((r) => setTimeout(r, speedMs));
+          }
+          scrollToBottom();
+        }
+
         function updateStatusUI() {
           const hasSession = Boolean(sessionToken) || typeof itersLeft === "number" || typeof expiresAt === "number";
           if (!hasSession) {
@@ -374,20 +442,13 @@
           itersEl.textContent = typeof itersLeft === "number" ? String(itersLeft) : "—";
           expEl.textContent = expiresAt ? formatParisDateTime(expiresAt) : "—";
 
-          // Blocage si expiré / iters 0
           const expired = expiresAt && nowSec() > expiresAt;
           const depleted = typeof itersLeft === "number" && itersLeft <= 0;
 
           if (expired) {
             setDisabled(true);
-            const b = addMessageBubble("bot");
-            b.textContent =
-              "Session expirée. Veuillez relancer un paiement Studio Scénarios (Niveau 2) ou contacter GhostOps.";
           } else if (depleted) {
             setDisabled(true);
-            const b = addMessageBubble("bot");
-            b.textContent =
-              "Limite atteinte : vos itérations ont été utilisées. Pour poursuivre, contactez GhostOps.";
           } else {
             setDisabled(false);
           }
@@ -418,11 +479,12 @@
             itersLeft = typeof obj.itersLeft === "number" ? obj.itersLeft : null;
             expiresAt = typeof obj.expiresAt === "number" ? obj.expiresAt : null;
 
-            // On recharge l’historique si présent
             history = Array.isArray(obj.history) ? obj.history.slice(0, 50) : [];
-            lastAssistantForContinue = typeof obj.lastAssistantForContinue === "string" ? obj.lastAssistantForContinue : "";
+            lastAssistantForContinue =
+              typeof obj.lastAssistantForContinue === "string" ? obj.lastAssistantForContinue : "";
 
-            return Boolean(sessionToken);
+            // On considère "restauré" même si le token est vide (ex: statut visible), mais on ne débloque pas pour autant.
+            return Boolean(sessionToken || itersLeft !== null || expiresAt !== null);
           } catch (_) {
             return false;
           }
@@ -434,141 +496,27 @@
           } catch (_) {}
         }
 
-        function escapeHtml(str) {
-          return String(str || "")
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-        }
-
-        function stripTruncMarker(text) {
-          const t = String(text || "");
-          if (!t.includes(TRUNC_MARKER)) return { cleaned: t, truncated: false };
-          return { cleaned: t.replace(TRUNC_MARKER, "").trim(), truncated: true };
-        }
-
-        // Convertit un texte Markdown simple en HTML aéré
-        function formatAiTextToHtml(raw) {
-          const text = String(raw || "").replace(/\r\n/g, "\n").trim();
-          if (!text) return "";
-
-          const lines = text.split("\n");
-          let html = "";
-          let inUl = false;
-
-          const closeUl = () => {
-            if (inUl) {
-              html += "</ul>";
-              inUl = false;
-            }
-          };
-
-          for (let i = 0; i < lines.length; i++) {
-            const line = lines[i];
-
-            // Ligne vide => séparation visuelle (sans multiplier les gros espaces)
-            if (!line.trim()) {
-              closeUl();
-              html += `<p class="mt-2"></p>`;
-              continue;
-            }
-
-            // Puce "- "
-            if (line.trim().startsWith("- ")) {
-              if (!inUl) {
-                html += "<ul>";
-                inUl = true;
-              }
-              let li = line.trim().slice(2);
-              li = escapeHtml(li);
-              li = li.replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-              html += `<li>${li}</li>`;
-              continue;
-            }
-
-            // Titres en gras sur une ligne "**...**"
-            const m = line.trim().match(/^\*\*(.+?)\*\*$/);
-            if (m) {
-              closeUl();
-              const title = escapeHtml(m[1]);
-              html += `<p class="section-title"><strong>${title}</strong></p>`;
-              continue;
-            }
-
-            // Ligne normale
-            closeUl();
-            let p = escapeHtml(line).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>");
-            html += `<p>${p}</p>`;
-          }
-
-          closeUl();
-          html = html.replace(/(<p class="mt-2"><\/p>\s*){3,}/g, '<p class="mt-2"></p><p class="mt-2"></p>');
-          return html;
-        }
-
-        function addMessageBubble(sender) {
-          const wrapper = document.createElement("div");
-          wrapper.className = sender === "user" ? "text-right" : "text-left";
-
-          const bubble = document.createElement("div");
-          bubble.className =
-            sender === "user"
-              ? "inline-block bg-blue-500 text-white text-xs md:text-sm px-3 py-2 rounded-lg mb-1"
-              : "inline-block bg-gray-800 text-gray-100 text-xs md:text-sm px-3 py-2 rounded-lg mb-1 bot-bubble";
-
-          wrapper.appendChild(bubble);
-          messages.appendChild(wrapper);
-          scrollToBottom();
-          return bubble;
-        }
-
-        function hideContinue() {
-          btnContinue.classList.add("hidden");
-          hintContinue.classList.add("hidden");
-        }
-
-        function showContinue() {
-          btnContinue.classList.remove("hidden");
-          hintContinue.classList.remove("hidden");
-        }
-
-        async function typewriterText(el, fullText, speedMs) {
-          el.textContent = "";
-          const txt = String(fullText || "");
-          for (let i = 0; i < txt.length; i++) {
-            el.textContent += txt[i];
-            if (i % 2 === 0) scrollToBottom();
-            // throttle “machine à écrire”
-            await new Promise((r) => setTimeout(r, speedMs));
-          }
-          scrollToBottom();
+        function pushUserToHistory(userText) {
+          history.push({ role: "user", content: userText });
+          if (history.length > 40) history = history.slice(history.length - 40);
         }
 
         async function renderBotReply(replyRaw) {
           const raw = String(replyRaw || "");
           const { cleaned, truncated } = stripTruncMarker(raw);
 
-          // Contexte "continue"
           lastAssistantForContinue = cleaned;
 
-          // Effet machine à écrire sur le texte brut
           const bubble = addMessageBubble("bot");
           await typewriterText(bubble, cleaned, 8);
 
-          // Puis conversion en HTML aéré
           const html = formatAiTextToHtml(cleaned);
           if (html) bubble.innerHTML = html;
 
-          // Affiche le bouton suite si tronqué
           if (truncated) showContinue();
           else hideContinue();
 
-          // Historique
           history.push({ role: "assistant", content: cleaned });
-
-          // Persist
           saveSessionToStorage();
         }
 
@@ -603,18 +551,17 @@
             return { ok: resp.ok, status: resp.status, data };
           } catch (err) {
             if (err && err.name === "AbortError") {
-              return { ok: false, status: 0, data: { error: "Temps de réponse dépassé. Veuillez réessayer." }, timeout: true };
+              return {
+                ok: false,
+                status: 0,
+                data: { error: "Temps de réponse dépassé. Veuillez réessayer." },
+                timeout: true,
+              };
             }
             return { ok: false, status: 0, data: { error: "Erreur réseau. Veuillez réessayer." } };
           } finally {
             clearTimeout(t);
           }
-        }
-
-        function pushUserToHistory(userText) {
-          history.push({ role: "user", content: userText });
-          // garde l’historique à taille raisonnable
-          if (history.length > 40) history = history.slice(history.length - 40);
         }
 
         async function sendUserMessage() {
@@ -624,14 +571,13 @@
           const userText = (input.value || "").trim();
           if (!userText) return;
 
-          // Garde-fou longueur
           if (userText.length > 4000) {
             const b = addMessageBubble("bot");
             b.textContent = "Message trop long. Merci de condenser (max ~4000 caractères) ou de découper en 2 envois.";
             return;
           }
 
-          // Si pas de token et pas de cs_id => impossible d'initier la session (niveau indépendant)
+          // Si pas de token et pas de cs_id : impossible d'initier
           if (!sessionToken && !csId) {
             const b = addMessageBubble("bot");
             b.textContent =
@@ -639,32 +585,27 @@
             return;
           }
 
-          // UI + historique
           const userBubble = addMessageBubble("user");
           userBubble.textContent = userText;
           pushUserToHistory(userText);
 
           input.value = "";
 
-          // Attente
           const waiting = addMessageBubble("bot");
           waiting.textContent = "Lecture scénarios en cours…";
 
           try {
-            // 1er appel : cs_id + message (optionnellement history après 1er échange)
+            // Si token : on envoie history ; sinon : init via cs_id
             const payload = sessionToken
               ? { sessionToken, message: userText, history }
               : { cs_id: csId, message: userText };
 
             const { ok, status, data, timeout } = await callApi(payload);
 
-            // Retire "Lecture..."
             if (waiting && waiting.parentNode) waiting.parentNode.removeChild(waiting);
 
             if (!ok || !data || !data.reply) {
               const b = addMessageBubble("bot");
-
-              // Erreur 504 backend (souvent timeout OpenAI / Vercel)
               if (status === 504 || timeout) {
                 timeoutHint.classList.remove("hidden");
                 b.textContent =
@@ -672,15 +613,11 @@
                   "Temps de génération dépassé. Réessayez, ou découpez votre message (ex: contexte puis acteurs puis contraintes).";
                 return;
               }
-
               b.textContent = (data && data.error) || "Une erreur est survenue (Studio Scénarios). Veuillez réessayer.";
               return;
             }
 
-            // Met à jour session
             mergeSessionFromApi(data);
-
-            // Rend la réponse
             await renderBotReply(data.reply);
           } catch (err) {
             console.error("Erreur sendUserMessage :", err);
@@ -695,7 +632,6 @@
 
           if (!sessionToken || !lastAssistantForContinue) return;
 
-          // UI attente
           const waiting = addMessageBubble("bot");
           waiting.textContent = "Suite en cours…";
 
@@ -722,9 +658,7 @@
               return;
             }
 
-            // Rotation token / statut
             mergeSessionFromApi(data);
-
             await renderBotReply(data.reply);
           } catch (err) {
             console.error("Erreur continue :", err);
@@ -754,30 +688,35 @@
         });
 
         // -------------------------
-        // Init : restauration session (si page rechargée)
+        // Init : restauration session
         // -------------------------
+        hideContinue();
+
         const restored = loadSessionFromStorage();
-        if (restored) {
-          updateStatusUI();
+
+        // Nettoyage si expiré au chargement
+        if (expiresAt && nowSec() > expiresAt) {
+          clearSessionStorage();
+          sessionToken = "";
+          itersLeft = null;
+          expiresAt = null;
+          lastAssistantForContinue = "";
+          history = [];
         }
 
-        // Si pas de cs_id et pas de token restauré : avertissement
+        // Si pas de cs_id et pas de token : avertissement + blocage
         if (!csId && !sessionToken) {
           const b = addMessageBubble("bot");
           b.textContent =
             "Accès non initialisé : identifiant de paiement manquant (cs_id). Veuillez revenir depuis la page de confirmation de paiement.";
           setDisabled(true);
         } else {
-          // si cs_id présent mais pas de token, on laisse initier
           setDisabled(false);
         }
 
-        // Nettoyage si expiré au chargement
-        if (expiresAt && nowSec() > expiresAt) {
-          clearSessionStorage();
-        }
-
-        updateStatusUI();
+        // Si restauré, on met le statut à jour (sans rejouer l’historique dans l’UI)
+        if (restored) updateStatusUI();
+        else updateStatusUI();
       })();
     </script>
   </body>
