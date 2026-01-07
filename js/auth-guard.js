@@ -1,27 +1,36 @@
-/* GhostOps — Auth Guard centralisé (v2 : durci + anti-loop + diagnostics)
+/* GhostOps — Auth Guard centralisé (v3 : durci + anti-loop + mapping tolérant)
    Objectifs :
    - Décision claire (OK/KO) + signal à la page via event "ghostops:auth"
-   - Tolérer le cas où Supabase n'est pas encore prêt
-   - Gérer proprement “magic link ouvert dans un autre navigateur”
+   - Tolérer Supabase pas encore prêt (config.js chargé après)
+   - Gérer “magic link ouvert dans un autre navigateur” (session absente)
    - Éviter les boucles (connexion -> index -> connexion, etc.)
-   - Donner des raisons stables (reason codes) pour vos redirections/logs
+   - Raisons stables (reason codes) pour redirections/logs
 
    Dépendances :
-   - window.GHOSTOPS_NIVEAU_PRODUIT = "diagnostic" | "studio" | "pre-brief"
+   - window.GHOSTOPS_NIVEAU_PRODUIT = "diagnostic" | "studio" | "studio-scenarios" | "pre-brief" | "prebrief"
    - window.ghostopsSupabase créé par /config.js
+
+   Table droits (attendu) :
+   - droits: user_id, niveau_produit, statut, revoked_at
 */
 
 (async function ghostopsAuthGuard() {
-  const niveauProduit = window.GHOSTOPS_NIVEAU_PRODUIT; // "diagnostic" | "studio" | "pre-brief"
+  const RAW_NIVEAU = String(window.GHOSTOPS_NIVEAU_PRODUIT || "").trim();
+
   const DEBUG =
     String(new URLSearchParams(window.location.search).get("debug") || "") === "1" ||
     String(localStorage.getItem("ghostops_debug_auth") || "") === "1";
 
   const NOW = Date.now();
   const PATH = window.location.pathname || "";
+  const SEARCH = window.location.search || "";
 
   function log(...args) {
     if (DEBUG) console.log("[GhostOps AuthGuard]", ...args);
+  }
+
+  function warn(...args) {
+    console.warn("[GhostOps AuthGuard]", ...args);
   }
 
   function emit(ok, reason, extra) {
@@ -34,8 +43,24 @@
     } catch (_) {}
   }
 
-  // Anti-loop simple : si on redirige trop souvent en peu de temps, on stoppe.
-  // (évite les cas "connexion -> index -> connexion" quand une page est mal câblée)
+  // -----------------------------
+  // Normalisation niveau produit
+  // -----------------------------
+  function normalizeNiveau(v) {
+    const s = String(v || "").trim().toLowerCase();
+    if (s === "prebrief" || s === "pre_brief" || s === "pre-brief-board") return "pre-brief";
+    if (s === "studio_scenarios" || s === "studio-scenarios" || s === "studio scenarios") return "studio-scenarios";
+    if (s === "studio") return "studio-scenarios";
+    if (s === "diagnostic" || s === "diagnostic-ia") return "diagnostic";
+    if (s === "pre-brief") return "pre-brief";
+    return "";
+  }
+
+  const niveauProduit = normalizeNiveau(RAW_NIVEAU);
+
+  // -----------------------------
+  // Anti-loop : si redirections trop fréquentes, stop
+  // -----------------------------
   function bumpRedirectCounter(target) {
     try {
       const key = "ghostops_auth_redirects";
@@ -44,7 +69,7 @@
       const elapsed = NOW - (obj.t || 0);
 
       const next = {
-        c: elapsed < 15000 ? (Number(obj.c || 0) + 1) : 1, // reset si >15s
+        c: elapsed < 15000 ? Number(obj.c || 0) + 1 : 1,
         t: NOW,
         last: String(target || ""),
       };
@@ -59,26 +84,31 @@
   function allowRedirect(target) {
     const count = bumpRedirectCounter(target);
     if (count >= 4) {
-      // stop : trop de redirections
       emit(false, "redirect_loop_guard", { target, count });
-      log("Loop guard activé :", { target, count });
+      warn("Loop guard activé :", { target, count });
       return false;
     }
     return true;
   }
 
   function buildNext() {
-    return encodeURIComponent(window.location.pathname + window.location.search);
+    return encodeURIComponent(PATH + SEARCH);
   }
 
   function goConnexion(reason, extra) {
+    // Évite de re-rediriger si on est déjà sur la page de connexion
+    if (PATH.endsWith("/connexion.html")) {
+      emit(false, reason || "already_on_connexion", { ...(extra || {}), already: true });
+      log("Déjà sur /connexion.html — pas de redirection supplémentaire.");
+      return;
+    }
+
     const next = buildNext();
     const params = new URLSearchParams();
     params.set("next", next);
     if (reason) params.set("reason", reason);
     if (DEBUG) params.set("debug", "1");
     if (extra && typeof extra === "object") {
-      // petit diagnostic (sans données sensibles)
       if (extra.niveauProduit) params.set("np", String(extra.niveauProduit));
     }
 
@@ -88,9 +118,10 @@
   }
 
   function goProduit(reason) {
+    // Map “niveau_produit” => pages publiques
     const map = {
       diagnostic: "/diagnostic-ia.html",
-      studio: "/studio-scenarios.html",
+      "studio-scenarios": "/studio-scenarios.html",
       "pre-brief": "/pre-brief-board.html",
     };
 
@@ -104,21 +135,28 @@
     window.location.assign(url);
   }
 
+  // -----------------------------
   // 0) Pré-check niveau
+  // -----------------------------
   if (!niveauProduit) {
-    console.error("GhostOps Auth Guard — niveau_produit non défini (window.GHOSTOPS_NIVEAU_PRODUIT)");
-    emit(false, "missing_niveau_produit");
-    // Pas de redirection automatique : évite boucles si page mal configurée
+    console.error(
+      "GhostOps Auth Guard — niveau_produit non défini ou invalide (window.GHOSTOPS_NIVEAU_PRODUIT). Valeur reçue :",
+      RAW_NIVEAU
+    );
+    emit(false, "missing_niveau_produit", { raw: RAW_NIVEAU });
+    // Pas de redirection auto : évite boucles si page mal configurée
     return;
   }
 
-  // 1) Récupérer le client Supabase centralisé (créé dans config.js)
+  // -----------------------------
+  // 1) Récupérer Supabase (créé dans config.js)
+  // -----------------------------
   let supabase = window.ghostopsSupabase;
 
   // Attente courte : config.js peut arriver après
   if (!supabase || !supabase.auth) {
     const t0 = Date.now();
-    while ((!supabase || !supabase.auth) && Date.now() - t0 < 1500) {
+    while ((!supabase || !supabase.auth) && Date.now() - t0 < 2000) {
       await new Promise((r) => setTimeout(r, 50));
       supabase = window.ghostopsSupabase;
     }
@@ -126,21 +164,36 @@
 
   if (!supabase || !supabase.auth) {
     console.error("GhostOps Auth Guard — window.ghostopsSupabase introuvable (config.js non chargé ?)");
-    emit(false, "supabase_missing");
+    emit(false, "supabase_missing", { niveauProduit });
     goConnexion("supabase_missing", { niveauProduit });
     return;
   }
 
-  // 2) Session obligatoire (on essaie aussi refreshSession si dispo)
+  // -----------------------------
+  // 2) Session obligatoire
+  // -----------------------------
   let session = null;
 
   try {
-    // getSession suffit dans la plupart des cas
+    // getSession
     const { data: sessData, error: sessErr } = await supabase.auth.getSession();
     session = sessData?.session || null;
     if (sessErr) log("getSession error:", sessErr);
 
-    // Si pas de session, on tente un refresh silencieux (utile si tokens présents)
+    // fallback : getUser (parfois plus robuste selon configs)
+    if (!session?.user?.id && typeof supabase.auth.getUser === "function") {
+      try {
+        const { data: uData, error: uErr } = await supabase.auth.getUser();
+        if (uErr) log("getUser error:", uErr);
+        if (uData?.user?.id) {
+          session = session || { user: uData.user };
+        }
+      } catch (e) {
+        log("getUser exception:", e);
+      }
+    }
+
+    // refresh silencieux si dispo (utile si tokens présents mais session pas hydratée)
     if (!session?.user?.id && typeof supabase.auth.refreshSession === "function") {
       try {
         const { data: refData, error: refErr } = await supabase.auth.refreshSession();
@@ -151,46 +204,68 @@
       }
     }
   } catch (e) {
-    console.error("GhostOps Auth Guard — exception getSession/refreshSession:", e);
+    console.error("GhostOps Auth Guard — exception getSession/getUser/refreshSession:", e);
   }
 
   if (!session?.user?.id) {
-    // Magic link ouvert dans un autre navigateur / session absente / expirée
-    emit(false, "no_session");
+    emit(false, "no_session", { niveauProduit });
     goConnexion("no_session", { niveauProduit });
     return;
   }
 
   const userId = session.user.id;
 
+  // -----------------------------
   // 3) Vérification droits (table : droits)
   // Colonnes attendues : user_id, niveau_produit, statut, revoked_at
-  // NB : on sélectionne aussi "created_at" utile en debug
+  // -----------------------------
   let droit = null;
 
+  // Mapping tolérant : si table utilise "studio" au lieu de "studio-scenarios" (ou inverse)
+  const niveauCandidates =
+    niveauProduit === "studio-scenarios"
+      ? ["studio-scenarios", "studio"]
+      : niveauProduit === "pre-brief"
+        ? ["pre-brief", "prebrief", "pre_brief"]
+        : [niveauProduit];
+
   try {
-    const q = supabase
-      .from("droits")
-      .select("id, statut, niveau_produit, revoked_at, created_at")
-      .eq("user_id", userId)
-      .eq("niveau_produit", niveauProduit)
-      .eq("statut", "actif")
-      .is("revoked_at", null);
+    // On essaie plusieurs candidats (sans multi-query lourde)
+    let lastError = null;
 
-    const { data, error } = await q.maybeSingle();
+    for (const np of niveauCandidates) {
+      const q = supabase
+        .from("droits")
+        .select("id, statut, niveau_produit, revoked_at, created_at")
+        .eq("user_id", userId)
+        .eq("niveau_produit", np)
+        .eq("statut", "actif")
+        .is("revoked_at", null);
 
-    if (error) {
-      console.warn("GhostOps Auth Guard — erreur check droits:", error);
-      emit(false, "right_check_error", { error: String(error.message || error) });
-      // Erreur technique : on renvoie vers produit (plus logique que bloquer)
+      const { data, error } = await q.maybeSingle();
+
+      if (error) {
+        lastError = error;
+        // On ne continue pas si c’est une vraie erreur SQL/permission ; mais en pratique,
+        // Supabase renvoie une erreur dès la 1ère query si RLS/permissions KO.
+        warn("Erreur check droits (np=" + np + "):", error);
+        break;
+      }
+
+      if (data) {
+        droit = data;
+        break;
+      }
+    }
+
+    if (!droit && lastError) {
+      emit(false, "right_check_error", { error: String(lastError.message || lastError), niveauProduit });
       goProduit("right_check_error");
       return;
     }
-
-    droit = data || null;
   } catch (e) {
     console.error("GhostOps Auth Guard — exception check droits:", e);
-    emit(false, "right_check_exception", { error: String(e?.message || e) });
+    emit(false, "right_check_exception", { error: String(e?.message || e), niveauProduit });
     goProduit("right_check_error");
     return;
   }
@@ -201,7 +276,9 @@
     return;
   }
 
+  // -----------------------------
   // 4) OK
-  log("Accès autorisé:", { niveauProduit, userId, droitId: droit.id });
-  emit(true, "authorized", { userId, niveauProduit, droitId: droit.id });
+  // -----------------------------
+  log("Accès autorisé:", { niveauProduit, userId, droitId: droit.id, droitNp: droit.niveau_produit });
+  emit(true, "authorized", { userId, niveauProduit, droitId: droit.id, droitNp: droit.niveau_produit });
 })();
