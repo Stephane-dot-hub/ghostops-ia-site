@@ -1,10 +1,11 @@
-/* GhostOps — Auth Guard centralisé (v4 : anti-loop renforcé + chemins stables + whitelists)
+/* GhostOps — Auth Guard centralisé (v5 : FIX double-encodage next + anti-loop renforcé + whitelists)
    Objectifs :
    - Décision claire (OK/KO) + event "ghostops:auth"
    - Tolérer Supabase pas prêt (config.js chargé après)
    - Gérer “magic link ouvert dans un autre navigateur” (session absente)
    - Éviter les boucles (connexion <-> index / produit / session)
    - Raisons stables (reason codes)
+   - ✅ FIX MAJEUR : ne JAMAIS pré-encoder "next" (sinon /%2F... -> 404)
 
    Dépendances :
    - window.GHOSTOPS_NIVEAU_PRODUIT = "diagnostic" | "studio-scenarios" | "pre-brief"
@@ -25,7 +26,7 @@
   const PATH = window.location.pathname || "";
   const SEARCH = window.location.search || "";
 
-  // Pages “spéciales” : ne jamais y rediriger en boucle
+  // Pages “spéciales”
   const IS_CONNEXION = /\/connexion\.html$/i.test(PATH);
 
   // ---- Logs ----
@@ -63,9 +64,8 @@
 
   // -----------------------------
   // Anti-loop : bloque si redirections vers la même cible trop vite
-  // + évite d’enchaîner “connexion -> connexion” ou “produit -> produit”
   // -----------------------------
-  const LOOP_KEY = "ghostops_auth_loop_v2";
+  const LOOP_KEY = "ghostops_auth_loop_v3";
 
   function bumpRedirectCounter(target) {
     try {
@@ -77,7 +77,6 @@
       const sameWindow = elapsed < 15000;
 
       const next = {
-        // si même cible dans la fenêtre, on incrémente fort
         c: sameWindow ? (sameTarget ? Number(obj.c || 0) + 1 : 1) : 1,
         t: NOW,
         last: String(target || ""),
@@ -94,7 +93,6 @@
   function allowRedirect(target) {
     const count = bumpRedirectCounter(target);
     if (count >= 3) {
-      // plus strict : 3 redirs identiques en <15s => stop
       emit(false, "redirect_loop_guard", { target, count });
       warn("Loop guard activé :", { target, count });
       return false;
@@ -102,8 +100,10 @@
     return true;
   }
 
+  // ✅ FIX : ne PAS encoder ici.
+  // URLSearchParams encodera automatiquement lors du params.set("next", value)
   function buildNext() {
-    return encodeURIComponent(PATH + SEARCH);
+    return (PATH || "/") + (SEARCH || "");
   }
 
   // -----------------------------
@@ -119,7 +119,6 @@
   }
 
   function goConnexion(reason, extra) {
-    // Si déjà sur /connexion.html, NE PAS rediriger : c’est la cause n°1 des boucles.
     if (IS_CONNEXION) {
       emit(false, reason || "already_on_connexion", { ...(extra || {}), already: true });
       log("Déjà sur /connexion.html — pas de redirection supplémentaire.");
@@ -128,7 +127,7 @@
 
     const next = buildNext();
     const params = new URLSearchParams();
-    params.set("next", next);
+    params.set("next", next); // encodage géré par URLSearchParams
     if (reason) params.set("reason", reason);
     if (DEBUG) params.set("debug", "1");
     if (extra && typeof extra === "object") {
@@ -142,7 +141,6 @@
 
   function goProduit(reason) {
     const target = productPageFor(niveauProduit);
-    // Si on est déjà sur la page produit cible, ne pas rediriger (évite produit->produit)
     if (PATH === target) {
       emit(false, reason || "already_on_product", { niveauProduit, target, already: true });
       log("Déjà sur la page produit — pas de redirection supplémentaire.");
@@ -167,8 +165,7 @@
       RAW_NIVEAU
     );
     emit(false, "missing_niveau_produit", { raw: RAW_NIVEAU });
-    // Pas de redirection auto : évite boucles si page mal configurée
-    return;
+    return; // pas de redirection auto : évite boucles si page mal configurée
   }
 
   // -----------------------------
@@ -277,6 +274,7 @@
 
     if (!droit && lastError) {
       emit(false, "right_check_error", { error: String(lastError.message || lastError), niveauProduit });
+      // On renvoie sur la page produit : le produit peut afficher une explication.
       goProduit("right_check_error");
       return;
     }
