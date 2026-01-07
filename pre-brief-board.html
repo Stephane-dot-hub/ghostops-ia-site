@@ -132,10 +132,14 @@
         font-size: 0.8rem;
         letter-spacing: 0.02em;
         transition: all 0.2s ease;
+        user-select: none;
       }
       .ghostops-cta:hover {
         background: white;
         color: black;
+      }
+      .ghostops-cta:active {
+        transform: translateY(1px);
       }
 
       /* Petit bouton secondaire */
@@ -147,9 +151,13 @@
         font-weight: 700;
         font-size: 0.8rem;
         transition: all 0.2s ease;
+        user-select: none;
       }
       .ghostops-cta-ghost:hover {
         background: rgba(148, 163, 184, 0.12);
+      }
+      .ghostops-cta-ghost:active {
+        transform: translateY(1px);
       }
 
       /* Bloc “prix / périmètre” plus lisible */
@@ -157,6 +165,23 @@
         border: 1px solid rgba(148, 163, 184, 0.35);
         background: rgba(2, 6, 23, 0.55);
         backdrop-filter: blur(6px);
+      }
+
+      /* Orientation bubble : lisibilité */
+      .bot-bubble a {
+        text-decoration: underline;
+        text-decoration-style: dotted;
+      }
+      .bot-bubble code,
+      .bot-bubble pre {
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      /* Accessibilité : focus visibles */
+      :focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.7);
+        outline-offset: 2px;
       }
     </style>
   </head>
@@ -184,15 +209,15 @@
       <!-- HERO / INTRO -->
       <section class="max-w-5xl mx-auto mt-8 mb-10">
         <p class="text-xs uppercase tracking-[.25em] text-gray-400 mb-3">GhostOps IA – Niveau&nbsp;3 · Pré-brief Board</p>
-        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-shadow">GhostOps Pré-brief Board – Note de gouvernance board-ready</h1>
+        <h1 class="text-3xl md:text-4xl font-bold mb-4 text-shadow">
+          GhostOps Pré-brief Board – Note de gouvernance board-ready
+        </h1>
 
         <!-- Badge niveau + tarif -->
         <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full price-chip text-[11px] text-gray-200 mb-4">
           <span class="uppercase tracking-[.18em] text-gray-400">Niveau&nbsp;3</span>
           <span class="h-1 w-1 rounded-full bg-gray-500"></span>
-          <span
-            >Forfait de référence&nbsp;: <span class="font-semibold">2&nbsp;990&nbsp;€ TTC</span></span
-          >
+          <span>Forfait de référence&nbsp;: <span class="font-semibold">2&nbsp;990&nbsp;€ TTC</span></span>
         </div>
 
         <!-- CTA rapide au-dessus (conversion) -->
@@ -392,7 +417,9 @@
 
           <form id="ghostops-orientation-form" class="space-y-3">
             <div>
-              <label for="ghostops-orientation-message" class="block text-xs font-semibold text-gray-200 mb-1">Votre situation en quelques lignes</label>
+              <label for="ghostops-orientation-message" class="block text-xs font-semibold text-gray-200 mb-1"
+                >Votre situation en quelques lignes</label
+              >
               <textarea
                 id="ghostops-orientation-message"
                 class="w-full px-3 py-2 rounded-md bg-gray-900 border border-gray-700 text-sm text-gray-100 focus:outline-none focus:border-gray-400"
@@ -400,9 +427,7 @@
                 maxlength="1500"
                 placeholder="Exposez les éléments essentiels : contexte, acteurs clés, ce que vous cherchez à éviter, horizon de décision… (1 500 caractères max)."
               ></textarea>
-              <div class="mt-1 text-[11px] text-gray-400">
-                <span id="ghostops-orientation-count">0</span>/1500
-              </div>
+              <div class="mt-1 text-[11px] text-gray-400"><span id="ghostops-orientation-count">0</span>/1500</div>
             </div>
 
             <div class="flex flex-wrap items-center gap-3 pt-1">
@@ -418,7 +443,7 @@
 
           <div
             id="ghostops-orientation-answer"
-            class="mt-4 text-sm text-gray-100 bg-gray-900/70 border border-gray-700 rounded-lg p-4 whitespace-pre-line hidden"
+            class="bot-bubble mt-4 text-sm text-gray-100 bg-gray-900/70 border border-gray-700 rounded-lg p-4 whitespace-pre-line hidden"
           ></div>
 
           <div class="mt-5 flex flex-col sm:flex-row gap-3">
@@ -436,7 +461,9 @@
       <!-- ACCÈS & HONORAIRES + CTA -->
       <section class="max-w-5xl mx-auto mt-8">
         <div class="bg-gray-800/80 rounded-2xl p-6 md:p-8">
-          <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">Accès au GhostOps Pré-brief Board &amp; honoraire de référence</h2>
+          <h2 class="text-xl md:text-2xl font-semibold mb-3 text-white text-shadow">
+            Accès au GhostOps Pré-brief Board &amp; honoraire de référence
+          </h2>
           <p class="text-gray-300 text-sm md:text-base mb-3">Le Pré-brief Board peut être activé&nbsp;:</p>
           <ul class="list-disc list-inside text-gray-300 text-sm md:text-base mb-3 space-y-1">
             <li>
@@ -476,7 +503,9 @@
 
             <!-- Indication post-paiement -->
             <p class="text-gray-500 text-[11px] md:text-xs mt-2">
-              Après paiement, vous serez redirigé vers l’espace de session sécurisé (URL contenant un identifiant <span class="font-semibold">cs_id</span>).
+              Après paiement, vous serez redirigé vers l’espace de session sécurisé (URL contenant un identifiant <span class="font-semibold"
+                >cs_id</span
+              >).
             </p>
           </div>
         </div>
@@ -507,9 +536,12 @@
         const answerEl = document.getElementById("ghostops-orientation-answer");
         const countEl = document.getElementById("ghostops-orientation-count");
 
+        // Robustesse
+        if (!textarea || !statusEl || !answerEl || !countEl) return;
+
         function updateCount() {
           const v = (textarea.value || "").length;
-          if (countEl) countEl.textContent = String(v);
+          countEl.textContent = String(v);
         }
         textarea.addEventListener("input", updateCount);
         updateCount();
@@ -519,16 +551,15 @@
           if (!text) return "";
 
           const escaped = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
           const urlRegex = /(https?:\/\/[^\s]+)/g;
 
           return escaped.replace(urlRegex, function (url) {
             const cleanUrl = url.replace(/&amp;/g, "&");
-            return `<a href="${cleanUrl}" class="underline decoration-dotted" target="_blank" rel="noopener">${url}</a>`;
+            return `<a href="${cleanUrl}" class="underline decoration-dotted" target="_blank" rel="noopener noreferrer">${url}</a>`;
           });
         }
 
-        // Effet "machine à écrire"
+        // Effet "machine à écrire" : écrit du texte, puis hydratation en HTML linkifié
         function typeWriter(text, element, charDelay, onComplete) {
           let i = 0;
           element.textContent = "";
@@ -542,7 +573,6 @@
               onComplete();
             }
           }
-
           step();
         }
 
@@ -567,11 +597,16 @@
           answerEl.classList.add("hidden");
           answerEl.innerHTML = "";
 
+          const controller = new AbortController();
+          const timeout = setTimeout(() => controller.abort(), 30000);
+
           try {
             const response = await fetch("/api/ghostops-chat", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({ message, source: "pre-brief-board" }),
+              signal: controller.signal,
+              cache: "no-store",
             });
 
             const data = await response.json().catch(() => ({}));
@@ -586,17 +621,22 @@
             statusEl.textContent = "Orientation proposée ci-dessous.";
             statusEl.className = "mt-3 text-xs text-green-400";
 
-            const fullText = data.reply;
+            const fullText = String(data.reply || "");
             answerEl.classList.remove("hidden");
 
-            // Effet "machine à écrire" puis transformation en liens cliquables
+            // Typewriter sur texte, puis linkify propre
             typeWriter(fullText, answerEl, 10, function () {
               answerEl.innerHTML = ghostOpsLinkify(answerEl.textContent);
             });
           } catch (err) {
             console.error("Erreur lors de l’appel /api/ghostops-chat :", err);
-            statusEl.textContent = "Erreur de connexion au moteur GhostOps. Veuillez réessayer ultérieurement.";
+            statusEl.textContent =
+              err && err.name === "AbortError"
+                ? "Délai dépassé (timeout). Veuillez réessayer."
+                : "Erreur de connexion au moteur GhostOps. Veuillez réessayer ultérieurement.";
             statusEl.className = "mt-3 text-xs text-red-400";
+          } finally {
+            clearTimeout(timeout);
           }
         });
       })();
