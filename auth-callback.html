@@ -2,7 +2,7 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GhostOps — Validation de connexion</title>
     <meta name="robots" content="noindex, nofollow" />
     <style>
@@ -11,195 +11,112 @@
         margin: 0;
         background: #0b0f19;
         color: #e6e8ee;
-      }
-      .wrap {
-        min-height: 100vh;
         display: grid;
         place-items: center;
-        padding: 24px;
+        min-height: 100vh;
       }
       .card {
-        width: min(720px, 92vw);
+        width: min(560px, calc(100vw - 32px));
         background: rgba(255, 255, 255, 0.06);
         border: 1px solid rgba(255, 255, 255, 0.1);
         border-radius: 14px;
         padding: 22px;
-        text-align: center;
       }
-      h1 {
-        font-size: 18px;
-        margin: 0 0 10px;
-      }
-      p {
-        margin: 0;
-        opacity: 0.9;
-        line-height: 1.5;
-        font-size: 14px;
-      }
-      .msg {
-        margin-top: 14px;
-        font-size: 13px;
-      }
-      .ok {
-        color: #7cffb2;
-      }
-      .err {
-        color: #ff7c7c;
-      }
-      .muted {
-        opacity: 0.75;
-        margin-top: 10px;
-        font-size: 12px;
-      }
-      a {
-        color: #cdd6ff;
-      }
+      h1 { font-size: 18px; margin: 0 0 8px; }
+      p { margin: 0; opacity: 0.9; line-height: 1.5; font-size: 13px; }
+      .err { margin-top: 10px; color: #ff7c7c; }
+      .muted { margin-top: 10px; opacity: 0.75; font-size: 12px; }
+      a { color: #cdd6ff; text-decoration: underline; }
     </style>
-
-    <!-- 1) SDK Supabase (navigateur) + 2) config.js (doit créer window.ghostopsSupabase) -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="/config.js"></script>
   </head>
-
   <body>
-    <div class="wrap">
-      <div class="card">
-        <h1>Connexion en cours…</h1>
-        <p>Nous finalisons votre session sécurisée. Vous allez être redirigé automatiquement.</p>
-        <div id="msg" class="msg"></div>
-        <div class="muted">
-          Si la redirection ne se fait pas, <a href="/connexion.html">retournez à la page de connexion</a>.
-        </div>
-      </div>
+    <div class="card">
+      <h1>Validation de connexion…</h1>
+      <p>Veuillez patienter, vous allez être redirigé automatiquement.</p>
+      <p id="err" class="err" style="display:none;"></p>
+      <p class="muted">
+        Si rien ne se passe, <a href="/connexion.html">retourner à la page de connexion</a>.
+      </p>
     </div>
+
+    <!-- 1) SDK Supabase (navigateur) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- 2) Votre config -->
+    <script src="/config.js"></script>
 
     <script>
       (function () {
-        const msg = document.getElementById("msg");
-        function setMsg(text, cls) {
-          msg.textContent = text || "";
-          msg.className = "msg " + (cls || "");
+        const supabase = window.ghostopsSupabase;
+        const errEl = document.getElementById("err");
+
+        function showErr(msg) {
+          errEl.textContent = msg;
+          errEl.style.display = "block";
         }
 
-        function sleep(ms) {
-          return new Promise((r) => setTimeout(r, ms));
-        }
-
-        async function waitForSupabaseClient(timeoutMs = 6000) {
-          const start = Date.now();
-          while (Date.now() - start < timeoutMs) {
-            if (window.ghostopsSupabase?.auth) return window.ghostopsSupabase;
-            await sleep(50);
-          }
-          return null;
-        }
-
-        // ✅ Sécurité : n'autoriser que des chemins internes
         function sanitizeInternalPath(p, fallback) {
-          const fb = fallback || "/index.html";
-          const v = String(p || "").trim();
+          const fb = fallback ?? "/index.html";
+          let v = String(p || "").trim();
           if (!v) return fb;
+
+          // Refuser URLs absolues
           if (v.startsWith("http://") || v.startsWith("https://")) return fb;
-          if (!v.startsWith("/")) return "/" + v;
+
+          // Si "next" arrive encodé en dur (%2F...%3F...)
+          try {
+            if (v.includes("%2F") || v.includes("%3F") || v.includes("%3D")) {
+              v = decodeURIComponent(v);
+            }
+          } catch (_) {}
+
+          if (!v.startsWith("/")) v = "/" + v;
+          if (v.includes("..")) return fb;
+
           return v;
         }
 
-        function getQueryParam(name) {
+        function getNextFromUrl() {
           const u = new URL(window.location.href);
-          return u.searchParams.get(name);
+          const n = u.searchParams.get("next");
+          return sanitizeInternalPath(n, null);
         }
 
-        function getHashParams() {
-          const h = window.location.hash?.startsWith("#") ? window.location.hash.slice(1) : "";
-          return new URLSearchParams(h);
-        }
-
-        // ✅ Nettoyage URL (retire tokens + code)
-        function cleanUrlKeepNext(nextPath) {
-          const base = "/auth-callback.html";
-          if (nextPath) {
-            history.replaceState(null, "", `${base}?next=${encodeURIComponent(nextPath)}`);
-          } else {
-            history.replaceState(null, "", base);
-          }
-        }
-
-        (async () => {
+        function getStoredNext() {
           try {
-            const supabase = await waitForSupabaseClient();
-            if (!supabase) {
-              throw new Error("Client Supabase indisponible (config.js non chargé).");
-            }
-
-            // ✅ cible finale
-            const nextRaw = getQueryParam("next");
-            const next = sanitizeInternalPath(nextRaw, "/index.html");
-
-            // Supabase peut revenir :
-            // - soit en PKCE : ?code=...
-            // - soit en implicit : #access_token=...&refresh_token=...
-            const url = new URL(window.location.href);
-            const code = url.searchParams.get("code");
-
-            const hash = getHashParams();
-            const access_token = hash.get("access_token");
-            const refresh_token = hash.get("refresh_token");
-
-            // Gestion erreurs éventuelles dans le hash
-            const error = hash.get("error");
-            const error_description = hash.get("error_description");
-            if (error || error_description) {
-              throw new Error(decodeURIComponent(error_description || error));
-            }
-
-            if (code) {
-              // ✅ PKCE : échange du code contre une session
-              const { data, error: exErr } = await supabase.auth.exchangeCodeForSession(code);
-              if (exErr) throw exErr;
-
-              cleanUrlKeepNext(next);
-              setMsg("Connexion validée. Redirection…", "ok");
-
-              // petite latence anti-race condition
-              setTimeout(() => {
-                window.location.replace(next);
-              }, 250);
-
-              return;
-            }
-
-            if (access_token && refresh_token) {
-              // ✅ Implicit : setSession avec tokens
-              const { error: setErr } = await supabase.auth.setSession({
-                access_token,
-                refresh_token,
-              });
-              if (setErr) throw setErr;
-
-              cleanUrlKeepNext(next);
-              setMsg("Connexion validée. Redirection…", "ok");
-
-              setTimeout(() => {
-                window.location.replace(next);
-              }, 250);
-
-              return;
-            }
-
-            // ✅ Dernier filet : si déjà connecté (session existante) on redirige
-            const { data } = await supabase.auth.getSession();
-            if (data?.session) {
-              cleanUrlKeepNext(next);
-              setMsg("Session déjà active. Redirection…", "ok");
-              setTimeout(() => window.location.replace(next), 200);
-              return;
-            }
-
-            throw new Error("Lien invalide ou expiré. Veuillez relancer une connexion.");
-          } catch (e) {
-            setMsg("Erreur : " + (e?.message || "Impossible de finaliser la connexion."), "err");
+            return sanitizeInternalPath(localStorage.getItem("ghostops_return_to"), null);
+          } catch {
+            return null;
           }
-        })();
+        }
+
+        async function run() {
+          if (!supabase?.auth) {
+            showErr("Supabase non initialisé. Vérifiez /config.js et le chargement du SDK.");
+            setTimeout(() => (window.location.href = "/connexion.html?reason=supabase_missing"), 1200);
+            return;
+          }
+
+          // 1) Laisser Supabase traiter l'URL (code/token) et installer la session
+          // NB: getSession() suffit généralement avec detectSessionInUrl:true dans createClient()
+          try {
+            await supabase.auth.getSession();
+          } catch (e) {
+            // même si ça échoue, on tente une redirection vers connexion
+            showErr("Impossible de finaliser la session. Reconnexion requise.");
+            setTimeout(() => (window.location.href = "/connexion.html?reason=no_session"), 1200);
+            return;
+          }
+
+          // 2) Choisir la cible
+          const nextFromUrl = getNextFromUrl();
+          const nextStored = getStoredNext();
+          const target = nextFromUrl || nextStored || "/index.html";
+
+          // 3) Redirection finale
+          window.location.replace(target);
+        }
+
+        run();
       })();
     </script>
   </body>
