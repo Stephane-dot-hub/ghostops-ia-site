@@ -4,10 +4,10 @@
 (function () {
   // ✅ 1) Renseignez vos valeurs réelles (Supabase > Project Settings > API)
   // Exemple: https://xxxx.supabase.co
-  window.SUPABASE_URL = "https://VOTRE-PROJET.supabase.co";
+  window.SUPABASE_URL = "https://isrxjzaphaciwdaxbylt.supabase.co";
 
   // Exemple: eyJhbGciOi...
-  window.SUPABASE_ANON_KEY = "VOTRE_ANON_PUBLIC_KEY";
+  window.SUPABASE_ANON_KEY = "sb_publishable_tF5NE6f0LBgwIY9wkf7Mbg_608SvdPY";
 
   // ✅ 2) Garde-fou
   if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
