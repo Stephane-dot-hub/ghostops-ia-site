@@ -1,24 +1,10 @@
 // /api/ghostops-studio-scenarios.js
-// Réplique sécurisée du Niveau 1, indépendante : Stripe cs_id -> token signé (TTL + itérations) -> décrément serveur.
-// + Support "continue" (suite) : obtenir la suite d'une réponse tronquée SANS consommer d’itération.
-//
-// ✅ PATCH AJOUTÉ (UI itérations/TTL côté front) :
-// - Ajout champs de télémétrie “propres” et stables dans meta : itersMax, ttlSeconds, serverNow, latencyMs, timeoutMs
-// - Ajout headers no-store (évite tout cache Vercel/edge)
-// - Renvoi explicite de truncMarker (front peut l’utiliser tel quel si besoin)
-//
-// ✅ OPTIMISATIONS (stabilité + 15 itérations par défaut) :
-// - MAX_ITERS par défaut = 15 (modifiable via env)
-// - TTL par défaut = 4h (14400s) (modifiable via env)
-// - max_output_tokens par défaut = 1600 ; continue = 1400 (modifiable via env)
-// - Timeout OpenAI par défaut = 40s (modifiable via env)
-// - Retry automatique (2 tentatives) avec fallback max_output_tokens plus bas
-// - AbortController par tentative (pas de timer “global”)
-// - Logs utiles + réponses JSON meta détaillées
+// Niveau 2 — Stripe cs_id -> token signé (TTL + itérations) -> décrément serveur.
+// + Support "continue" : suite d'une réponse tronquée SANS consommer d’itération.
 //
 // Compatible front :
-// - 1er appel : { cs_id, message }   (ou { cs_id, description })
-// - appels suivants : { sessionToken, message, history }
+// - 1er appel : { cs_id, message } (ou { cs_id, description })
+// - suivants : { sessionToken, message, history }
 // - suite : { sessionToken, continue:true, last_assistant:"...", history }
 //
 // Le serveur renvoie : { reply, sessionToken, itersLeft, expiresAt, meta }
@@ -156,8 +142,9 @@ function b64urlEncode(bufOrStr) {
 }
 
 function b64urlDecodeToString(s) {
-  const pad = 4 - (s.length % 4 || 4);
-  const base64 = (s + "=".repeat(pad)).replace(/-/g, "+").replace(/_/g, "/");
+  const str = String(s || "");
+  const padLen = (4 - (str.length % 4)) % 4;
+  const base64 = (str + "=".repeat(padLen)).replace(/-/g, "+").replace(/_/g, "/");
   return Buffer.from(base64, "base64").toString("utf8");
 }
 
@@ -180,8 +167,9 @@ function verifyToken(token, secret) {
   const [payload, sig] = parts;
   const expected = b64urlEncode(hmacSha256(secret, payload));
 
-  const sigBuf = Buffer.from(sig);
-  const expBuf = Buffer.from(expected);
+  // Comparaison en temps constant sur la représentation ASCII des b64url
+  const sigBuf = Buffer.from(sig, "utf8");
+  const expBuf = Buffer.from(expected, "utf8");
   if (sigBuf.length !== expBuf.length || !crypto.timingSafeEqual(sigBuf, expBuf)) {
     return { ok: false, reason: "bad_signature" };
   }
@@ -298,7 +286,7 @@ async function callOpenAIWithTimeout({ apiKey, model, input, maxOut, timeoutMs }
 module.exports = async function handler(req, res) {
   const startedAtMs = Date.now();
 
-  // ✅ PATCH no-cache : évite toute mise en cache côté edge/proxy
+  // no-cache : évite toute mise en cache côté edge/proxy
   res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
@@ -330,11 +318,16 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const expectedPriceId = cleanStr(process.env.GHOSTOPS_STUDIO_STRIPE_PRICE_ID);
+  // IMPORTANT : on aligne sur le même Price ID que le create-checkout-session (fallback multi-env)
+  const expectedPriceId =
+    cleanStr(process.env.STRIPE_PRICE_ID_STUDIO_SCENARIOS) ||
+    cleanStr(process.env.GHOSTOPS_STUDIO_STRIPE_PRICE_ID) ||
+    cleanStr(process.env.STRIPE_PRICE_ID) ||
+    "";
 
   const stripe = new Stripe(stripeSecretKey);
 
-  // Paramètres session (✅ défauts Niveau 2)
+  // Paramètres session (défauts Niveau 2)
   const MAX_ITERS = Number(process.env.GHOSTOPS_STUDIO_MAX_ITERS || "15") || 15;
   const TTL_SECONDS = Number(process.env.GHOSTOPS_STUDIO_SESSION_TTL_SECONDS || "14400") || 14400; // 4h
 
@@ -349,14 +342,12 @@ module.exports = async function handler(req, res) {
     cleanStr(process.env.GHOSTOPS_STUDIO_MODEL) ||
     "gpt-4.1-mini";
 
-  // Longueur de réponse (✅ défauts Niveau 2)
+  // Longueur de réponse (défauts Niveau 2)
   const maxOutDefault = Number(process.env.GHOSTOPS_STUDIO_MAX_OUTPUT_TOKENS || "1600") || 1600;
   const maxOutContinue = Number(process.env.GHOSTOPS_STUDIO_MAX_OUTPUT_TOKENS_CONTINUE || "1400") || 1400;
 
-  // Timeout OpenAI (✅ défaut 40s)
+  // Timeout OpenAI (défaut 40s)
   const OPENAI_TIMEOUT_MS = Number(process.env.GHOSTOPS_OPENAI_TIMEOUT_MS || "40000") || 40000;
-
-  const contentType = req.headers["content-type"] || "";
 
   // --- Lecture body robuste ---
   let body = req.body && typeof req.body === "object" ? req.body : null;
@@ -389,16 +380,6 @@ module.exports = async function handler(req, res) {
 
   // Continue context
   const lastAssistant = clampText(cleanStr(body.last_assistant || body.lastAssistant), 8000);
-
-  console.log("[ghostops-studio-scenarios] content-type:", contentType);
-  console.log("[ghostops-studio-scenarios] keys:", Object.keys(body || {}));
-  console.log("[ghostops-studio-scenarios] rawLen:", raw ? raw.length : 0);
-  console.log("[ghostops-studio-scenarios] descLen:", effectiveDescription.length);
-  console.log("[ghostops-studio-scenarios] historyLen:", history.length);
-  console.log("[ghostops-studio-scenarios] hasToken:", Boolean(incomingToken));
-  console.log("[ghostops-studio-scenarios] hasCsId:", Boolean(csId));
-  console.log("[ghostops-studio-scenarios] continue:", isContinue);
-  console.log("[ghostops-studio-scenarios] lastAssistantLen:", lastAssistant.length);
 
   // Validations
   if (!effectiveDescription && !isContinue) {
@@ -465,7 +446,11 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const check = await verifyStripeCheckoutSession({ stripe, csId, expectedPriceId });
+    const check = await verifyStripeCheckoutSession({
+      stripe,
+      csId,
+      expectedPriceId: expectedPriceId || "",
+    });
 
     if (!check.ok) {
       return res.status(401).json({
@@ -575,7 +560,7 @@ Instruction :
 
   const userPrompt = isContinue ? userPromptContinue : isFollowup ? userPromptFollowup : userPromptInitial;
 
-  const model = (isContinue || isFollowup || isFollowupFromHistory) ? modelFollowup : modelInitial;
+  const model = isContinue || isFollowup || isFollowupFromHistory ? modelFollowup : modelInitial;
   const maxOut = isContinue ? maxOutContinue : maxOutDefault;
 
   // 3) Appel OpenAI (avec retry)
@@ -694,13 +679,13 @@ Instruction :
       itersLeft: newItersLeft,
       expiresAt: sessionCtx.exp,
       meta: {
-        truncMarker: TRUNC_MARKER, // ✅ PATCH utile front si besoin
+        truncMarker: TRUNC_MARKER,
         model,
         followup: Boolean(isContinue || isFollowup || isFollowupFromHistory),
         continue: Boolean(isContinue),
         historyUsed: history.length,
         max_output_tokens: maxOut,
-        timeoutMs: OPENAI_TIMEOUT_MS, // ✅ PATCH UI/debug
+        timeoutMs: OPENAI_TIMEOUT_MS,
         incomplete: Boolean(apiSaysIncomplete),
         productLock: Boolean(expectedPriceId),
         retried,
@@ -708,10 +693,10 @@ Instruction :
         session: {
           createdNewSession,
           ttlSeconds: TTL_SECONDS,
-          maxIters: MAX_ITERS, // ✅ PATCH UI (15 par défaut)
+          maxIters: MAX_ITERS,
         },
-        serverNow: now, // ✅ PATCH UI
-        latencyMs: Date.now() - startedAtMs, // ✅ PATCH UI/debug
+        serverNow: now,
+        latencyMs: Date.now() - startedAtMs,
       },
     });
   } catch (err) {
