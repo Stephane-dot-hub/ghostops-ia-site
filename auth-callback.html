@@ -39,15 +39,16 @@
       </p>
     </div>
 
-    <!-- 1) SDK Supabase (navigateur) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- 2) Votre config -->
     <script src="/config.js"></script>
 
     <script>
       (function () {
         const supabase = window.ghostopsSupabase;
         const errEl = document.getElementById("err");
+
+        const RETURN_KEY = "ghostops_return_to";
+        const RETURN_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
         function showErr(msg) {
           errEl.textContent = msg;
@@ -58,19 +59,52 @@
           const fb = fallback ?? "/index.html";
           let v = String(p || "").trim();
           if (!v) return fb;
-
-          // Refuser URLs absolues
           if (v.startsWith("http://") || v.startsWith("https://")) return fb;
-
-          // Si "next" arrive encodé (%2F...%3F...)
           try {
-            if (/%2F|%3F|%3D/i.test(v)) v = decodeURIComponent(v);
+            if (v.includes("%2F") || v.includes("%3F") || v.includes("%3D")) {
+              v = decodeURIComponent(v);
+            }
           } catch (_) {}
-
           if (!v.startsWith("/")) v = "/" + v;
           if (v.includes("..")) return fb;
-
           return v;
+        }
+
+        function setWithTTL(key, value, ttlMs) {
+          try {
+            const payload = { v: String(value || ""), exp: Date.now() + Number(ttlMs || 0) };
+            localStorage.setItem(key, JSON.stringify(payload));
+          } catch (_) {}
+        }
+
+        function getWithTTL(key) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return null;
+
+            if (raw[0] !== "{") {
+              const v = sanitizeInternalPath(raw, null);
+              if (v) setWithTTL(key, v, RETURN_TTL_MS);
+              return v;
+            }
+
+            const obj = JSON.parse(raw);
+            const exp = Number(obj?.exp || 0);
+            const v = sanitizeInternalPath(obj?.v, null);
+
+            if (!v) {
+              localStorage.removeItem(key);
+              return null;
+            }
+            if (!exp || Date.now() > exp) {
+              localStorage.removeItem(key);
+              return null;
+            }
+            return v;
+          } catch (_) {
+            try { localStorage.removeItem(key); } catch {}
+            return null;
+          }
         }
 
         function getNextFromUrl() {
@@ -80,82 +114,31 @@
         }
 
         function getStoredNext() {
-          try {
-            return sanitizeInternalPath(localStorage.getItem("ghostops_return_to"), null);
-          } catch {
-            return null;
-          }
-        }
-
-        function buildConnexionUrl(reason, next) {
-          const u = new URL("/connexion.html", window.location.origin);
-          if (reason) u.searchParams.set("reason", reason);
-          if (next) u.searchParams.set("next", next);
-          return u.toString();
-        }
-
-        function clearSensitiveUrlArtifacts() {
-          // Optionnel : nettoyer l’URL (hash ou params) après traitement
-          // Évite de laisser traîner des tokens dans l’historique.
-          try {
-            const u = new URL(window.location.href);
-            // on conserve uniquement "next" si présent
-            const keepNext = u.searchParams.get("next");
-            const clean = new URL(u.origin + u.pathname);
-            if (keepNext) clean.searchParams.set("next", keepNext);
-            window.history.replaceState({}, "", clean.toString());
-          } catch (_) {}
-        }
-
-        async function waitForSession(maxMs) {
-          const start = Date.now();
-          while (Date.now() - start < maxMs) {
-            try {
-              const { data } = await supabase.auth.getSession();
-              if (data?.session) return data.session;
-            } catch (_) {}
-            await new Promise((r) => setTimeout(r, 150));
-          }
-          return null;
+          return getWithTTL(RETURN_KEY);
         }
 
         async function run() {
           if (!supabase?.auth) {
             showErr("Supabase non initialisé. Vérifiez /config.js et le chargement du SDK.");
-            setTimeout(() => {
-              window.location.href = buildConnexionUrl("supabase_missing", "/index.html");
-            }, 900);
+            setTimeout(() => (window.location.href = "/connexion.html?reason=supabase_missing"), 1200);
             return;
           }
 
-          // 1) Déterminer la cible (avant toute redirection)
+          try {
+            await supabase.auth.getSession();
+          } catch (e) {
+            showErr("Impossible de finaliser la session. Reconnexion requise.");
+            setTimeout(() => (window.location.href = "/connexion.html?reason=no_session"), 1200);
+            return;
+          }
+
           const nextFromUrl = getNextFromUrl();
           const nextStored = getStoredNext();
           const target = nextFromUrl || nextStored || "/index.html";
 
-          // 2) Laisser Supabase traiter l'URL (code/token) et installer la session
-          // Selon la config, ça peut être sync/async côté SDK. On “attend” une session réelle.
-          try {
-            await supabase.auth.getSession();
-          } catch (_) {
-            // On ne conclut pas encore : on va quand même attendre une session quelques ms
-          }
+          // Optionnel : “rafraîchir” le retour en TTL si target est valide
+          if (target) setWithTTL(RETURN_KEY, target, RETURN_TTL_MS);
 
-          // 3) Attendre une session réelle (évite les faux positifs)
-          const session = await waitForSession(1500);
-
-          if (!session) {
-            showErr("Connexion non finalisée (session absente). Reconnexion requise.");
-            setTimeout(() => {
-              window.location.href = buildConnexionUrl("no_session", target);
-            }, 1100);
-            return;
-          }
-
-          // 4) Nettoyage optionnel
-          clearSensitiveUrlArtifacts();
-
-          // 5) Redirection finale
           window.location.replace(target);
         }
 
