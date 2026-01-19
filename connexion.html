@@ -68,15 +68,10 @@
         opacity: 0.98;
         line-height: 1.45;
       }
-      .ok {
-        color: #7cffb2;
-      }
-      .err {
-        color: #ff7c7c;
-      }
-      .warn {
-        color: #ffd36a;
-      }
+      .ok { color: #7cffb2; }
+      .err { color: #ff7c7c; }
+      .warn { color: #ffd36a; }
+
       .muted {
         opacity: 0.8;
         font-size: 12px;
@@ -95,9 +90,8 @@
         color: #cdd6ff;
         text-decoration: underline;
       }
-      .hidden {
-        display: none;
-      }
+      .hidden { display: none; }
+
       .pill {
         display: inline-flex;
         align-items: center;
@@ -127,7 +121,6 @@
         <h1>Connexion GhostOps</h1>
         <p>Saisissez votre e-mail. Vous recevrez un lien de connexion sécurisé.</p>
 
-        <!-- Alerte contextualisée (ex: no_session) -->
         <div id="contextPill" class="pill hidden">
           <span id="contextText"></span>
         </div>
@@ -147,13 +140,8 @@
         </form>
 
         <div class="smalllink">
-          <!-- Visible uniquement si déjà connecté -->
           <a href="#" id="logoutLink" class="hidden">Se déconnecter</a>
-
-          <!-- Lien de retour si next est défini -->
           <a href="#" id="backLink" class="hidden">Revenir à la page demandée</a>
-
-          <!-- Reset local (utile si tests) -->
           <a href="#" id="resetLink">Réinitialiser la connexion (local)</a>
         </div>
 
@@ -169,7 +157,6 @@
     <!-- 2) Votre config browser-only : doit créer window.ghostopsSupabase -->
     <script src="/config.js"></script>
 
-    <!-- 3) Logique login -->
     <script>
       (function () {
         const supabase = window.ghostopsSupabase;
@@ -180,196 +167,3 @@
         const msg = document.getElementById("msg");
         const logoutLink = document.getElementById("logoutLink");
         const backLink = document.getElementById("backLink");
-        const resetLink = document.getElementById("resetLink");
-        const contextPill = document.getElementById("contextPill");
-        const contextText = document.getElementById("contextText");
-
-        function setMsg(text, type) {
-          msg.textContent = text || "";
-          msg.className = "msg " + (type || "");
-        }
-
-        function normalizeEmail(v) {
-          return (v || "").trim().toLowerCase();
-        }
-
-        function sanitizeInternalPath(p, fallback) {
-          const fb = fallback ?? null;
-          const v = String(p || "").trim();
-          if (!v) return fb;
-          if (v.startsWith("http://") || v.startsWith("https://")) return fb; // sécurité
-          if (!v.startsWith("/")) return "/" + v;
-          return v;
-        }
-
-        function getNextFromUrl() {
-          const u = new URL(window.location.href);
-          return sanitizeInternalPath(u.searchParams.get("next"), null);
-        }
-
-        function getReasonFromUrl() {
-          const u = new URL(window.location.href);
-          return (u.searchParams.get("reason") || "").trim();
-        }
-
-        function getStoredNext() {
-          return sanitizeInternalPath(localStorage.getItem("ghostops_return_to"), null);
-        }
-
-        function setStoredNext(next) {
-          if (next) localStorage.setItem("ghostops_return_to", next);
-          else localStorage.removeItem("ghostops_return_to");
-        }
-
-        function updateBackLink(target) {
-          if (!target) {
-            backLink.classList.add("hidden");
-            backLink.href = "#";
-            return;
-          }
-          backLink.href = target;
-          backLink.classList.remove("hidden");
-        }
-
-        function showContext(reason, nextTarget) {
-          if (!reason) return;
-
-          let text = "";
-          let kind = "warn";
-
-          if (reason === "no_session") {
-            text =
-              "Vous avez probablement validé le lien dans un autre navigateur. Reconnectez-vous ici, puis revenez à la page demandée.";
-          } else if (reason === "supabase_missing") {
-            text = "Configuration technique incomplète : Supabase n’a pas pu être initialisé. Vérifiez /config.js.";
-            kind = "err";
-          } else if (reason === "expired") {
-            text = "Votre session a expiré. Veuillez vous reconnecter.";
-          } else {
-            text = "Veuillez vous reconnecter pour accéder à la page demandée.";
-          }
-
-          contextText.textContent = text;
-          contextPill.classList.remove("hidden");
-          contextPill.classList.remove("ok", "err", "warn");
-          contextPill.classList.add(kind);
-
-          if (nextTarget) updateBackLink(nextTarget);
-        }
-
-        // Sanity check : config.js + SDK chargés
-        if (!supabase?.auth) {
-          setMsg(
-            "Erreur : Supabase non initialisé. Vérifiez /config.js (version navigateur) et le chargement du SDK.",
-            "err"
-          );
-          showContext("supabase_missing", null);
-          return;
-        }
-
-        // Mémorise le next si présent
-        const nextFromUrl = getNextFromUrl();
-        if (nextFromUrl) setStoredNext(nextFromUrl);
-
-        const reason = getReasonFromUrl();
-        const storedNext = getStoredNext();
-        const finalNext = nextFromUrl || storedNext || "/index.html";
-
-        // Afficher une alerte utile si on arrive avec reason=no_session (ou autre)
-        showContext(reason, finalNext);
-
-        // Si déjà connecté : redirige vers next (si fourni), sinon affiche logout
-        (async () => {
-          try {
-            const { data } = await supabase.auth.getSession();
-            if (data?.session) {
-              // Si l'utilisateur est déjà connecté, on peut aller directement à la page demandée
-              if (finalNext) {
-                window.location.replace(finalNext);
-                return;
-              }
-              logoutLink.classList.remove("hidden");
-              setMsg("Vous êtes déjà connecté.", "ok");
-            }
-          } catch {
-            // silence
-          }
-        })();
-
-        // Déconnexion
-        logoutLink.addEventListener("click", async (e) => {
-          e.preventDefault();
-          try {
-            await supabase.auth.signOut();
-          } catch {}
-          try {
-            localStorage.removeItem("ghostops_return_to");
-          } catch {}
-          logoutLink.classList.add("hidden");
-          setMsg("Déconnexion effectuée. Vous pouvez vous reconnecter.", "ok");
-        });
-
-        // Reset local (utile en phase de test)
-        resetLink.addEventListener("click", async (e) => {
-          e.preventDefault();
-          try {
-            await supabase.auth.signOut();
-          } catch {}
-          try {
-            localStorage.removeItem("ghostops_return_to");
-            // on évite un clear() global qui pourrait effacer d'autres clés du site
-          } catch {}
-          setMsg("Réinitialisation locale effectuée. Vous pouvez relancer une connexion.", "ok");
-        });
-
-        // Back link
-        backLink.addEventListener("click", (e) => {
-          // simple navigation
-        });
-
-        form.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          setMsg("", "");
-
-          const email = normalizeEmail(emailEl.value);
-          if (!email) {
-            setMsg("Veuillez renseigner un e-mail valide.", "err");
-            return;
-          }
-
-          btn.disabled = true;
-          btn.textContent = "Envoi en cours…";
-
-          try {
-            // Important : on ancre le next dans le callback
-            const redirectTo = `${window.location.origin}/auth-callback.html?next=${encodeURIComponent(
-              finalNext
-            )}`;
-
-            const { error } = await supabase.auth.signInWithOtp({
-              email,
-              options: {
-                emailRedirectTo: redirectTo,
-              },
-            });
-
-            if (error) throw error;
-
-            setMsg(
-              "Lien envoyé. Ouvrez votre e-mail et cliquez sur “Se connecter”. (Idéalement dans le même navigateur que GhostOps.)",
-              "ok"
-            );
-
-            // On affiche le lien “revenir” dès maintenant
-            updateBackLink(finalNext);
-          } catch (err) {
-            setMsg(`Erreur : ${err?.message || "échec de l’envoi du lien."}`, "err");
-          } finally {
-            btn.disabled = false;
-            btn.textContent = "Recevoir le lien de connexion";
-          }
-        });
-      })();
-    </script>
-  </body>
-</html>
