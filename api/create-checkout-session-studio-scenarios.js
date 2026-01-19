@@ -4,7 +4,24 @@ const crypto = require("crypto");
 
 const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 const priceId = process.env.STRIPE_PRICE_ID_STUDIO_SCENARIOS || ""; // Stripe Price ID (Niveau 2)
-const publicOriginEnv = (process.env.PUBLIC_SITE_ORIGIN || "").trim(); // ex: https://www.ghostops.tech
+
+// IMPORTANT : doit être votre domaine prod (ex: https://www.ghostops.tech)
+// => à définir dans Vercel ENV (Production + Preview si vous testez en preview)
+const publicOriginEnv = (process.env.PUBLIC_SITE_ORIGIN || "").trim();
+
+function normalizeOrigin(origin) {
+  const v = String(origin || "").trim();
+  if (!v) return "";
+
+  // interdit les origins "vercel.app" pour éviter le piège "Log in to Vercel"
+  if (/vercel\.app$/i.test(v.replace(/^https?:\/\//i, "").split("/")[0])) return "";
+
+  // force https en prod si l'utilisateur a oublié le schéma
+  if (!/^https?:\/\//i.test(v)) return `https://${v}`;
+
+  // retire un trailing slash
+  return v.replace(/\/+$/, "");
+}
 
 module.exports = async function handler(req, res) {
   // Sécurité : uniquement POST
@@ -25,10 +42,12 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  // Origin fiable : NE PAS faire confiance à req.headers.origin (peut être usurpé)
-  const origin =
-    publicOriginEnv ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000");
+  // ✅ ORIGIN FIABLE
+  // - On utilise PUBLIC_SITE_ORIGIN (recommandé et obligatoire en prod)
+  // - On refuse explicitement les origins vercel.app
+  // - En fallback local uniquement : localhost
+  const normalizedPublicOrigin = normalizeOrigin(publicOriginEnv);
+  const origin = normalizedPublicOrigin || "http://localhost:3000";
 
   // Stripe client
   const stripe = new Stripe(stripeSecretKey);
@@ -40,7 +59,6 @@ module.exports = async function handler(req, res) {
     const expiresAt = now + expiresInSeconds;
 
     // Idempotency : évite la création de plusieurs sessions si double-clic / retry navigateur
-    // (le client envoie déjà un anti-double-clic, mais on sécurise serveur aussi)
     const idem =
       (req.headers["x-idempotency-key"] && String(req.headers["x-idempotency-key"]).slice(0, 128)) ||
       crypto.createHash("sha256").update(`${req.headers["user-agent"] || ""}|${now}`).digest("hex");
@@ -48,25 +66,21 @@ module.exports = async function handler(req, res) {
     const session = await stripe.checkout.sessions.create(
       {
         mode: "payment",
-
-        // Laisser Stripe décider des moyens selon votre config (recommandé).
-        // payment_method_types: ["card"],
-
         line_items: [{ price: priceId, quantity: 1 }],
 
-        // Après paiement OK → espace session (Stripe remplace {CHECKOUT_SESSION_ID})
+        // ✅ Après paiement OK → espace session (Stripe remplace {CHECKOUT_SESSION_ID})
         success_url: `${origin}/studio-scenarios-session.html?cs_id={CHECKOUT_SESSION_ID}`,
 
-        // Annulation → retour page paiement
+        // ✅ Annulation → retour page paiement
         cancel_url: `${origin}/paiement-studio-scenarios.html?canceled=1`,
 
-        // Expiration Checkout Session (réduit le "replay")
+        // Expiration Checkout Session
         expires_at: expiresAt,
 
         // Traces / filtre dans Stripe
         client_reference_id: "ghostops_studio_scenarios",
 
-        // Métadonnées utiles (Checkout + PaymentIntent)
+        // Métadonnées utiles
         metadata: {
           product: "ghostops_studio_scenarios",
           niveau: "studio",
@@ -84,8 +98,6 @@ module.exports = async function handler(req, res) {
     return res.status(200).json({ url: session.url });
   } catch (err) {
     console.error("Erreur Stripe create-checkout-session-studio-scenarios :", err);
-
-    // Éviter de trop exposer en prod ; garder details utiles côté logs
     return res.status(500).json({
       error: "Erreur lors de la création de la session de paiement Stripe (Studio Scénarios).",
     });
