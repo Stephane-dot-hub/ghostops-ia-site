@@ -33,29 +33,58 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="/config.js"></script>
 
-    <!-- ✅ Niveau produit (doit être défini AVANT activation + auth-guard) -->
+    <!-- ✅ Niveau produit (canonique) -->
     <script>
-      // IMPORTANT: on normalise côté auth-guard ("studio" => "studio-scenarios")
-      window.GHOSTOPS_NIVEAU_PRODUIT = "studio";
+      window.GHOSTOPS_NIVEAU_PRODUIT = "studio-scenarios";
     </script>
 
-    <!-- ✅ Activation du droit (Option B) : uniquement si cs_id présent, puis nettoyage URL -->
+    <!-- ✅ Orchestrateur : activation si cs_id, puis auth-guard -->
     <script>
       (function () {
         const params = new URLSearchParams(window.location.search);
         const csId = (params.get("cs_id") || "").trim();
-        const niveauProduit = window.GHOSTOPS_NIVEAU_PRODUIT; // "diagnostic" | "studio" | "pre-brief"
+        const niveauProduit = window.GHOSTOPS_NIVEAU_PRODUIT; // "studio-scenarios"
+        const DEBUG = params.get("debug") === "1";
 
-        if (!csId) return;
+        function log(...a) {
+          if (DEBUG) console.log("[GhostOps Studio Orchestrator]", ...a);
+        }
 
-        async function activateRight() {
-          const supabase = window.ghostopsSupabase;
-          if (!supabase?.auth) throw new Error("Supabase non prêt");
+        function loadAuthGuard() {
+          // Évite double chargement
+          if (window.__GHOSTOPS_AUTH_GUARD_LOADED) return;
+          window.__GHOSTOPS_AUTH_GUARD_LOADED = true;
 
-          const { data } = await supabase.auth.getSession();
-          const accessToken = data?.session?.access_token;
-          if (!accessToken) throw new Error("Session Supabase absente");
+          const s = document.createElement("script");
+          s.src = "/js/auth-guard.js";
+          s.defer = true;
+          document.head.appendChild(s);
+        }
 
+        async function waitSupabaseReady(timeoutMs) {
+          const t0 = Date.now();
+          while (Date.now() - t0 < timeoutMs) {
+            const sb = window.ghostopsSupabase;
+            if (sb && sb.auth && typeof sb.auth.getSession === "function") return sb;
+            await new Promise((r) => setTimeout(r, 60));
+          }
+          return null;
+        }
+
+        async function getAccessTokenWithRetry(sb, timeoutMs) {
+          const t0 = Date.now();
+          while (Date.now() - t0 < timeoutMs) {
+            try {
+              const { data } = await sb.auth.getSession();
+              const token = data?.session?.access_token || "";
+              if (token) return token;
+            } catch (_) {}
+            await new Promise((r) => setTimeout(r, 120));
+          }
+          return "";
+        }
+
+        async function activateRight(sb, accessToken) {
           const r = await fetch("/api/ghostops-activate-right", {
             method: "POST",
             headers: {
@@ -69,34 +98,72 @@
           if (!r.ok || !j.ok) {
             throw new Error(j.error || "Activation impossible");
           }
+          return true;
+        }
 
-          // Nettoyage URL : on retire cs_id
+        function cleanUrlAfterActivation() {
           const url = new URL(window.location.href);
           url.searchParams.delete("cs_id");
+          url.searchParams.set("paid", "1");
           url.searchParams.set("activated", "1");
           window.location.replace(url.toString());
         }
 
-        window.addEventListener("ghostops:auth", function (e) {
-          const detail = e?.detail || {};
-          if (detail.reason !== "activation_required") return;
+        async function run() {
+          // Cas standard : pas de cs_id => on charge l’auth-guard immédiatement
+          if (!csId) {
+            loadAuthGuard();
+            return;
+          }
 
-          // On tente l’activation une seule fois (anti boucle)
-          const onceKey = "ghostops_activation_once_" + niveauProduit + "_" + csId;
-          if (sessionStorage.getItem(onceKey) === "1") return;
+          // Cas paiement : cs_id présent => on tente d’activer le droit, puis on charge l’auth-guard
+          log("cs_id détecté, tentative activation…", csId);
+
+          const sb = await waitSupabaseReady(2500);
+          if (!sb) {
+            // Supabase pas prêt : on charge quand même l’auth-guard qui gérera "supabase_missing"
+            loadAuthGuard();
+            return;
+          }
+
+          // On a besoin d’une session (access token) pour activer côté API
+          const accessToken = await getAccessTokenWithRetry(sb, 2500);
+
+          if (!accessToken) {
+            // Pas de session => renvoyer vers connexion en conservant cs_id dans next
+            const next = window.location.pathname + window.location.search;
+            const q = new URLSearchParams();
+            q.set("next", next);
+            q.set("reason", "no_session");
+            window.location.assign("/connexion.html?" + q.toString());
+            return;
+          }
+
+          // Anti-boucle : une seule tentative d’activation par cs_id dans cette session navigateur
+          const onceKey = "ghostops_activate_once_" + niveauProduit + "_" + csId;
+          if (sessionStorage.getItem(onceKey) === "1") {
+            log("activation déjà tentée, on charge auth-guard");
+            loadAuthGuard();
+            return;
+          }
           sessionStorage.setItem(onceKey, "1");
 
-          activateRight().catch((err) => {
-            console.error("[GhostOps activate-right] error:", err);
-            // Optionnel : afficher un message UI ici si nécessaire
-          });
-        });
+          try {
+            await activateRight(sb, accessToken);
+            log("activation OK, nettoyage URL…");
+            cleanUrlAfterActivation();
+            return; // stop : reload
+          } catch (e) {
+            console.error("[GhostOps activate-right] error:", e);
+            // Si activation échoue : on charge auth-guard, qui redirigera vers produit (no_right) si besoin
+            loadAuthGuard();
+            return;
+          }
+        }
+
+        run();
       })();
     </script>
-
-    <!-- ✅ Auth guard centralisé (droits) -->
-    <!-- IMPORTANT: chemin cohérent avec diagnostic (/js/auth-guard.js) -->
-    <script src="/js/auth-guard.js"></script>
 
     <style>
       body::before {
@@ -308,11 +375,12 @@
         const FRONT_TIMEOUT_MS = 35000;
 
         const params = new URLSearchParams(window.location.search);
-        const csId = params.get("cs_id") || "";
+        const csId = (params.get("cs_id") || "").trim();
         const paid = params.get("paid");
+        const activated = params.get("activated");
         const paidBanner = document.getElementById("ghostops-studio-paid-banner");
 
-        if ((paid === "1" || csId) && paidBanner) paidBanner.classList.remove("hidden");
+        if ((paid === "1" || activated === "1" || csId) && paidBanner) paidBanner.classList.remove("hidden");
 
         const form = document.getElementById("ghostops-studio-form");
         const input = document.getElementById("ghostops-studio-input");
@@ -420,7 +488,6 @@
           return { cleaned: t.replace(TRUNC_MARKER, "").trim(), truncated: true };
         }
 
-        // Convertit un texte "Markdown simple" en HTML aéré
         function formatAiTextToHtml(raw) {
           const text = String(raw || "").replace(/\r\n/g, "\n").trim();
           if (!text) return "";
@@ -445,7 +512,6 @@
               continue;
             }
 
-            // Puce "- "
             if (line.trim().startsWith("- ")) {
               if (!inUl) {
                 html += "<ul>";
@@ -458,7 +524,6 @@
               continue;
             }
 
-            // Titres en gras sur une ligne "**...**"
             const m = line.trim().match(/^\*\*(.+?)\*\*$/);
             if (m) {
               closeUl();
@@ -505,13 +570,8 @@
           const expired = expiresAt && nowSec() > expiresAt;
           const depleted = typeof itersLeft === "number" && itersLeft <= 0;
 
-          if (expired) {
-            setDisabled(true);
-          } else if (depleted) {
-            setDisabled(true);
-          } else {
-            setDisabled(false);
-          }
+          if (expired || depleted) setDisabled(true);
+          else setDisabled(false);
         }
 
         function saveSessionToStorage() {
@@ -603,9 +663,7 @@
             });
 
             let data = {};
-            try {
-              data = await resp.json();
-            } catch (_) {}
+            try { data = await resp.json(); } catch (_) {}
 
             return { ok: resp.ok, status: resp.status, data };
           } catch (err) {
@@ -623,6 +681,17 @@
           }
         }
 
+        async function injectSupabaseToken(payload) {
+          try {
+            const sb = window.ghostopsSupabase;
+            if (sb?.auth?.getSession) {
+              const { data: s } = await sb.auth.getSession();
+              const accessToken = s?.session?.access_token;
+              if (accessToken) payload.supabaseAccessToken = accessToken;
+            }
+          } catch (_) {}
+        }
+
         async function sendUserMessage() {
           hideContinue();
           timeoutHint.classList.add("hidden");
@@ -633,17 +702,6 @@
           if (userText.length > 4000) {
             const b = addMessageBubble("bot");
             b.textContent = "Message trop long. Merci de condenser (max ~4000 caractères) ou de découper en 2 envois.";
-            return;
-          }
-
-          // ✅ Accès via droits : si pas de token et pas de cs_id, on peut quand même laisser vivre
-          // MAIS votre backend doit gérer Supabase JWT pour créer/valider une session.
-          // Ici : on accepte aussi l'init via sessionToken/cs_id (comme avant).
-          // Si rien : on bloque.
-          if (!sessionToken && !csId) {
-            const b = addMessageBubble("bot");
-            b.textContent =
-              "Accès non initialisé : identifiant de paiement manquant (cs_id). Veuillez revenir depuis la page de confirmation de paiement.";
             return;
           }
 
@@ -659,17 +717,12 @@
           try {
             const payload = sessionToken
               ? { sessionToken, message: userText, history }
-              : { cs_id: csId, message: userText };
+              : { message: userText, history };
 
-            // ✅ Enrichissement : joindre le JWT Supabase si dispo (pour backends qui valident via auth)
-            try {
-              const sb = window.ghostopsSupabase;
-              if (sb?.auth?.getSession) {
-                const { data: s } = await sb.auth.getSession();
-                const accessToken = s?.session?.access_token;
-                if (accessToken) payload.supabaseAccessToken = accessToken;
-              }
-            } catch (_) {}
+            await injectSupabaseToken(payload);
+
+            // Compat : si backend exige cs_id pour init, on le fournit si dispo
+            if (!sessionToken && csId) payload.cs_id = csId;
 
             const { ok, status, data, timeout } = await callApi(payload);
 
@@ -700,7 +753,6 @@
 
         async function requestContinue() {
           timeoutHint.classList.add("hidden");
-
           if (!sessionToken || !lastAssistantForContinue) return;
 
           const waiting = addMessageBubble("bot");
@@ -714,15 +766,7 @@
               history,
             };
 
-            // ✅ Joindre Supabase JWT si dispo
-            try {
-              const sb = window.ghostopsSupabase;
-              if (sb?.auth?.getSession) {
-                const { data: s } = await sb.auth.getSession();
-                const accessToken = s?.session?.access_token;
-                if (accessToken) payload.supabaseAccessToken = accessToken;
-              }
-            } catch (_) {}
+            await injectSupabaseToken(payload);
 
             const { ok, status, data, timeout } = await callApi(payload);
 
@@ -775,7 +819,6 @@
 
         const restored = loadSessionFromStorage();
 
-        // Nettoyage si expiré au chargement
         if (expiresAt && nowSec() > expiresAt) {
           clearSessionStorage();
           sessionToken = "";
@@ -785,17 +828,9 @@
           history = [];
         }
 
-        // Si pas de cs_id et pas de token : avertissement + blocage
-        if (!csId && !sessionToken) {
-          const b = addMessageBubble("bot");
-          b.textContent =
-            "Accès non initialisé : identifiant de paiement manquant (cs_id). Veuillez revenir depuis la page de confirmation de paiement.";
-          setDisabled(true);
-        } else {
-          setDisabled(false);
-        }
+        // Ne bloque plus sur l’absence de cs_id : modèle "droits" + auth-guard
+        setDisabled(false);
 
-        // Si restauré, on met le statut à jour
         if (restored) updateStatusUI();
         else updateStatusUI();
       })();
