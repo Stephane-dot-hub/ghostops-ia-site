@@ -178,7 +178,6 @@
 
         function normalizeEmail(v) {
           return (v || "").trim().toLowerCase();
-        knowing
         }
 
         function sanitizeInternalPath(p, fallback) {
@@ -226,12 +225,20 @@
           let kind = "warn";
 
           if (reason === "no_session") {
-            text = "Vous avez probablement validé le lien dans un autre navigateur. Reconnectez-vous ici, puis revenez à la page demandée.";
+            text =
+              "Vous avez probablement validé le lien dans un autre navigateur. Reconnectez-vous ici, puis revenez à la page demandée.";
           } else if (reason === "supabase_missing") {
-            text = "Configuration technique incomplète : Supabase n’a pas pu être initialisé. Vérifiez /config.js.";
+            text =
+              "Configuration technique incomplète : Supabase n’a pas pu être initialisé. Vérifiez /config.js.";
             kind = "err";
           } else if (reason === "expired") {
             text = "Votre session a expiré. Veuillez vous reconnecter.";
+          } else if (reason === "already_connected") {
+            text = "Session active détectée. Vous pouvez continuer sans vous reconnecter.";
+            kind = "ok";
+          } else if (reason === "signed_out") {
+            text = "Déconnexion effectuée. Vous pouvez vous reconnecter.";
+            kind = "ok";
           } else {
             text = "Veuillez vous reconnecter pour accéder à la page demandée.";
           }
@@ -244,18 +251,39 @@
           if (nextTarget) updateBackLink(nextTarget);
         }
 
-        // Sanity check : config.js + SDK chargés
-        if (!supabase?.auth) {
-          setMsg("Erreur : Supabase non initialisé. Vérifiez /config.js (version navigateur) et le chargement du SDK.", "err");
-          showContext("supabase_missing", null);
-          return;
+        function setAlreadyConnectedUI(target) {
+          // Message explicite + liens utiles
+          showContext("already_connected", target);
+          setMsg("Session active détectée. Redirection en cours…", "ok");
+          updateBackLink(target);
+          logoutLink.classList.remove("hidden");
+
+          // Désactive le formulaire pour éviter de “renvoyer un lien” inutilement
+          btn.disabled = true;
+          emailEl.disabled = true;
+
+          // Redirection contrôlée (visible)
+          let s = 3;
+          const tick = () => {
+            setMsg(`Session active détectée. Redirection dans ${s}s…`, "ok");
+            if (s <= 0) {
+              window.location.replace(target);
+              return;
+            }
+            s -= 1;
+            setTimeout(tick, 1000);
+          };
+          tick();
         }
 
-        // Optionnel : aide au diagnostic si config absente/invalide
-        // (Ne bloque pas, mais donne un indice en cas de “Failed to fetch”)
-        if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
-          // Si votre config.js ne pose pas ces globals, ignorez ce message.
-          // On ne bloque pas car window.ghostopsSupabase peut exister sans exposer les variables.
+        // Sanity check : config.js + SDK chargés
+        if (!supabase?.auth) {
+          setMsg(
+            "Erreur : Supabase non initialisé. Vérifiez /config.js (version navigateur) et le chargement du SDK.",
+            "err"
+          );
+          showContext("supabase_missing", null);
+          return;
         }
 
         // Mémorise le next si présent
@@ -268,12 +296,12 @@
 
         showContext(reason, finalNext);
 
-        // Si déjà connecté : redirige vers next
+        // ✅ Si déjà connecté : afficher un état clair, puis rediriger (plus de redirection silencieuse)
         (async () => {
           try {
             const { data } = await supabase.auth.getSession();
             if (data?.session) {
-              window.location.replace(finalNext);
+              setAlreadyConnectedUI(finalNext);
               return;
             }
           } catch {
@@ -284,17 +312,36 @@
         // Déconnexion
         logoutLink.addEventListener("click", async (e) => {
           e.preventDefault();
-          try { await supabase.auth.signOut(); } catch {}
-          try { localStorage.removeItem("ghostops_return_to"); } catch {}
+          try {
+            await supabase.auth.signOut();
+          } catch {}
+          try {
+            localStorage.removeItem("ghostops_return_to");
+          } catch {}
           logoutLink.classList.add("hidden");
+
+          // Réactive le formulaire
+          btn.disabled = false;
+          emailEl.disabled = false;
+
           setMsg("Déconnexion effectuée. Vous pouvez vous reconnecter.", "ok");
+          showContext("signed_out", finalNext);
         });
 
         // Reset local
         resetLink.addEventListener("click", async (e) => {
           e.preventDefault();
-          try { await supabase.auth.signOut(); } catch {}
-          try { localStorage.removeItem("ghostops_return_to"); } catch {}
+          try {
+            await supabase.auth.signOut();
+          } catch {}
+          try {
+            localStorage.removeItem("ghostops_return_to");
+          } catch {}
+
+          // Réactive le formulaire
+          btn.disabled = false;
+          emailEl.disabled = false;
+
           setMsg("Réinitialisation locale effectuée. Vous pouvez relancer une connexion.", "ok");
         });
 
@@ -312,7 +359,7 @@
           btn.textContent = "Envoi en cours…";
 
           try {
-            // ✅ Construction robuste du callback + next (pas d’encodeURIComponent manuel)
+            // ✅ Construction robuste du callback + next
             const cb = new URL("/auth-callback.html", window.location.origin);
             cb.searchParams.set("next", finalNext);
             const redirectTo = cb.toString();
@@ -331,7 +378,6 @@
 
             updateBackLink(finalNext);
           } catch (err) {
-            // Message enrichi : “Failed to fetch” = problème réseau / URL Supabase / blocage privacy
             const m = String(err?.message || "");
             if (/Failed to fetch/i.test(m)) {
               setMsg(
