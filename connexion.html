@@ -139,7 +139,7 @@
           <div id="msg" class="msg"></div>
         </form>
 
-        <div class="smalllink">
+        <div class="smalllink" id="linksRow">
           <a href="#" id="logoutLink" class="hidden">Se déconnecter</a>
           <a href="#" id="backLink" class="hidden">Revenir à la page demandée</a>
           <a href="#" id="resetLink">Réinitialiser la connexion (local)</a>
@@ -168,8 +168,12 @@
         const logoutLink = document.getElementById("logoutLink");
         const backLink = document.getElementById("backLink");
         const resetLink = document.getElementById("resetLink");
+        const linksRow = document.getElementById("linksRow");
         const contextPill = document.getElementById("contextPill");
         const contextText = document.getElementById("contextText");
+
+        const RETURN_KEY = "ghostops_return_to";
+        const RETURN_TTL_MS = 30 * 60 * 1000; // 30 minutes
 
         function setMsg(text, type) {
           msg.textContent = text || "";
@@ -186,8 +190,54 @@
           if (!v) return fb;
           if (v.startsWith("http://") || v.startsWith("https://")) return fb; // sécurité
           if (!v.startsWith("/")) return "/" + v;
+          if (v.includes("..")) return fb;
           return v;
         }
+
+        // -------- TTL helpers (compat rétroactive) --------
+        function setWithTTL(key, value, ttlMs) {
+          try {
+            const payload = { v: String(value || ""), exp: Date.now() + Number(ttlMs || 0) };
+            localStorage.setItem(key, JSON.stringify(payload));
+          } catch (_) {}
+        }
+
+        function getWithTTL(key) {
+          try {
+            const raw = localStorage.getItem(key);
+            if (!raw) return null;
+
+            // compat: si ancienne valeur simple "/page.html"
+            if (raw[0] !== "{") {
+              const v = sanitizeInternalPath(raw, null);
+              // On “migre” en TTL pour éviter stockage infini
+              if (v) setWithTTL(key, v, RETURN_TTL_MS);
+              return v;
+            }
+
+            const obj = JSON.parse(raw);
+            const exp = Number(obj?.exp || 0);
+            const v = sanitizeInternalPath(obj?.v, null);
+
+            if (!v) {
+              localStorage.removeItem(key);
+              return null;
+            }
+            if (!exp || Date.now() > exp) {
+              localStorage.removeItem(key);
+              return null;
+            }
+            return v;
+          } catch (_) {
+            try { localStorage.removeItem(key); } catch {}
+            return null;
+          }
+        }
+
+        function clearKey(key) {
+          try { localStorage.removeItem(key); } catch {}
+        }
+        // --------------------------------------------------
 
         function getNextFromUrl() {
           const u = new URL(window.location.href);
@@ -200,12 +250,12 @@
         }
 
         function getStoredNext() {
-          return sanitizeInternalPath(localStorage.getItem("ghostops_return_to"), null);
+          return getWithTTL(RETURN_KEY);
         }
 
         function setStoredNext(next) {
-          if (next) localStorage.setItem("ghostops_return_to", next);
-          else localStorage.removeItem("ghostops_return_to");
+          if (next) setWithTTL(RETURN_KEY, next, RETURN_TTL_MS);
+          else clearKey(RETURN_KEY);
         }
 
         function updateBackLink(target) {
@@ -252,17 +302,14 @@
         }
 
         function setAlreadyConnectedUI(target) {
-          // Message explicite + liens utiles
           showContext("already_connected", target);
           setMsg("Session active détectée. Redirection en cours…", "ok");
           updateBackLink(target);
           logoutLink.classList.remove("hidden");
 
-          // Désactive le formulaire pour éviter de “renvoyer un lien” inutilement
           btn.disabled = true;
           emailEl.disabled = true;
 
-          // Redirection contrôlée (visible)
           let s = 3;
           const tick = () => {
             setMsg(`Session active détectée. Redirection dans ${s}s…`, "ok");
@@ -276,7 +323,6 @@
           tick();
         }
 
-        // Sanity check : config.js + SDK chargés
         if (!supabase?.auth) {
           setMsg(
             "Erreur : Supabase non initialisé. Vérifiez /config.js (version navigateur) et le chargement du SDK.",
@@ -287,58 +333,47 @@
         }
 
         // --- PATCH UX : ouverture "volontaire" de /connexion.html ---
-        // Mémorise le next si présent
         const nextFromUrl = getNextFromUrl();
         if (nextFromUrl) setStoredNext(nextFromUrl);
 
         const reason = getReasonFromUrl();
         const storedNext = getStoredNext();
 
-        // ✅ Ouverture volontaire : pas de next et pas de reason
         const isDirectOpen = !nextFromUrl && !reason;
 
-        // ✅ Cible "retour" (pour le lien)
         const returnTarget = nextFromUrl || storedNext || "/index.html";
-
-        // ✅ Cible auto : uniquement si on a un contexte
         const autoTarget = isDirectOpen ? "/index.html" : returnTarget;
 
         showContext(reason, returnTarget);
         updateBackLink(returnTarget);
 
-        // ✅ Si déjà connecté : UX explicite, sans téléportation vers une page produit
         (async () => {
           try {
             const { data } = await supabase.auth.getSession();
             if (data?.session) {
-              // Toujours afficher "Se déconnecter" si session active
               logoutLink.classList.remove("hidden");
 
-              // Cas ouverture volontaire : pas d'auto-redirect, proposer options
               if (isDirectOpen) {
                 showContext("already_connected", returnTarget);
                 setMsg("Session active détectée. Vous pouvez continuer.", "ok");
 
-                // Désactive l'envoi de lien inutile
                 btn.disabled = true;
                 emailEl.disabled = true;
 
-                // Ajuste le libellé du lien "back"
                 updateBackLink(returnTarget);
                 backLink.textContent = "Revenir à la dernière page";
 
-                // Ajoute un lien "Aller à l’accueil" (sans modifier le HTML)
+                // Ajout lien "Aller à l’accueil" (sans modifier le HTML)
                 const home = document.createElement("a");
                 home.href = "/index.html";
                 home.textContent = "Aller à l’accueil";
                 home.style.color = "#cdd6ff";
                 home.style.textDecoration = "underline";
-                backLink.parentElement.appendChild(home);
+                linksRow.appendChild(home);
 
                 return;
               }
 
-              // Cas contextuel : redirection contrôlée vers autoTarget
               setAlreadyConnectedUI(autoTarget);
               return;
             }
@@ -347,18 +382,12 @@
           }
         })();
 
-        // Déconnexion
         logoutLink.addEventListener("click", async (e) => {
           e.preventDefault();
-          try {
-            await supabase.auth.signOut();
-          } catch {}
-          try {
-            localStorage.removeItem("ghostops_return_to");
-          } catch {}
-          logoutLink.classList.add("hidden");
+          try { await supabase.auth.signOut(); } catch {}
+          setStoredNext(null);
 
-          // Réactive le formulaire
+          logoutLink.classList.add("hidden");
           btn.disabled = false;
           emailEl.disabled = false;
 
@@ -366,17 +395,11 @@
           showContext("signed_out", "/index.html");
         });
 
-        // Reset local
         resetLink.addEventListener("click", async (e) => {
           e.preventDefault();
-          try {
-            await supabase.auth.signOut();
-          } catch {}
-          try {
-            localStorage.removeItem("ghostops_return_to");
-          } catch {}
+          try { await supabase.auth.signOut(); } catch {}
+          setStoredNext(null);
 
-          // Réactive le formulaire
           btn.disabled = false;
           emailEl.disabled = false;
 
@@ -397,7 +420,6 @@
           btn.textContent = "Envoi en cours…";
 
           try {
-            // ✅ Construction robuste du callback + next
             const cb = new URL("/auth-callback.html", window.location.origin);
             cb.searchParams.set("next", returnTarget);
             const redirectTo = cb.toString();
