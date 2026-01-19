@@ -167,3 +167,186 @@
         const msg = document.getElementById("msg");
         const logoutLink = document.getElementById("logoutLink");
         const backLink = document.getElementById("backLink");
+        const resetLink = document.getElementById("resetLink");
+        const contextPill = document.getElementById("contextPill");
+        const contextText = document.getElementById("contextText");
+
+        function setMsg(text, type) {
+          msg.textContent = text || "";
+          msg.className = "msg " + (type || "");
+        }
+
+        function normalizeEmail(v) {
+          return (v || "").trim().toLowerCase();
+        knowing
+        }
+
+        function sanitizeInternalPath(p, fallback) {
+          const fb = fallback ?? null;
+          const v = String(p || "").trim();
+          if (!v) return fb;
+          if (v.startsWith("http://") || v.startsWith("https://")) return fb; // sécurité
+          if (!v.startsWith("/")) return "/" + v;
+          return v;
+        }
+
+        function getNextFromUrl() {
+          const u = new URL(window.location.href);
+          return sanitizeInternalPath(u.searchParams.get("next"), null);
+        }
+
+        function getReasonFromUrl() {
+          const u = new URL(window.location.href);
+          return (u.searchParams.get("reason") || "").trim();
+        }
+
+        function getStoredNext() {
+          return sanitizeInternalPath(localStorage.getItem("ghostops_return_to"), null);
+        }
+
+        function setStoredNext(next) {
+          if (next) localStorage.setItem("ghostops_return_to", next);
+          else localStorage.removeItem("ghostops_return_to");
+        }
+
+        function updateBackLink(target) {
+          if (!target) {
+            backLink.classList.add("hidden");
+            backLink.href = "#";
+            return;
+          }
+          backLink.href = target;
+          backLink.classList.remove("hidden");
+        }
+
+        function showContext(reason, nextTarget) {
+          if (!reason) return;
+
+          let text = "";
+          let kind = "warn";
+
+          if (reason === "no_session") {
+            text = "Vous avez probablement validé le lien dans un autre navigateur. Reconnectez-vous ici, puis revenez à la page demandée.";
+          } else if (reason === "supabase_missing") {
+            text = "Configuration technique incomplète : Supabase n’a pas pu être initialisé. Vérifiez /config.js.";
+            kind = "err";
+          } else if (reason === "expired") {
+            text = "Votre session a expiré. Veuillez vous reconnecter.";
+          } else {
+            text = "Veuillez vous reconnecter pour accéder à la page demandée.";
+          }
+
+          contextText.textContent = text;
+          contextPill.classList.remove("hidden");
+          contextPill.classList.remove("ok", "err", "warn");
+          contextPill.classList.add(kind);
+
+          if (nextTarget) updateBackLink(nextTarget);
+        }
+
+        // Sanity check : config.js + SDK chargés
+        if (!supabase?.auth) {
+          setMsg("Erreur : Supabase non initialisé. Vérifiez /config.js (version navigateur) et le chargement du SDK.", "err");
+          showContext("supabase_missing", null);
+          return;
+        }
+
+        // Optionnel : aide au diagnostic si config absente/invalide
+        // (Ne bloque pas, mais donne un indice en cas de “Failed to fetch”)
+        if (!window.SUPABASE_URL || !window.SUPABASE_ANON_KEY) {
+          // Si votre config.js ne pose pas ces globals, ignorez ce message.
+          // On ne bloque pas car window.ghostopsSupabase peut exister sans exposer les variables.
+        }
+
+        // Mémorise le next si présent
+        const nextFromUrl = getNextFromUrl();
+        if (nextFromUrl) setStoredNext(nextFromUrl);
+
+        const reason = getReasonFromUrl();
+        const storedNext = getStoredNext();
+        const finalNext = nextFromUrl || storedNext || "/index.html";
+
+        showContext(reason, finalNext);
+
+        // Si déjà connecté : redirige vers next
+        (async () => {
+          try {
+            const { data } = await supabase.auth.getSession();
+            if (data?.session) {
+              window.location.replace(finalNext);
+              return;
+            }
+          } catch {
+            // silence
+          }
+        })();
+
+        // Déconnexion
+        logoutLink.addEventListener("click", async (e) => {
+          e.preventDefault();
+          try { await supabase.auth.signOut(); } catch {}
+          try { localStorage.removeItem("ghostops_return_to"); } catch {}
+          logoutLink.classList.add("hidden");
+          setMsg("Déconnexion effectuée. Vous pouvez vous reconnecter.", "ok");
+        });
+
+        // Reset local
+        resetLink.addEventListener("click", async (e) => {
+          e.preventDefault();
+          try { await supabase.auth.signOut(); } catch {}
+          try { localStorage.removeItem("ghostops_return_to"); } catch {}
+          setMsg("Réinitialisation locale effectuée. Vous pouvez relancer une connexion.", "ok");
+        });
+
+        form.addEventListener("submit", async (e) => {
+          e.preventDefault();
+          setMsg("", "");
+
+          const email = normalizeEmail(emailEl.value);
+          if (!email) {
+            setMsg("Veuillez renseigner un e-mail valide.", "err");
+            return;
+          }
+
+          btn.disabled = true;
+          btn.textContent = "Envoi en cours…";
+
+          try {
+            // ✅ Construction robuste du callback + next (pas d’encodeURIComponent manuel)
+            const cb = new URL("/auth-callback.html", window.location.origin);
+            cb.searchParams.set("next", finalNext);
+            const redirectTo = cb.toString();
+
+            const { error } = await supabase.auth.signInWithOtp({
+              email,
+              options: { emailRedirectTo: redirectTo },
+            });
+
+            if (error) throw error;
+
+            setMsg(
+              "Lien envoyé. Ouvrez votre e-mail et cliquez sur “Se connecter”. (Idéalement dans le même navigateur que GhostOps.)",
+              "ok"
+            );
+
+            updateBackLink(finalNext);
+          } catch (err) {
+            // Message enrichi : “Failed to fetch” = problème réseau / URL Supabase / blocage privacy
+            const m = String(err?.message || "");
+            if (/Failed to fetch/i.test(m)) {
+              setMsg(
+                "Erreur : échec réseau (“Failed to fetch”). Vérifiez que SUPABASE_URL/ANON_KEY sont corrects dans /config.js et testez hors navigation privée (InPrivate) / sans bloqueur.",
+                "err"
+              );
+            } else {
+              setMsg(`Erreur : ${err?.message || "échec de l’envoi du lien."}`, "err");
+            }
+          } finally {
+            btn.disabled = false;
+            btn.textContent = "Recevoir le lien de connexion";
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
