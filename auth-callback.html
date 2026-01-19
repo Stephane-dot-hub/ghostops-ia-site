@@ -62,11 +62,9 @@
           // Refuser URLs absolues
           if (v.startsWith("http://") || v.startsWith("https://")) return fb;
 
-          // Si "next" arrive encodé en dur (%2F...%3F...)
+          // Si "next" arrive encodé (%2F...%3F...)
           try {
-            if (v.includes("%2F") || v.includes("%3F") || v.includes("%3D")) {
-              v = decodeURIComponent(v);
-            }
+            if (/%2F|%3F|%3D/i.test(v)) v = decodeURIComponent(v);
           } catch (_) {}
 
           if (!v.startsWith("/")) v = "/" + v;
@@ -89,30 +87,75 @@
           }
         }
 
+        function buildConnexionUrl(reason, next) {
+          const u = new URL("/connexion.html", window.location.origin);
+          if (reason) u.searchParams.set("reason", reason);
+          if (next) u.searchParams.set("next", next);
+          return u.toString();
+        }
+
+        function clearSensitiveUrlArtifacts() {
+          // Optionnel : nettoyer l’URL (hash ou params) après traitement
+          // Évite de laisser traîner des tokens dans l’historique.
+          try {
+            const u = new URL(window.location.href);
+            // on conserve uniquement "next" si présent
+            const keepNext = u.searchParams.get("next");
+            const clean = new URL(u.origin + u.pathname);
+            if (keepNext) clean.searchParams.set("next", keepNext);
+            window.history.replaceState({}, "", clean.toString());
+          } catch (_) {}
+        }
+
+        async function waitForSession(maxMs) {
+          const start = Date.now();
+          while (Date.now() - start < maxMs) {
+            try {
+              const { data } = await supabase.auth.getSession();
+              if (data?.session) return data.session;
+            } catch (_) {}
+            await new Promise((r) => setTimeout(r, 150));
+          }
+          return null;
+        }
+
         async function run() {
           if (!supabase?.auth) {
             showErr("Supabase non initialisé. Vérifiez /config.js et le chargement du SDK.");
-            setTimeout(() => (window.location.href = "/connexion.html?reason=supabase_missing"), 1200);
+            setTimeout(() => {
+              window.location.href = buildConnexionUrl("supabase_missing", "/index.html");
+            }, 900);
             return;
           }
 
-          // 1) Laisser Supabase traiter l'URL (code/token) et installer la session
-          // NB: getSession() suffit généralement avec detectSessionInUrl:true dans createClient()
-          try {
-            await supabase.auth.getSession();
-          } catch (e) {
-            // même si ça échoue, on tente une redirection vers connexion
-            showErr("Impossible de finaliser la session. Reconnexion requise.");
-            setTimeout(() => (window.location.href = "/connexion.html?reason=no_session"), 1200);
-            return;
-          }
-
-          // 2) Choisir la cible
+          // 1) Déterminer la cible (avant toute redirection)
           const nextFromUrl = getNextFromUrl();
           const nextStored = getStoredNext();
           const target = nextFromUrl || nextStored || "/index.html";
 
-          // 3) Redirection finale
+          // 2) Laisser Supabase traiter l'URL (code/token) et installer la session
+          // Selon la config, ça peut être sync/async côté SDK. On “attend” une session réelle.
+          try {
+            await supabase.auth.getSession();
+          } catch (_) {
+            // On ne conclut pas encore : on va quand même attendre une session quelques ms
+          }
+
+          // 3) Attendre une session réelle (évite les faux positifs)
+          const session = await waitForSession(1500);
+
+          if (!session) {
+            showErr("Connexion non finalisée (session absente). Reconnexion requise.");
+            setTimeout(() => {
+              window.location.href = buildConnexionUrl("no_session", target);
+            }, 1100);
+            return;
+          }
+
+          // 4) Nettoyage optionnel
+          clearSensitiveUrlArtifacts();
+
+          // 5) Redirection finale
           window.location.replace(target);
         }
 
