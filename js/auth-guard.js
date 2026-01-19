@@ -1,18 +1,12 @@
-/* GhostOps — Auth Guard centralisé (v5 : FIX double-encodage next + anti-loop renforcé + whitelists)
+/* GhostOps — Auth Guard centralisé (v6 : hardening pages système + next safe + anti-loop + whitelists)
    Objectifs :
    - Décision claire (OK/KO) + event "ghostops:auth"
    - Tolérer Supabase pas prêt (config.js chargé après)
    - Gérer “magic link ouvert dans un autre navigateur” (session absente)
    - Éviter les boucles (connexion <-> index / produit / session)
    - Raisons stables (reason codes)
-   - ✅ FIX MAJEUR : ne JAMAIS pré-encoder "next" (sinon /%2F... -> 404)
-
-   Dépendances :
-   - window.GHOSTOPS_NIVEAU_PRODUIT = "diagnostic" | "studio-scenarios" | "pre-brief"
-   - window.ghostopsSupabase créé par /config.js
-
-   Table droits (attendu) :
-   - droits: user_id, niveau_produit, statut, revoked_at
+   - ✅ FIX : ne JAMAIS pré-encoder "next" (URLSearchParams encode)
+   - ✅ HARDEN : ne jamais rediriger depuis/vers pages système (connexion/callback)
 */
 
 (async function ghostopsAuthGuard() {
@@ -26,8 +20,21 @@
   const PATH = window.location.pathname || "";
   const SEARCH = window.location.search || "";
 
-  // Pages “spéciales”
+  // Pages “système”
   const IS_CONNEXION = /\/connexion\.html$/i.test(PATH);
+  const IS_AUTH_CALLBACK = /\/auth-callback\.html$/i.test(PATH);
+
+  // IMPORTANT : si ce guard est inclus par erreur sur une page système, on ne fait rien.
+  if (IS_CONNEXION || IS_AUTH_CALLBACK) {
+    try {
+      window.dispatchEvent(
+        new CustomEvent("ghostops:auth", {
+          detail: { ok: true, reason: "system_page_bypass", ts: Date.now(), path: PATH },
+        })
+      );
+    } catch (_) {}
+    return;
+  }
 
   // ---- Logs ----
   function log(...args) {
@@ -101,9 +108,18 @@
   }
 
   // ✅ FIX : ne PAS encoder ici.
-  // URLSearchParams encodera automatiquement lors du params.set("next", value)
+  // URLSearchParams encodera automatiquement.
   function buildNext() {
     return (PATH || "/") + (SEARCH || "");
+  }
+
+  // Hardening : refuser d’utiliser une page système comme "next"
+  function safeNext(next) {
+    const v = String(next || "").trim();
+    if (!v) return "/index.html";
+    // Bloquer next vers pages système
+    if (/\/connexion\.html/i.test(v) || /\/auth-callback\.html/i.test(v)) return "/index.html";
+    return v;
   }
 
   // -----------------------------
@@ -119,13 +135,15 @@
   }
 
   function goConnexion(reason, extra) {
-    if (IS_CONNEXION) {
-      emit(false, reason || "already_on_connexion", { ...(extra || {}), already: true });
-      log("Déjà sur /connexion.html — pas de redirection supplémentaire.");
+    // Sécurité : ne jamais être ici si page système (double garde)
+    if (IS_CONNEXION || IS_AUTH_CALLBACK) {
+      emit(false, reason || "system_page_no_redirect", { ...(extra || {}), already: true });
+      log("Page système — pas de redirection.");
       return;
     }
 
-    const next = buildNext();
+    const next = safeNext(buildNext());
+
     const params = new URLSearchParams();
     params.set("next", next); // encodage géré par URLSearchParams
     if (reason) params.set("reason", reason);
@@ -274,7 +292,7 @@
 
     if (!droit && lastError) {
       emit(false, "right_check_error", { error: String(lastError.message || lastError), niveauProduit });
-      // On renvoie sur la page produit : le produit peut afficher une explication.
+      // On renvoie sur la page produit (explication possible) : évite d’ouvrir connexion inutilement
       goProduit("right_check_error");
       return;
     }
