@@ -210,7 +210,6 @@
             // compat: si ancienne valeur simple "/page.html"
             if (raw[0] !== "{") {
               const v = sanitizeInternalPath(raw, null);
-              // On “migre” en TTL pour éviter stockage infini
               if (v) setWithTTL(key, v, RETURN_TTL_MS);
               return v;
             }
@@ -268,7 +267,13 @@
           backLink.classList.remove("hidden");
         }
 
-        function showContext(reason, nextTarget) {
+        function hideBackLink() {
+          backLink.classList.add("hidden");
+          backLink.href = "#";
+          backLink.textContent = "Revenir à la page demandée";
+        }
+
+        function showContext(reason, nextTargetForContextOnly) {
           if (!reason) return;
 
           let text = "";
@@ -298,13 +303,14 @@
           contextPill.classList.remove("ok", "err", "warn");
           contextPill.classList.add(kind);
 
-          if (nextTarget) updateBackLink(nextTarget);
+          // ⚠️ On ne gère plus le backLink ici : on évite les faux "retours".
+          // nextTargetForContextOnly est conservé au besoin pour afficher le message, mais pas pour afficher un lien.
+          void nextTargetForContextOnly;
         }
 
         function setAlreadyConnectedUI(target) {
           showContext("already_connected", target);
           setMsg("Session active détectée. Redirection en cours…", "ok");
-          updateBackLink(target);
           logoutLink.classList.remove("hidden");
 
           btn.disabled = true;
@@ -323,30 +329,61 @@
           tick();
         }
 
+        function ensureHomeLinkOnce() {
+          if (document.getElementById("homeLinkDynamic")) return;
+          const home = document.createElement("a");
+          home.id = "homeLinkDynamic";
+          home.href = "/index.html";
+          home.textContent = "Aller à l’accueil";
+          home.style.color = "#cdd6ff";
+          home.style.textDecoration = "underline";
+          linksRow.appendChild(home);
+        }
+
         if (!supabase?.auth) {
           setMsg(
             "Erreur : Supabase non initialisé. Vérifiez /config.js (version navigateur) et le chargement du SDK.",
             "err"
           );
           showContext("supabase_missing", null);
+          hideBackLink();
           return;
         }
 
-        // --- PATCH UX : ouverture "volontaire" de /connexion.html ---
+        // ---------------------------
+        // ✅ NOUVELLE LOGIQUE "RETOUR"
+        // ---------------------------
         const nextFromUrl = getNextFromUrl();
         if (nextFromUrl) setStoredNext(nextFromUrl);
 
         const reason = getReasonFromUrl();
         const storedNext = getStoredNext();
 
+        // ✅ VRAI retour uniquement si nextFromUrl ou storedNext existent
+        const hasReturn = !!(nextFromUrl || storedNext);
+
+        // ✅ Ouverture volontaire : pas de next et pas de reason
         const isDirectOpen = !nextFromUrl && !reason;
 
-        const returnTarget = nextFromUrl || storedNext || "/index.html";
-        const autoTarget = isDirectOpen ? "/index.html" : returnTarget;
+        // ✅ Cible de retour (si existante), sinon null
+        const returnTarget = hasReturn ? (nextFromUrl || storedNext) : null;
 
-        showContext(reason, returnTarget);
-        updateBackLink(returnTarget);
+        // ✅ Cible auto (si contexte), sinon accueil
+        const autoTarget = isDirectOpen ? "/index.html" : (returnTarget || "/index.html");
 
+        // Contexte (pill uniquement si reason)
+        showContext(reason, returnTarget || "/index.html");
+
+        // ✅ Afficher le lien "Revenir..." uniquement si on a un vrai retour
+        if (hasReturn) {
+          updateBackLink(returnTarget);
+        } else {
+          hideBackLink();
+        }
+
+        // ---------------------------
+        // ✅ SESSION EXISTANTE ?
+        // ---------------------------
         (async () => {
           try {
             const { data } = await supabase.auth.getSession();
@@ -354,23 +391,21 @@
               logoutLink.classList.remove("hidden");
 
               if (isDirectOpen) {
-                showContext("already_connected", returnTarget);
+                showContext("already_connected", returnTarget || "/index.html");
                 setMsg("Session active détectée. Vous pouvez continuer.", "ok");
 
                 btn.disabled = true;
                 emailEl.disabled = true;
 
-                updateBackLink(returnTarget);
-                backLink.textContent = "Revenir à la dernière page";
+                // En accès direct, on évite le faux "retour" s'il n'existe pas
+                if (hasReturn) {
+                  updateBackLink(returnTarget);
+                  backLink.textContent = "Revenir à la dernière page";
+                } else {
+                  hideBackLink();
+                }
 
-                // Ajout lien "Aller à l’accueil" (sans modifier le HTML)
-                const home = document.createElement("a");
-                home.href = "/index.html";
-                home.textContent = "Aller à l’accueil";
-                home.style.color = "#cdd6ff";
-                home.style.textDecoration = "underline";
-                linksRow.appendChild(home);
-
+                ensureHomeLinkOnce();
                 return;
               }
 
@@ -382,6 +417,9 @@
           }
         })();
 
+        // ---------------------------
+        // Déconnexion
+        // ---------------------------
         logoutLink.addEventListener("click", async (e) => {
           e.preventDefault();
           try { await supabase.auth.signOut(); } catch {}
@@ -393,8 +431,12 @@
 
           setMsg("Déconnexion effectuée. Vous pouvez vous reconnecter.", "ok");
           showContext("signed_out", "/index.html");
+
+          // Après déconnexion, pas de "retour" (sauf si next explicite)
+          hideBackLink();
         });
 
+        // Reset local
         resetLink.addEventListener("click", async (e) => {
           e.preventDefault();
           try { await supabase.auth.signOut(); } catch {}
@@ -404,8 +446,14 @@
           emailEl.disabled = false;
 
           setMsg("Réinitialisation locale effectuée. Vous pouvez relancer une connexion.", "ok");
+
+          // Après reset, on supprime aussi le faux "retour"
+          hideBackLink();
         });
 
+        // ---------------------------
+        // Submit OTP
+        // ---------------------------
         form.addEventListener("submit", async (e) => {
           e.preventDefault();
           setMsg("", "");
@@ -421,7 +469,7 @@
 
           try {
             const cb = new URL("/auth-callback.html", window.location.origin);
-            cb.searchParams.set("next", returnTarget);
+            cb.searchParams.set("next", returnTarget || "/index.html");
             const redirectTo = cb.toString();
 
             const { error } = await supabase.auth.signInWithOtp({
@@ -436,7 +484,9 @@
               "ok"
             );
 
-            updateBackLink(returnTarget);
+            // Après envoi, on ne montre "Revenir..." que si on a un vrai retour
+            if (hasReturn) updateBackLink(returnTarget);
+            else hideBackLink();
           } catch (err) {
             const m = String(err?.message || "");
             if (/Failed to fetch/i.test(m)) {
